@@ -27,6 +27,10 @@ export default defineManifest(() => ({
   background: {
     service_worker: 'src/background.ts'
   },
+  host_permissions: [
+    "http://*/*",
+    "https://*/*"
+  ],
   content_scripts: [
     {
       matches: ['<all_urls>'],
