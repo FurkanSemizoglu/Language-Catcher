@@ -20,8 +20,13 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         console.log('new window has been triggered')
 
         console.log("message from background to content");
-        chrome.tabs.query({ active: true, currentWindow: true }, (tabs : any) => {
-          chrome.tabs.sendMessage(tabs[0].id, { action : 'ready-to-detect' }, (response : any) =>  {
+        chrome.tabs.query({ active: true , currentWindow: true}, (tabs : any) => {
+
+          tabs.forEach((tab : any) => {
+            console.log('tab : ', tab)
+          })
+
+          chrome.tabs.sendMessage(tabs[0].id, { action : 'ready-to-detect' , tabID : tabs[0].id , tabUrl : tabs[0].url }, (response : any) =>  {
             console.log('response from content : ', response)
           })
         })
