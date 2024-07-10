@@ -23,7 +23,7 @@ export default defineManifest(() => ({
     default_popup: 'index.html', //path to the HTML file
     default_icon: 'src/images/history16.png' // icon for the image
   },
-  permissions: ["activeTab" , "tabs"],
+  permissions: ["activeTab" , "tabs" , "<all_urls>"],
   background: {
     service_worker: 'src/background.ts'
   },
@@ -34,7 +34,7 @@ export default defineManifest(() => ({
   content_scripts: [
     {
       matches: ['<all_urls>'],
-      js: ['./src/content.ts']
+      js: ['src/content.ts']
     }
   ]
 }))

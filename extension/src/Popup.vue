@@ -15,15 +15,14 @@ const showLanguageButtonClicked = ()=>{
 }
 
 
-const searchButtonClicked = ()=>{
+const searchButtonClicked = () => {
   console.log('search button clicked');
   console.log(URL.value);
 
-   chrome.runtime.sendMessage({message: 'URL-sended', url: URL.value}, (response) => {
+   chrome.runtime.sendMessage({message: 'URL-sended', url: URL.value} , (response) => {
     console.log("message sent to background");
     console.log("response from background  : " , response);
-  }); 
-  
+  });   
 }
 console.log(showUrl.value);
 

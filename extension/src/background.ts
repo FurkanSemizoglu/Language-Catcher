@@ -9,7 +9,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.message === 'URL-sended') {
     console.log('URL-sended')
     const newURL: string = request.url
-
+  
     try {
       console.log('trying new tab creation')
       chrome.tabs.create({ url: newURL })
@@ -24,6 +24,13 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     } catch (error) {
       console.log('error while creating new tab', error)
     }
+  }
+  else if (request.message === 'HTML-Tag-Name') {
+
+
+    alert('HTML-Tag-Name')
+    console.log('HTML-Tag-Name')
+    sendResponse({ message: 'HTML-Tag-Name', response: 'html' })
   }
   sendResponse('background received message')
   return true

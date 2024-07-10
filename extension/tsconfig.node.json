@@ -8,7 +8,7 @@
     "playwright.config.*",
     "vite.config.ts",
     "manifest.config.ts"
-  ],
+  ], // last two added by Furkan
   "compilerOptions": {
     "composite": true,
     "noEmit": true,
