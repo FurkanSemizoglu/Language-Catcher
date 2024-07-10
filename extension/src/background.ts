@@ -53,7 +53,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   else if (request.message === 'HTML-Tag-Name') {
 
 
-    alert('HTML-Tag-Name')
     console.log('HTML-Tag-Name')
     sendResponse({ message: 'HTML-Tag-Name', response: 'html' })
   }
