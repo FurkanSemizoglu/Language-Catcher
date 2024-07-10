@@ -1,4 +1,12 @@
-console.log('content is running')
+/* chrome.runtime.sendMessage({ message: 'get-website-url' }, (response) => {
+  console.log('message sent to background')
+  console.log('response from background  : ', response)
+})
+
+
+
+
+
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   // deneme
@@ -12,7 +20,17 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       console.log('contetn')
     }, 3000)
   }
-})
+}) */
+
+  console.log('content is running')
+ document.body.style.backgroundColor = 'orange'
+
+/* 
+document.body.textContent = ''
+
+let header = document.createElement('h1')
+header.textContent = 'This page has been eaten'
+document.body.appendChild(header) */
 
 const parseURL = (url: string) => {
   // parse Url to find language

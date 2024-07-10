@@ -12,18 +12,38 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   
     try {
       console.log('trying new tab creation')
-      chrome.tabs.create({ url: newURL })
+      chrome.windows.create({ url: newURL })
       console.log('tab created successfully')
 
-      setTimeout(() => {
+
+      chrome.tabs.onUpdated.addListener(() => {
+        console.log('new window has been triggered')
+
         console.log("message from background to content");
         chrome.tabs.query({ active: true, currentWindow: true }, (tabs : any) => {
-          chrome.tabs.sendMessage(tabs[0].id, { action : 'ready-to-detect' }, (response : any) =>  {})
+          chrome.tabs.sendMessage(tabs[0].id, { action : 'ready-to-detect' }, (response : any) =>  {
+            console.log('response from content : ', response)
+          })
         })
-      }, 1000)
+      })
+
+
+      // instead of setTimeout, we can use chrome.runtime.onUpdated.addListener
+   /*    setTimeout(() => {
+        console.log("message from background to content");
+        chrome.tabs.query({ active: true, currentWindow: true }, (tabs : any) => {
+          chrome.tabs.sendMessage(tabs[0].id, { action : 'ready-to-detect' }, (response : any) =>  {
+            console.log('response from content : ', response)
+          })
+        })
+      }, 1000) */
     } catch (error) {
       console.log('error while creating new tab', error)
     }
+  }  
+  if (request.message === 'get-website-url') {
+    console.log('get-website-url is working in background.ts')
+    sendResponse({ message: 'get-website-url', response: 'url' })
   }
   else if (request.message === 'HTML-Tag-Name') {
 
