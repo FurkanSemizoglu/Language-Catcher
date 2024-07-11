@@ -2,6 +2,8 @@
   console.log('message sent to background')
   console.log('response from background  : ', response)
 }) */
+import DetectLanguage from 'detectlanguage'
+import languages from './types'
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   // deneme
@@ -59,11 +61,29 @@ const parseURL = (url: string) => {
 
   console.log('language detected from url : ', array)
 
+  if (array.length > 0) {
+   /*  array.forEach((word) => {
+      fetch('./languages.json')
+        .then((response) => response.json())
+        .then((data) => {
+          console.log("data checkk " ,data)
+        })
+    }) */
+
+        array.forEach((word) => {
+        const data =  languages[word]
+        console.log("native name :" ,data.nativeName);
+        console.log("name :" ,data.name);
+
+      })
+  }
   // burdan sonra ya apiye veri göndericez herbir kelime için ya da kendi json dosyamızda aratıcaz
   // 3 harften küçük olan kelimeleri ararsak performans artabilir
 
   /*     const parsedWords : string[]  = parsedUrl.forEach((word : string) => { word.split('/[\s,.]+/')}) */
 }
+
+parseURL('https://online.deu.edu.tr/')
 
 const detectMetaTag = () => {
   // Finds the meta tag
@@ -97,17 +117,42 @@ const detectHtmlLang = () => {
   }
 }
 
-const takeParagraphs = () => {
+const takeParagraphs = async () => {
   let listOfParagraphTags = document.getElementsByTagName('p')
-  console.log('list of p tags : ', listOfParagraphTags)
+  /*  console.log('list of p tags : ', listOfParagraphTags) */
 
   const newArray = Array.from(listOfParagraphTags)
-  newArray.filter((pTag) => { pTag.innerText.length > 5 })
+
+  /* console.log('newArray : ', newArray) */
+
+  let pTagTextsArray: string[] = []
 
   for (let index = 0; index < newArray.length; index++) {
-    console.log('object of p tags : ', newArray[index].innerText)
+    /*   console.log('object of p tags : ', newArray[index].innerText) */
+    pTagTextsArray.push(newArray[index].innerText)
   }
+
+  pTagTextsArray = pTagTextsArray.filter(
+    (text) => text.length > 50 && text !== ' ' && text.includes('Copyright') === false
+  )
+
+  // arraydeki veriyi azalt 5 ya da 6 tane veri yeterli olucaktır
+  console.log('pTagsArray', pTagTextsArray)
+
+  pTagTextsArray.forEach((text) => {
+    console.log(text.length)
+  })
+  /*   detectLang.detect(pTagTextsArray).then(function (result) {
+    console.log(result[0])
+    console.log(JSON.stringify(result))
+    const languages = result.map(item => item.length > 0 && item[0].isReliable ? item[0].language : null);
+
+    console.log("mapped languages  : ", languages);
+    
+  }) */
 }
+
+takeParagraphs()
 
 const detectLangFromStorage = () => {
   // Finds the language from storage
