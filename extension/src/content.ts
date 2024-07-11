@@ -13,8 +13,9 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     console.log('tab id : ', request.tabID)
     detectHtmlLang()
     parseURL(request.tabUrl)
-/*     takeParagraphs()
- */    setTimeout(() => {
+    detectMetaTag()
+    takeParagraphs()
+    setTimeout(() => {
       console.log('contetn')
     }, 3000)
   }
@@ -33,6 +34,7 @@ header.textContent = 'This page has been eaten'
 document.body.appendChild(header) */
 
 const parseURL = (url: string) => {
+  // x3 point
   // parse Url to find language
   // maybe it can be return a string
 
@@ -65,6 +67,13 @@ const parseURL = (url: string) => {
 
 const detectMetaTag = () => {
   // Finds the meta tag
+
+  const languageContent: string | null | undefined = document
+    .querySelector('meta[name="language"]')
+    ?.getAttribute('content')
+
+  if (languageContent) console.log('language was detected by meta tag : ', languageContent)
+  else console.log("language couldn't be detected by meta tag")
 }
 
 const detectHtmlLang = () => {
@@ -89,10 +98,15 @@ const detectHtmlLang = () => {
 }
 
 const takeParagraphs = () => {
+  let listOfParagraphTags = document.getElementsByTagName('p')
+  console.log('list of p tags : ', listOfParagraphTags)
 
-/* 
-  let listOfParagraphTags= document.getElementsByTagName("p");
-  console.log("list of p tags : "  , listOfParagraphTags ); */
+  const newArray = Array.from(listOfParagraphTags)
+  newArray.filter((pTag) => { pTag.innerText.length > 5 })
+
+  for (let index = 0; index < newArray.length; index++) {
+    console.log('object of p tags : ', newArray[index].innerText)
+  }
 }
 
 const detectLangFromStorage = () => {
