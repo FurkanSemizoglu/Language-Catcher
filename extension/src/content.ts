@@ -15,16 +15,25 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     console.log('show-language-in-same-page in content.ts')
 
     /*  const data: Promise<LanguageData> =  languageDetectPrediction(window.location.href) */
-    languageDetectPrediction(window.location.href).then((data) => {
+     languageDetectPrediction(window.location.href).then((data) => {
       console.log('data from content.ts : ', data)
       sendResponse(data)
     })
     /*  console.log("data came from content.ts : ", data);
     sendResponse(data) */
   }
+  return true
 
   /* sendResponse('content received message') */
 })
+
+const handleData = async () : Promise<LanguageData> => {
+  return await languageDetectPrediction(window.location.href)
+/*   languageDetectPrediction(window.location.href).then((data) => {
+    console.log('data from content.ts : ', data)
+    
+  }) */
+}
 
 console.log('content is running for language-catcher-extension')
 
