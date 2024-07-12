@@ -14,7 +14,9 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   } else if (request.action === 'show-language-in-same-page') {
     console.log('show-language-in-same-page in content.ts')
 
-    languageDetectPrediction(window.location.href)
+    const data : LanguageData = languageDetectPrediction(window.location.href)
+
+    sendResponse(data)
   }
 
   sendResponse('content received message')

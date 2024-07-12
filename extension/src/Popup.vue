@@ -5,7 +5,8 @@ import { ref } from 'vue';
 const showUrl = ref<boolean>(false);
 const showLanguage = ref<boolean>(false);
 const URL = ref<string>('');
-
+let language = ref<string>('');
+let detectedPlaces = ref<string[]>([]);
 const showUrlButtonClicked = ()=>{
   showUrl.value = !showUrl.value;
 }
@@ -13,7 +14,11 @@ const showUrlButtonClicked = ()=>{
 const showLanguageButtonClicked = ()=>{
   showLanguage.value = !showLanguage.value;
 
-  chrome.runtime.sendMessage({message : "show-language-in-same-page"} , (response) => {
+  chrome.runtime.sendMessage({message : "show-language-in-same-page"} , (response :  any) => {
+    alert(response.findedPlaces);
+
+    language.value = response.language;
+    detectedPlaces.value = response.findedPlaces;
     console.log("message sent to background for show language in same page");
     console.log("response from background  : " , response);
   
@@ -47,6 +52,12 @@ console.log(showUrl.value);
       <button  class="p-2 bg-#0059f7 border rounded-lg text-white text-xl cursor-pointer" @click="showUrlButtonClicked" >Or Write An Url</button>
     </div>
 
-    <span v-if="showLanguage">Türkçe</span>
+    <div v-if="showLanguage">
+      <span>{{ language }}</span>
+      <div>
+        Veriler buralardan alınmıştır : 
+        <span v-for="place in detectedPlaces" :key="place">{{ place }} ,</span>
+      </div>
+    </div>
   </div>
 </template>
