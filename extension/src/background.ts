@@ -1,6 +1,14 @@
 console.log('background is running')
 
+/* chrome.action.onClicked.addListener((tab) => {
 
+  console.log('action clicked')
+  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    const activeTab = tabs[0]
+    console.log('activeTab : ', activeTab)
+  
+  })
+}) */
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   console.log('background received message', request)
@@ -9,50 +17,63 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.message === 'URL-sended') {
     console.log('URL-sended')
     const newURL: string = request.url
-  
+
     try {
       console.log('trying new tab creation')
-      chrome.windows.create({ url: newURL })
-      console.log('tab created successfully')
+      chrome.windows.create({ url: newURL }).then(() => {
+        console.log('tab created successfully')
 
+        chrome.tabs.onUpdated.addListener(async function listener(tabId, changeInfo, tab) {
+          console.log('new window has been triggered')
 
-      chrome.tabs.onUpdated.addListener(() => {
-        console.log('new window has been triggered')
+          console.log('message from background to content')
+          if (changeInfo.status === 'complete') {
+            console.log('tab is complete')
 
-        console.log("message from background to content");
-        chrome.tabs.query({ active: true , currentWindow: true}, (tabs : any) => {
+            // Error handling response: TypeError: Cannot read properties of undefined (reading 'id')
+            // Cehck for above error
 
-          tabs.forEach((tab : any) => {
-            console.log('tab : ', tab)
-          })
+            try {
+              chrome.tabs.query({ active: true, currentWindow: true }, (tabs: any) => {
+                chrome.tabs.sendMessage(
+                  tabs[0].id,
+                  { action: 'ready-to-detect', tabID: tabs[0].id, tabUrl: tabs[0].url }/* ,
+                  (response: any) => {
+                    if (chrome.runtime.lastError) {
+                      console.error(chrome.runtime.lastError)
+                    } else {
+                      console.log('tab was sended to content script')
+                      chrome.tabs.onUpdated.removeListener(listener)
+                    }
+                  } */
+                )
+              })
+            } catch (error) {
+              console.log('errror bavgorund', error)
+            }
+          }
 
-          chrome.tabs.sendMessage(tabs[0].id, { action : 'ready-to-detect' , tabID : tabs[0].id , tabUrl : tabs[0].url }, (response : any) =>  {
-            console.log('response from content : ', response)
-          })
+          /* }
+        chrome.tabs.onUpdated.removeListener(listener); */
         })
       })
-
-
-      // instead of setTimeout, we can use chrome.runtime.onUpdated.addListener
-   /*    setTimeout(() => {
-        console.log("message from background to content");
-        chrome.tabs.query({ active: true, currentWindow: true }, (tabs : any) => {
-          chrome.tabs.sendMessage(tabs[0].id, { action : 'ready-to-detect' }, (response : any) =>  {
-            console.log('response from content : ', response)
-          })
-        })
-      }, 1000) */
     } catch (error) {
       console.log('error while creating new tab', error)
     }
-  }  
-  if (request.message === 'get-website-url') {
+  }
+  else if(request.message === 'show-language-in-same-page') {
+    console.log('show-language-in-same-page task is working in background.ts')
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs: any) => {
+      chrome.tabs.sendMessage(
+        tabs[0].id,
+        { action: 'show-language-in-same-page' }
+      )
+    })
+  }
+  else if (request.message === 'get-website-url') {
     console.log('get-website-url is working in background.ts')
     sendResponse({ message: 'get-website-url', response: 'url' })
-  }
-  else if (request.message === 'HTML-Tag-Name') {
-
-
+  } else if (request.message === 'HTML-Tag-Name') {
     console.log('HTML-Tag-Name')
     sendResponse({ message: 'HTML-Tag-Name', response: 'html' })
   }

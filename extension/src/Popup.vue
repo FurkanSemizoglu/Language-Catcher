@@ -12,6 +12,12 @@ const showUrlButtonClicked = ()=>{
 
 const showLanguageButtonClicked = ()=>{
   showLanguage.value = !showLanguage.value;
+
+  chrome.runtime.sendMessage({message : "show-language-in-same-page"} , (response) => {
+    console.log("message sent to background for show language in same page");
+    console.log("response from background  : " , response);
+  
+  })
 }
 
 
