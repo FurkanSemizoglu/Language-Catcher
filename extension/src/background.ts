@@ -3,6 +3,7 @@ console.log('background is running')
 interface LanguageData {
   language: string
   findedPlaces: string[]
+  paragraphLang?: boolean
 }
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
@@ -10,9 +11,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   console.log('URL : ', request.url)
 
   let langData: LanguageData = {
-    language: "",
-    findedPlaces: []
-  };
+    language: '',
+    findedPlaces: [],
+    paragraphLang: false
+  }
 
   if (request.message === 'URL-sended') {
     console.log('URL-sended')
@@ -31,10 +33,11 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
             try {
               chrome.tabs.query({ active: true, currentWindow: true }, (tabs: any) => {
-                chrome.tabs.sendMessage(
-                  tabs[0].id,
-                  { action: 'ready-to-detect', tabID: tabs[0].id, tabUrl: tabs[0].url }
-                )
+                chrome.tabs.sendMessage(tabs[0].id, {
+                  action: 'ready-to-detect',
+                  tabID: tabs[0].id,
+                  tabUrl: tabs[0].url
+                })
               })
             } catch (error) {
               console.log('error in background', error)
@@ -56,9 +59,12 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
           console.log('response from content languages data  : ', response)
           langData.language = response.language
           langData.findedPlaces = response.findedPlaces
-
-          console.log("lang data checker", langData);
-          console.log("lang data checker", langData.findedPlaces);
+           
+          if(response.paragraphLang){
+            langData.paragraphLang = response.paragraphLang
+          }
+          console.log('lang data checker', langData)
+          console.log('lang data checker', langData.findedPlaces)
 
           // Send the response after receiving data
           sendResponse(langData)
@@ -66,6 +72,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       )
     })
     return true
-  } 
+  }
   return false
 })
