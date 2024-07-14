@@ -33,21 +33,40 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
             try {
               chrome.tabs.query({ active: true, currentWindow: true }, (tabs: any) => {
-                chrome.tabs.sendMessage(tabs[0].id, {
-                  action: 'ready-to-detect',
-                  tabID: tabs[0].id,
-                  tabUrl: tabs[0].url
-                })
+                chrome.tabs.sendMessage(
+                  tabs[0].id,
+                  {
+                    action: 'ready-to-detect',
+                    tabID: tabs[0].id,
+                    tabUrl: tabs[0].url
+                  },
+                  (response: any) => {
+                    console.log('response from content languages data  : ', response)
+                    langData.language = response.language
+                    langData.findedPlaces = response.findedPlaces
+
+                    if (response.paragraphLang) {
+                      langData.paragraphLang = response.paragraphLang
+                    }
+                    console.log('lang data checker for ready-to-detect', langData)
+                    console.log('lang data checker for ready to detect', langData.findedPlaces)
+                    sendResponse(langData)
+                  }
+                )
               })
+
+              return true // Indicate that sendResponse will be called asynchronously
             } catch (error) {
               console.log('error in background', error)
             }
           }
-        })
+        }) 
       })
     } catch (error) {
       console.log('error while creating new tab', error)
     }
+    // kod hata verince returnleri gpt ekledi düzeltti
+    return true // Indicate that sendResponse will be called asynchronously
   } else if (request.message === 'show-language-in-same-page') {
     console.log('show-language-in-same-page task is working in background.ts')
 
@@ -59,19 +78,20 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
           console.log('response from content languages data  : ', response)
           langData.language = response.language
           langData.findedPlaces = response.findedPlaces
-           
-          if(response.paragraphLang){
+
+          if (response.paragraphLang) {
             langData.paragraphLang = response.paragraphLang
           }
           console.log('lang data checker', langData)
           console.log('lang data checker', langData.findedPlaces)
 
-          // Send the response after receiving data
           sendResponse(langData)
         }
       )
     })
     return true
   }
+  /* console.log("last data from background", langData); */
+  /*   sendResponse(langData) */
   return false
 })

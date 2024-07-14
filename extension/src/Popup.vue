@@ -39,12 +39,22 @@ const searchButtonClicked = () => {
   console.log('search button clicked')
   console.log(URL.value)
 
-  chrome.runtime.sendMessage({ message: 'URL-sended', url: URL.value }, (response) => {
+  showLanguage.value = true
+
+  chrome.runtime.sendMessage({ message: 'URL-sended', url: URL.value }, (response: any) => {
     console.log('message sent to background')
+    console.log('response from background  : ', response)
+
+    language.value = response.language
+    detectedPlaces.value = response.findedPlaces
+    paragraphExist.value = response.paragraphLang
+
+    langName.value = languages[response.language].name
+    langNativeName.value = languages[response.language].nativeName
+    console.log('message sent to background for show language in same page')
     console.log('response from background  : ', response)
   })
 }
-
 
 console.log(showUrl.value)
 </script>
@@ -81,7 +91,7 @@ console.log(showUrl.value)
       <!--  <span>{{ language }}</span> -->
       <div class="">
         <span class="font-bold text-xl">Language : </span>
-        <span class="text-lg">{{ langName }} - {{ langNativeName }}</span>
+        <span class="text-lg">{{ language }} - {{ langName }} - {{ langNativeName }}</span>
         <!-- Veriler buralardan alınmıştır : -->
       </div>
       <br />
@@ -91,7 +101,8 @@ console.log(showUrl.value)
         Veriler buralardan alınmıştır :
         <span v-for="place in detectedPlaces" :key="place"
           >{{ place }} <span v-if="place !== detectedPlaces[detectedPlaces.length - 1]">-</span>
-        </span> .
+        </span>
+        .
         <br />
         <span v-if="paragraphExist && detectedPlaces.length > 0">
           Ayrıca sitenin içeriğinin de

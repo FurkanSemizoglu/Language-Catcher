@@ -1,7 +1,3 @@
-/* chrome.runtime.sendMessage({ message: 'get-website-url' }, (response) => {
-  console.log('message sent to background')
-  console.log('response from background  : ', response)
-}) */
 import DetectLanguage from 'detectlanguage'
 import languages from './types'
 
@@ -10,42 +6,41 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === 'ready-to-detect') {
     console.log('ready-to-detect')
     console.log('tab id : ', request.tabID)
-    languageDetectPrediction(request.tabUrl)
+    languageDetectPrediction().then((data) => {
+      console.log('data from content.ts for new tab url : ', data)
+      sendResponse(data)
+    })
   } else if (request.action === 'show-language-in-same-page') {
     console.log('show-language-in-same-page in content.ts')
-
-    /*  const data: Promise<LanguageData> =  languageDetectPrediction(window.location.href) */
-     languageDetectPrediction(window.location.href).then((data) => {
+    languageDetectPrediction().then((data) => {
       console.log('data from content.ts : ', data)
       sendResponse(data)
     })
-
   }
-  return true  // şurası return true olunca çalıştı
-  
+  return true // şurası return true olunca çalıştı
 
   /* sendResponse('content received message') */
 })
 
-const handleData = async () : Promise<LanguageData> => {
-  return await languageDetectPrediction(window.location.href)
-
+const handleData = async (): Promise<LanguageData> => {
+  return await languageDetectPrediction()
 }
 
 console.log('content is running for language-catcher-extension')
 
 const parseURL = (/* url: string */): string => {
-
-  const url : string= window.location.hostname
+  const url: string = window.location.hostname
 
   // if we use lacotion.hostname there is no need to parse with slash
 
-  console.log("location href " , url);
+  console.log('location href ', url)
   const parsedUrl: string[] = url.split('/')
 
   let array: string[] = []
   parsedUrl.forEach((url) => {
-    array = array.concat(url.split('.')).filter((word) => word.length < 3 && word.length !== 0 && languages[word])
+    array = array
+      .concat(url.split('.'))
+      .filter((word) => word.length < 3 && word.length !== 0 && languages[word])
   })
 
   console.log(parsedUrl)
@@ -53,7 +48,7 @@ const parseURL = (/* url: string */): string => {
 
   console.log('language detected from url : ', array)
 
-/*   let detectedLanguages: string[] | any[] = []
+  /*   let detectedLanguages: string[] | any[] = []
 
   if (array.length > 0) {
     array.forEach((word) => {
@@ -71,13 +66,11 @@ const parseURL = (/* url: string */): string => {
     return []
   } */
 
-
-  if (array.length === 0) {
+  if (array.length === 1) {
     return array[0]
-  } else{
+  } else {
     return ''
   }
-
 
   // burdan sonra ya apiye veri göndericez herbir kelime için ya da kendi json dosyamızda aratıcaz
   // 3 harften küçük olan kelimeleri ararsak performans artabilir
@@ -201,13 +194,14 @@ interface LanguageData {
   paragraphLang?: boolean
 }
 
-const languageDetectPrediction = async (url: string): Promise<LanguageData> => {
+const languageDetectPrediction = async (): Promise<LanguageData> => {
   let detectedLanguages: string[] | any[] = []
 
   let detectedPlaces: string[] = []
-  if (detectHtmlLang() !== '') {
-    detectedLanguages.push(detectHtmlLang())
-    console.log('detected html lang : ', detectHtmlLang())
+  const detectedLangFromHTML = detectHtmlLang()
+  if (detectedLangFromHTML !== '') {
+    detectedLanguages.push(detectedLangFromHTML)
+    console.log('detected html lang : ', detectedLangFromHTML)
     detectedPlaces.push('lang etiketi')
   }
   const returnedUrl = parseURL()
@@ -216,19 +210,19 @@ const languageDetectPrediction = async (url: string): Promise<LanguageData> => {
 
     if (detectedLanguages[0] === returnedUrl) {
       console.log('not increasing because ther are same')
-      detectedPlaces.push('url')
-      detectedLanguages.push(returnedUrl)
+      detectedPlaces.push('url')     
     } else {
-      console.log("they are not same maybe we need to check it for here");
+      console.log('they are not same maybe we need to check it for here')
       detectedPlaces.push('url')
       detectedLanguages.push(returnedUrl)
     }
     console.log('detected languages from url : ', returnedUrl)
   }
-  if (detectMetaTag() !== '') {
-    detectedLanguages.push(detectMetaTag())
+  const detectedMetaTag = detectMetaTag()
+  if (detectedMetaTag !== '') {
+    detectedLanguages.push(detectedMetaTag)
     detectedPlaces.push('meta tag')
-    console.log('detected meta tag : ', detectMetaTag())
+    console.log('detected meta tag : ', detectedMetaTag)
   }
 
   const paragraphLang = await takeParagraphs()
@@ -246,7 +240,7 @@ const languageDetectPrediction = async (url: string): Promise<LanguageData> => {
     }
   }
   console.log('detected places : ', detectedPlaces)
-
+  console.log("detected languages : ", detectedLanguages);
   if (detectedLanguages.length === 1) {
     const data = {
       language: detectedLanguages[0],
@@ -261,5 +255,4 @@ const languageDetectPrediction = async (url: string): Promise<LanguageData> => {
       findedPlaces: detectedPlaces
     }
   }
-
 }
