@@ -45,7 +45,7 @@ const searchButtonClicked = () => {
   })
 }
 
-const findLanguageFromJSON = (langCode: string) => {}
+
 console.log(showUrl.value)
 </script>
 
