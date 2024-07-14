@@ -22,7 +22,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     /*  console.log("data came from content.ts : ", data);
     sendResponse(data) */
   }
-  return true
+  return true  // şurası return true olunca çalıştı
+  
 
   /* sendResponse('content received message') */
 })

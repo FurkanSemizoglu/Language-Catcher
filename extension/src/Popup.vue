@@ -7,6 +7,11 @@ const URL = ref<string>('')
 let language = ref<string>('')
 let detectedPlaces = ref<string[]>([])
 let paragraphExist = ref<boolean>(false)
+let langName = ref<string>('')
+let langNativeName = ref<string>('')
+
+import languages from './types'
+
 const showUrlButtonClicked = () => {
   showUrl.value = !showUrl.value
 }
@@ -16,11 +21,14 @@ const showLanguageButtonClicked = () => {
 
   if (showLanguage.value === true) {
     chrome.runtime.sendMessage({ message: 'show-language-in-same-page' }, (response: any) => {
-    /*   alert(response.findedPlaces) */
+      /*   alert(response.findedPlaces) */
 
       language.value = response.language
       detectedPlaces.value = response.findedPlaces
       paragraphExist.value = response.paragraphLang
+
+      langName.value = languages[response.language].name
+      langNativeName.value = languages[response.language].nativeName
       console.log('message sent to background for show language in same page')
       console.log('response from background  : ', response)
     })
@@ -36,6 +44,8 @@ const searchButtonClicked = () => {
     console.log('response from background  : ', response)
   })
 }
+
+const findLanguageFromJSON = (langCode: string) => {}
 console.log(showUrl.value)
 </script>
 
@@ -67,12 +77,28 @@ console.log(showUrl.value)
       </button>
     </div>
 
-    <div v-if="showLanguage">
-      <span>{{ language }}</span>
-      <div>
+    <div v-if="showLanguage" class="flex flex-col w-s mx-a max-w-s px-12">
+      <!--  <span>{{ language }}</span> -->
+      <div class="">
+        <span class="font-bold text-xl">Language : </span>
+        <span class="text-lg">{{ langName }} - {{ langNativeName }}</span>
+        <!-- Veriler buralardan alınmıştır : -->
+      </div>
+      <br />
+
+      <div class="text-lg">
+        <span class="font-bold text-xl">Description : </span>
         Veriler buralardan alınmıştır :
-        <span v-for="place in detectedPlaces" :key="place">{{ place }} ,</span>
-        <span v-if="paragraphExist">Ayrıca sitenin içeriğinin de lang etiketi ile uyuştuğu tespit edilmiştir  </span>
+        <span v-for="place in detectedPlaces" :key="place"
+          >{{ place }} <span v-if="place !== detectedPlaces[detectedPlaces.length - 1]">-</span>
+        </span> .
+        <br />
+        <span v-if="paragraphExist && detectedPlaces.length > 0">
+          Ayrıca sitenin içeriğinin de
+          <span v-if="detectedPlaces.includes('lang etiketi')">lang etiketi </span>
+          <span v-else>url </span>
+          ile uyuştuğu tespit edilmiştir
+        </span>
       </div>
     </div>
   </div>
