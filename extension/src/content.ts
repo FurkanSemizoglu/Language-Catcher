@@ -18,7 +18,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     })
   }
   return true // şurası return true olunca çalıştı
-
 })
 
 const handleData = async (): Promise<LanguageData> => {
@@ -32,11 +31,10 @@ const parseURL = (/* url: string */): string => {
 
   // if we use lacotion.hostname there is no need to parse with slash
 
-  if(url.startsWith("/en")){
-    return "en"
-  }
-  else if(url.startsWith("/tr")){
-    return "tr"
+  if (url.startsWith('/en')) {
+    return 'en'
+  } else if (url.startsWith('/tr')) {
+    return 'tr'
   }
 
   console.log('location href ', url)
@@ -49,12 +47,10 @@ const parseURL = (/* url: string */): string => {
       .filter((word) => word.length < 3 && word.length !== 0 && languages[word])
   })
 
-
   console.log(parsedUrl)
   console.log(array)
 
   console.log('language detected from url : ', array)
-
 
   if (array.length === 1) {
     return array[0]
@@ -137,8 +133,7 @@ const takeParagraphs = async (): Promise<string> => {
     console.log(text.length)
   })
 
-
-  if(searchDivText){
+  if (searchDivText) {
     document.querySelectorAll('div').forEach((div) => {
       if (
         div.innerText.trim().length > 50 &&
@@ -189,9 +184,15 @@ const takeParagraphs = async (): Promise<string> => {
   }
 }
 
-const detectLangFromStorage = () => {
-  // Finds the language from storage
-}
+const getLanguageFromLocalStorage = (): string | null => {
+  return localStorage.getItem('siteLanguage');
+};
+
+const getLanguageFromSessionStorage = (): string | null => {
+  return sessionStorage.getItem('siteLanguage');
+};
+
+
 
 interface LanguageData {
   language: string
@@ -199,114 +200,91 @@ interface LanguageData {
   paragraphLang?: boolean
 }
 
-const languageDetect = () => {
-  let detectedLanguages: string[] | any[] = []
-  let detectedPlaces: string[] = []
 
-  const url = findUrl()
-  const htmlLang = findHtmlLang()
-  
-  if(url != '' && htmlLang != ''){
-    if(url === htmlLang){
-      detectedLanguages.push(url)
-      detectedPlaces.push('url')
-    }
-    else{
-      detectedLanguages.push(url)
-      detectedLanguages.push(htmlLang)
-      detectedPlaces.push('url')
-      detectedPlaces.push('lang etiketi')
-    }
-   
-  }
 
-}
-
-const findUrl = ( )  : string => {
-  // Checks if the url exists in the storage
+const checkUrl = (detectedLanguages: string[], detectedPlaces: string[]) => {
   const returnedUrl = parseURL()
   if (returnedUrl !== '') {
-/*     detectedLanguages.push(returnedUrl)
-    console.log('detected html lang : ', returnedUrl)
-    detectedPlaces.push('lang etiketi') */
-    return returnedUrl
-  }
-
-  return ''
-
-}
-
-const findHtmlLang = ( )  : string => {
-
-  const detectedLangFromHTML = detectHtmlLang()
-  if (detectedLangFromHTML !== '') {
-/*     detectedLanguages.push(detectedLangFromHTML)
-    console.log('detected html lang : ', detectedLangFromHTML)
-    detectedPlaces.push('lang etiketi') */
-    return detectedLangFromHTML
-  }
-
-  return ''
-
-}
-
-const languageDetectPrediction = async (): Promise<LanguageData> => {
-  let detectedLanguages: string[] | any[] = []
-
-  let detectedPlaces: string[] = []
-
-  const returnedUrl = parseURL()
-  if (returnedUrl !== '') {
-    //  Buraları düzenle kod tekrarı var
     detectedLanguages.push(returnedUrl)
-    console.log('detected url : ', returnedUrl)
     detectedPlaces.push('url')
-   
+
     console.log('detected languages from url : ', returnedUrl)
   }
+}
+
+const checkHtmlLang = (detectedLanguages: string[], detectedPlaces: string[]) => {
   const detectedLangFromHTML = detectHtmlLang()
   if (detectedLangFromHTML !== '') {
-    if (detectedLanguages.length > 0  && detectedLanguages[0] === detectedLangFromHTML) {
-      detectedPlaces.push('lang etiketi')     
-    }
-    else if(detectedLanguages.length === 0){
+    if (detectedLanguages.length > 0 && detectedLanguages[0] === detectedLangFromHTML) {
+      detectedPlaces.push('lang etiketi')
+    } else if (detectedLanguages.length === 0) {
       detectedLanguages.push(detectedLangFromHTML)
-      detectedPlaces.push('lang etiketi') 
-    }
-    else {
-      console.log('url lang etiketinden farklı')
-/*       detectedPlaces.push('url')
-      detectedLanguages.push(detectedLangFromHTML) */
+      detectedPlaces.push('lang etiketi')
+    } else {
+      console.log('url lang etiketinden farklı ')
     }
   }
+}
+
+const checkStorage = (detectedLanguages: string[], detectedPlaces: string[]) => {
+  const localStorageLang = getLanguageFromLocalStorage()
+  const sessionStorageLang = getLanguageFromSessionStorage()
+
+  if (localStorageLang && detectedLanguages.length > 0 && detectedLanguages[0] === localStorageLang) {
+    detectedLanguages.push(localStorageLang)
+    detectedPlaces.push('local storage')
+  }
+  else if (localStorageLang && detectedLanguages.length === 0){
+    detectedLanguages.push(localStorageLang)
+    detectedPlaces.push('local storage')
+  }
+
+  if (sessionStorageLang && detectedLanguages.length > 0 && detectedLanguages[0] === sessionStorageLang) {
+    detectedLanguages.push(sessionStorageLang)
+    detectedPlaces.push('session storage')
+  }
+
+}
+
+const checkMetaTag = (detectedLanguages: string[], detectedPlaces: string[]) => {
   const detectedMetaTag = detectMetaTag()
   if (detectedMetaTag !== '') {
     detectedLanguages.push(detectedMetaTag)
     detectedPlaces.push('meta tag')
     console.log('detected meta tag : ', detectedMetaTag)
   }
+}
 
+const checkParagraphs = async (
+  detectedLanguages: string[],
+  paragraphCorrectObj: { value: boolean }
+) => {
   const paragraphLang = await takeParagraphs()
 
-  let paragraphCorrect: boolean = false
   console.log('paragraph lang : ', paragraphLang)
 
   if (paragraphLang !== '') {
-    console.log('noluoyr')
     if (paragraphLang === detectedLanguages[0]) {
-      paragraphCorrect = true
-      console.log('paragraph correct')
+      paragraphCorrectObj.value = true
     } else {
-      paragraphCorrect = false
+      paragraphCorrectObj.value = false
     }
   }
-  console.log('detected places : ', detectedPlaces)
-  console.log("detected languages : ", detectedLanguages);
+}
+
+
+
+const sendResponse = (
+  detectedLanguages: string[],
+  detectedPlaces: string[],
+  paragraphCorrectObj: { value: boolean }
+) : LanguageData =>  {
   if (detectedLanguages.length === 1) {
+    console.log("paragphh in sendresponse");
     const data = {
       language: detectedLanguages[0],
       findedPlaces: detectedPlaces,
-      paragraphLang: paragraphCorrect
+      paragraphLang: paragraphCorrectObj.value
     }
     console.log('returned data from content.ts  to send background : ', data)
     return data
@@ -318,9 +296,25 @@ const languageDetectPrediction = async (): Promise<LanguageData> => {
   }
 }
 
+const languageDetectPrediction = async (): Promise<LanguageData> => {
+  let detectedLanguages: string[] | any[] = []
+  let detectedPlaces: string[] = []
+  let paragraphCorrectObj = { value: false };
 
+  checkUrl(detectedLanguages, detectedPlaces)
+  checkHtmlLang(detectedLanguages, detectedPlaces)
+  checkMetaTag(detectedLanguages, detectedPlaces)
+  checkStorage(detectedLanguages, detectedPlaces)
+/*   await checkParagraphs(detectedLanguages, paragraphCorrectObj) */
 
-const languageDetectPrediction2 = async () : Promise<LanguageData>  => {
+  console.log('detected places : ', detectedPlaces)
+  console.log('detected languages : ', detectedLanguages)
+  console.log("paragraph Correct : ", paragraphCorrectObj.value);
+  return sendResponse(detectedLanguages, detectedPlaces, paragraphCorrectObj)
+
+}
+
+const languageDetectPrediction2 = async (): Promise<LanguageData> => {
   let detectedLanguages: string[] | any[] = []
 
   let detectedPlaces: string[] = []
@@ -337,56 +331,54 @@ const languageDetectPrediction2 = async () : Promise<LanguageData>  => {
 
   let paragraphCorrect: boolean = false
 
-  let value = detectedLanguages[0] 
+  let value = detectedLanguages[0]
   let count = 0
   let a = 0
-  console.log("detected languages : ", detectedLanguages);
+  console.log('detected languages : ', detectedLanguages)
   for (let i = 0; i < detectedLanguages.length; i++) {
     if (detectedLanguages[i] === value) {
       count += 1
     }
 
     if (count >= detectedLanguages.length / 2) {
-      break;
-    }
-    else{
+      break
+    } else {
       a += 1
       value = detectedLanguages[a]
       i = 0
     }
   }
 
-  console.log(value);
+  console.log(value)
 
-  if(value === detectedLangFromHTML){
+  if (value === detectedLangFromHTML) {
     detectedPlaces.push('lang etiketi')
   }
 
-  if(value === returnedUrl){
+  if (value === returnedUrl) {
     detectedPlaces.push('url')
   }
 
-  if(value === detectedMetaTag){
+  if (value === detectedMetaTag) {
     detectedPlaces.push('meta tag')
   }
 
-  if(value === paragraphLang){
+  if (value === paragraphLang) {
     paragraphCorrect = true
   }
 
-  console.log("value : " , value);
-  if(value ){
+  console.log('value : ', value)
+  if (value) {
     return {
-    language: value,
-    findedPlaces: detectedPlaces,
-    paragraphLang: paragraphCorrect
+      language: value,
+      findedPlaces: detectedPlaces,
+      paragraphLang: paragraphCorrect
     }
-  }
-  else{
+  } else {
     return {
       language: 'not detected',
       findedPlaces: detectedPlaces,
       paragraphLang: paragraphCorrect
-    }}
-
+    }
+  }
 }

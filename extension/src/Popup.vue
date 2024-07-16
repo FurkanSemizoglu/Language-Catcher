@@ -91,25 +91,36 @@ console.log(showUrl.value)
       <!--  <span>{{ language }}</span> -->
       <div class="">
         <span class="font-bold text-xl">Language : </span>
-        <span class="text-lg">{{ language }} - {{ langName }} - {{ langNativeName }}</span>
+        <span v-if="language !== 'not detected'" class="text-lg">{{ language }} - {{ langName }} - {{ langNativeName }}</span>
+        <span v-else class="text-lg">Not Detected</span>
         <!-- Veriler buralardan alınmıştır : -->
       </div>
       <br />
 
-      <div class="text-lg">
-        <span class="font-bold text-xl">Description : </span>
-        Veriler buralardan alınmıştır :
-        <span v-for="place in detectedPlaces" :key="place"
-          >{{ place }} <span v-if="place !== detectedPlaces[detectedPlaces.length - 1]">-</span>
-        </span>
-        .
-        <br />
+      <div v-if="language !== 'not detected'" class="text-lg">
+        <div>
+          <span class="font-bold text-xl">Description : </span>
+          <span>Veriler buralardan alınmıştır:</span>
+          <br />
+          <span v-for="place in detectedPlaces" :key="place"
+            >{{ place }} <span v-if="place !== detectedPlaces[detectedPlaces.length - 1]">-</span>
+          </span>
+          .
+        </div>
+        <!--    <br /> -->
         <span v-if="paragraphExist && detectedPlaces.length > 0">
           Ayrıca sitenin içeriğinin de
           <span v-if="detectedPlaces.includes('lang etiketi')">lang etiketi </span>
           <span v-else>url </span>
           ile uyuştuğu tespit edilmiştir
         </span>
+      </div>
+      <div v-else  class="text-lg">
+        <div>
+          <span class="font-bold text-xl">Description : </span>
+          <br>
+          Kullanıcıdan ekstra veri alınız .       
+        </div>
       </div>
     </div>
   </div>
