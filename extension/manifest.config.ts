@@ -23,13 +23,20 @@ export default defineManifest(() => ({
     default_popup: 'index.html', //path to the HTML file
     default_icon: 'src/images/history16.png' // icon for the image
   },
+  permissions: ["activeTab" , "tabs" ],
   background: {
     service_worker: 'src/background.ts'
   },
+  host_permissions: [
+    "http://*/*",
+    "https://*/*",
+    "*://*/*"
+  ],
   content_scripts: [
     {
       matches: ['<all_urls>'],
-      js: ['./src/content.ts']
+      js: ['src/content.ts'],
+      run_at: "document_start"
     }
   ]
 }))

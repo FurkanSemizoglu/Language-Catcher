@@ -9,6 +9,7 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
-    }
+    },
+    "types": ["@types/chrome"] // The types part was not exist here, I added it to use chrome types by Furkan
   }
 }
