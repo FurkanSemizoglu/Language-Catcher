@@ -20,9 +20,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   return true // şurası return true olunca çalıştı
 })
 
-const handleData = async (): Promise<LanguageData> => {
-  return await languageDetectPrediction()
-}
 
 console.log('content is running for language-catcher-extension')
 
@@ -305,7 +302,7 @@ const languageDetectPrediction = async (): Promise<LanguageData> => {
   checkHtmlLang(detectedLanguages, detectedPlaces)
   checkMetaTag(detectedLanguages, detectedPlaces)
   checkStorage(detectedLanguages, detectedPlaces)
-/*   await checkParagraphs(detectedLanguages, paragraphCorrectObj) */
+  await checkParagraphs(detectedLanguages, paragraphCorrectObj)
 
   console.log('detected places : ', detectedPlaces)
   console.log('detected languages : ', detectedLanguages)
