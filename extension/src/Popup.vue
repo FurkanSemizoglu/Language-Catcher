@@ -21,7 +21,6 @@ const showLanguageButtonClicked = () => {
 
   if (showLanguage.value === true) {
     chrome.runtime.sendMessage({ message: 'show-language-in-same-page' }, (response: any) => {
-      /*   alert(response.findedPlaces) */
 
       language.value = response.language
       detectedPlaces.value = response.findedPlaces
@@ -42,9 +41,6 @@ const searchButtonClicked = () => {
   showLanguage.value = true
 
   chrome.runtime.sendMessage({ message: 'URL-sended', url: URL.value }, (response: any) => {
-    console.log('message sent to background')
-    console.log('response from background  : ', response)
-
     language.value = response.language
     detectedPlaces.value = response.findedPlaces
     paragraphExist.value = response.paragraphLang
@@ -88,15 +84,12 @@ console.log(showUrl.value)
     </div>
 
     <div v-if="showLanguage" class="flex flex-col w-s mx-a max-w-s px-12">
-      <!--  <span>{{ language }}</span> -->
       <div class="">
         <span class="font-bold text-xl">Language : </span>
         <span v-if="language !== 'not detected'" class="text-lg">{{ language }} - {{ langName }} - {{ langNativeName }}</span>
-        <span v-else class="text-lg">Not Detected</span>
-        <!-- Veriler buralardan alınmıştır : -->
+        <span v-else class="text-lg">Not Detected</span>  
       </div>
       <br />
-
       <div v-if="language !== 'not detected'" class="text-lg">
         <div>
           <span class="font-bold text-xl">Description : </span>
@@ -107,7 +100,6 @@ console.log(showUrl.value)
           </span>
           .
         </div>
-        <!--    <br /> -->
         <span v-if="paragraphExist && detectedPlaces.length > 0">
           Ayrıca sitenin içeriğinin de
           <span v-if="detectedPlaces.includes('lang etiketi')">lang etiketi </span>
