@@ -19,7 +19,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   }
   return true // şurası return true olunca çalıştı
 
-  /* sendResponse('content received message') */
 })
 
 const handleData = async (): Promise<LanguageData> => {
@@ -29,9 +28,16 @@ const handleData = async (): Promise<LanguageData> => {
 console.log('content is running for language-catcher-extension')
 
 const parseURL = (/* url: string */): string => {
-  const url: string = window.location.hostname
+  const url: string = window.location.pathname
 
   // if we use lacotion.hostname there is no need to parse with slash
+
+  if(url.startsWith("/en")){
+    return "en"
+  }
+  else if(url.startsWith("/tr")){
+    return "tr"
+  }
 
   console.log('location href ', url)
   const parsedUrl: string[] = url.split('/')
@@ -43,28 +49,12 @@ const parseURL = (/* url: string */): string => {
       .filter((word) => word.length < 3 && word.length !== 0 && languages[word])
   })
 
+
   console.log(parsedUrl)
   console.log(array)
 
   console.log('language detected from url : ', array)
 
-  /*   let detectedLanguages: string[] | any[] = []
-
-  if (array.length > 0) {
-    array.forEach((word) => {
-
-      if (languages[word]) {
-        detectedLanguages.push(word)
-      }
-
-      const data = languages[word]
-      console.log('native name :', data.nativeName)
-      console.log('name :', data.name)
-    })
-  } else {
-    console.log("language couldn't be detected from url")
-    return []
-  } */
 
   if (array.length === 1) {
     return array[0]
@@ -147,8 +137,21 @@ const takeParagraphs = async (): Promise<string> => {
     console.log(text.length)
   })
 
+
+  if(searchDivText){
+    document.querySelectorAll('div').forEach((div) => {
+      if (
+        div.innerText.trim().length > 50 &&
+        div.innerText !== ' ' &&
+        !div.innerText.includes('Copyright')
+      ) {
+        pTagTextsArray.push(div.innerText)
+      }
+    })
+  }
+
   try {
-    const detectLang = new DetectLanguage('69df41dc9cb344460d07b6823a3d5d28')
+    const detectLang = new DetectLanguage('73902226a060dd3911c0419b0dec1c66')
     const result = await detectLang.detect(pTagTextsArray)
 
     console.log(result[0])
@@ -160,6 +163,8 @@ const takeParagraphs = async (): Promise<string> => {
 
     console.log('mapped languages  : ', languages)
 
+    // bu fonksiyon revize edilmeli ilki farklıysa yanlış çalışır
+    // en çok tekrar eden dilin seçilmesi gerekiyor
     let count: number = 0
     languages.forEach((lang) => {
       if (lang === languages[0]) {
@@ -194,29 +199,85 @@ interface LanguageData {
   paragraphLang?: boolean
 }
 
+const languageDetect = () => {
+  let detectedLanguages: string[] | any[] = []
+  let detectedPlaces: string[] = []
+
+  const url = findUrl()
+  const htmlLang = findHtmlLang()
+  
+  if(url != '' && htmlLang != ''){
+    if(url === htmlLang){
+      detectedLanguages.push(url)
+      detectedPlaces.push('url')
+    }
+    else{
+      detectedLanguages.push(url)
+      detectedLanguages.push(htmlLang)
+      detectedPlaces.push('url')
+      detectedPlaces.push('lang etiketi')
+    }
+   
+  }
+
+}
+
+const findUrl = ( )  : string => {
+  // Checks if the url exists in the storage
+  const returnedUrl = parseURL()
+  if (returnedUrl !== '') {
+/*     detectedLanguages.push(returnedUrl)
+    console.log('detected html lang : ', returnedUrl)
+    detectedPlaces.push('lang etiketi') */
+    return returnedUrl
+  }
+
+  return ''
+
+}
+
+const findHtmlLang = ( )  : string => {
+
+  const detectedLangFromHTML = detectHtmlLang()
+  if (detectedLangFromHTML !== '') {
+/*     detectedLanguages.push(detectedLangFromHTML)
+    console.log('detected html lang : ', detectedLangFromHTML)
+    detectedPlaces.push('lang etiketi') */
+    return detectedLangFromHTML
+  }
+
+  return ''
+
+}
+
 const languageDetectPrediction = async (): Promise<LanguageData> => {
   let detectedLanguages: string[] | any[] = []
 
   let detectedPlaces: string[] = []
-  const detectedLangFromHTML = detectHtmlLang()
-  if (detectedLangFromHTML !== '') {
-    detectedLanguages.push(detectedLangFromHTML)
-    console.log('detected html lang : ', detectedLangFromHTML)
-    detectedPlaces.push('lang etiketi')
-  }
+
   const returnedUrl = parseURL()
   if (returnedUrl !== '') {
     //  Buraları düzenle kod tekrarı var
-
-    if (detectedLanguages[0] === returnedUrl) {
-      console.log('not increasing because ther are same')
-      detectedPlaces.push('url')     
-    } else {
-      console.log('they are not same maybe we need to check it for here')
-      detectedPlaces.push('url')
-      detectedLanguages.push(returnedUrl)
-    }
+    detectedLanguages.push(returnedUrl)
+    console.log('detected url : ', returnedUrl)
+    detectedPlaces.push('url')
+   
     console.log('detected languages from url : ', returnedUrl)
+  }
+  const detectedLangFromHTML = detectHtmlLang()
+  if (detectedLangFromHTML !== '') {
+    if (detectedLanguages.length > 0  && detectedLanguages[0] === detectedLangFromHTML) {
+      detectedPlaces.push('lang etiketi')     
+    }
+    else if(detectedLanguages.length === 0){
+      detectedLanguages.push(detectedLangFromHTML)
+      detectedPlaces.push('lang etiketi') 
+    }
+    else {
+      console.log('url lang etiketinden farklı')
+/*       detectedPlaces.push('url')
+      detectedLanguages.push(detectedLangFromHTML) */
+    }
   }
   const detectedMetaTag = detectMetaTag()
   if (detectedMetaTag !== '') {
@@ -255,4 +316,77 @@ const languageDetectPrediction = async (): Promise<LanguageData> => {
       findedPlaces: detectedPlaces
     }
   }
+}
+
+
+
+const languageDetectPrediction2 = async () : Promise<LanguageData>  => {
+  let detectedLanguages: string[] | any[] = []
+
+  let detectedPlaces: string[] = []
+
+  const detectedLangFromHTML = detectHtmlLang()
+  const returnedUrl = parseURL()
+  const detectedMetaTag = detectMetaTag()
+  const paragraphLang = await takeParagraphs()
+
+  detectedLanguages.push(detectedLangFromHTML)
+  detectedLanguages.push(returnedUrl)
+  detectedLanguages.push(detectedMetaTag)
+  detectedLanguages.push(paragraphLang)
+
+  let paragraphCorrect: boolean = false
+
+  let value = detectedLanguages[0] 
+  let count = 0
+  let a = 0
+  console.log("detected languages : ", detectedLanguages);
+  for (let i = 0; i < detectedLanguages.length; i++) {
+    if (detectedLanguages[i] === value) {
+      count += 1
+    }
+
+    if (count >= detectedLanguages.length / 2) {
+      break;
+    }
+    else{
+      a += 1
+      value = detectedLanguages[a]
+      i = 0
+    }
+  }
+
+  console.log(value);
+
+  if(value === detectedLangFromHTML){
+    detectedPlaces.push('lang etiketi')
+  }
+
+  if(value === returnedUrl){
+    detectedPlaces.push('url')
+  }
+
+  if(value === detectedMetaTag){
+    detectedPlaces.push('meta tag')
+  }
+
+  if(value === paragraphLang){
+    paragraphCorrect = true
+  }
+
+  console.log("value : " , value);
+  if(value ){
+    return {
+    language: value,
+    findedPlaces: detectedPlaces,
+    paragraphLang: paragraphCorrect
+    }
+  }
+  else{
+    return {
+      language: 'not detected',
+      findedPlaces: detectedPlaces,
+      paragraphLang: paragraphCorrect
+    }}
+
 }
