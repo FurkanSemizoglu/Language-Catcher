@@ -16,6 +16,12 @@ const showUrlButtonClicked = () => {
   showUrl.value = !showUrl.value
 }
 
+
+window.addEventListener( "", (e) => {
+  console.log('message received from background')
+  const domain = e
+})
+
 const showLanguageButtonClicked = () => {
   showLanguage.value = !showLanguage.value
 
@@ -25,6 +31,8 @@ const showLanguageButtonClicked = () => {
       language.value = response.language
       detectedPlaces.value = response.findedPlaces
       paragraphExist.value = response.paragraphLang
+
+
 
       langName.value = languages[response.language].name
       langNativeName.value = languages[response.language].nativeName
