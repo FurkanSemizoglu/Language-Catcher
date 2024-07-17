@@ -17,8 +17,8 @@ const showUrlButtonClicked = () => {
 }
 
 
-window.addEventListener( "", (e) => {
-  console.log('message received from background')
+window.addEventListener( "language-catcher-start", (e) => {
+  console.log('Language-catcher-start')
   const domain = e
 })
 
