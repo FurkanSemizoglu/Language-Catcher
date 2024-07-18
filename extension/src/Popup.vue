@@ -9,7 +9,6 @@ let detectedPlaces = ref<string[]>([])
 let paragraphExist = ref<boolean>(false)
 let langName = ref<string>('')
 let langNativeName = ref<string>('')
-let domainName = ref<string>('')
 import languages from './types'
 
 const showUrlButtonClicked = () => {
@@ -17,11 +16,9 @@ const showUrlButtonClicked = () => {
 }
 
 window.addEventListener('language-catcher-start', (e) => {
-  alert('Language catcher is starting')
   console.log('Language catcher is starting')
   const event = e as CustomEvent
   const domain = event.detail.domain
-  domainName.value = domain
   console.log(domain)
 })
 
@@ -43,7 +40,7 @@ const showLanguageButtonClicked = () => {
 }
 
 const searchButtonClicked = () => {
-  console.log('search button clicked')
+
   console.log(URL.value)
 
   showLanguage.value = true
@@ -60,7 +57,6 @@ const searchButtonClicked = () => {
   })
 }
 
-console.log(showUrl.value)
 </script>
 
 <template>
@@ -80,7 +76,7 @@ console.log(showUrl.value)
         class="p-2 bg-#0059f7 border rounded-lg text-white text-xl cursor-pointer shadow-xl"
         @click="showLanguageButtonClicked"
       >
-        {{ domainName }}
+
         Show The Language
       </button>
 
