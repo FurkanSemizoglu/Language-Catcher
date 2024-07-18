@@ -1,6 +1,14 @@
 import DetectLanguage from 'detectlanguage'
 import languages from './types'
 
+window.addEventListener("language-catcher-start", (e) => {
+
+  console.log('Language catcher is starting');
+  const event = e as CustomEvent;
+  const domain = event.detail.domain;
+  console.log("domaain " , domain);
+});
+
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   console.log('content received message', request)
   if (request.action === 'ready-to-detect') {
@@ -27,6 +35,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     console.log('show-language-in-same-page in content.ts')
     languageDetectPrediction().then((data) => {
       console.log('data from content.ts : ', data)
+
       sendResponse(data)
     })
   }

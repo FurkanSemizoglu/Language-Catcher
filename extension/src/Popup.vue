@@ -9,17 +9,20 @@ let detectedPlaces = ref<string[]>([])
 let paragraphExist = ref<boolean>(false)
 let langName = ref<string>('')
 let langNativeName = ref<string>('')
-
+let domainName = ref<string>('')
 import languages from './types'
 
 const showUrlButtonClicked = () => {
   showUrl.value = !showUrl.value
 }
 
-
-window.addEventListener( "language-catcher-start", (e) => {
-  console.log('Language-catcher-start')
-  const domain = e
+window.addEventListener('language-catcher-start', (e) => {
+  alert('Language catcher is starting')
+  console.log('Language catcher is starting')
+  const event = e as CustomEvent
+  const domain = event.detail.domain
+  domainName.value = domain
+  console.log(domain)
 })
 
 const showLanguageButtonClicked = () => {
@@ -27,12 +30,9 @@ const showLanguageButtonClicked = () => {
 
   if (showLanguage.value === true) {
     chrome.runtime.sendMessage({ message: 'show-language-in-same-page' }, (response: any) => {
-
       language.value = response.language
       detectedPlaces.value = response.findedPlaces
       paragraphExist.value = response.paragraphLang
-
-
 
       langName.value = languages[response.language].name
       langNativeName.value = languages[response.language].nativeName
@@ -80,6 +80,7 @@ console.log(showUrl.value)
         class="p-2 bg-#0059f7 border rounded-lg text-white text-xl cursor-pointer shadow-xl"
         @click="showLanguageButtonClicked"
       >
+        {{ domainName }}
         Show The Language
       </button>
 
@@ -94,8 +95,10 @@ console.log(showUrl.value)
     <div v-if="showLanguage" class="flex flex-col w-s mx-a max-w-s px-12">
       <div class="">
         <span class="font-bold text-xl">Language : </span>
-        <span v-if="language !== 'not detected'" class="text-lg">{{ language }} - {{ langName }} - {{ langNativeName }}</span>
-        <span v-else class="text-lg">Not Detected</span>  
+        <span v-if="language !== 'not detected'" class="text-lg"
+          >{{ language }} - {{ langName }} - {{ langNativeName }}</span
+        >
+        <span v-else class="text-lg">Not Detected</span>
       </div>
       <br />
       <div v-if="language !== 'not detected'" class="text-lg">
@@ -115,11 +118,11 @@ console.log(showUrl.value)
           ile uyuştuğu tespit edilmiştir
         </span>
       </div>
-      <div v-else  class="text-lg">
+      <div v-else class="text-lg">
         <div>
           <span class="font-bold text-xl">Description : </span>
-          <br>
-          Kullanıcıdan ekstra veri alınız .       
+          <br />
+          Kullanıcıdan ekstra veri alınız .
         </div>
       </div>
     </div>
