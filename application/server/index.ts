@@ -12,6 +12,8 @@ const cookieParser = require('cookie-parser');
 const mongoose = require('mongoose');
 
 
+
+
 dotenv.config();
 
 const app  = express();
@@ -24,7 +26,7 @@ mongoose
 
 
 app.use(cors())
-
+app.use("/" , require('./routes/test'));
 const PORT : string | number= process.env.PORT || 5000;
 
 
