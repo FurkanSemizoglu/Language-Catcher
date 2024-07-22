@@ -1,10 +1,10 @@
 <script setup lang="ts">
-
+import { RouterView } from 'vue-router'
 </script>
 
 <template>
   <div>
-    <h1 class="text-blue">Language cathcer is ready for development</h1>
+    <RouterView />
   </div>
 </template>
 
