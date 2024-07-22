@@ -1,6 +1,26 @@
 import DetectLanguage from 'detectlanguage'
 import languages from './types'
 
+window.addEventListener("language-catcher-start", (e) => {
+
+  console.log('Language catcher is starting');
+  const event = e as CustomEvent;
+  const domain = event.detail.domain;
+  console.log("domaain " , domain);
+
+  chrome.runtime.sendMessage({ message: 'URL-sended', url: domain }, (response: any) => {
+/*     language.value = response.language
+    detectedPlaces.value = response.findedPlaces
+    paragraphExist.value = response.paragraphLang
+
+    langName.value = languages[response.language].name
+    langNativeName.value = languages[response.language].nativeName */
+    console.log('message sent to background to run in application')
+    console.log('response from background  : ', response)
+  })
+
+});
+
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   console.log('content received message', request)
   if (request.action === 'ready-to-detect') {
@@ -8,18 +28,31 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     console.log('tab id : ', request.tabID)
     languageDetectPrediction().then((data) => {
       console.log('data from content.ts for new tab url : ', data)
+
+      const languageCatcherResult = new CustomEvent('languageCatcherResult', {
+        detail: {
+          status: 'completed',
+          domain: 'example.com',
+          language: data.language,
+          languageFetchedFrom: data.findedPlaces,
+          languageAccuracy: 'high'
+        }
+      })
+
+      window.dispatchEvent(languageCatcherResult)
+
       sendResponse(data)
     })
   } else if (request.action === 'show-language-in-same-page') {
     console.log('show-language-in-same-page in content.ts')
     languageDetectPrediction().then((data) => {
       console.log('data from content.ts : ', data)
+
       sendResponse(data)
     })
   }
   return true // şurası return true olunca çalıştı
 })
-
 
 console.log('content is running for language-catcher-extension')
 
@@ -182,22 +215,18 @@ const takeParagraphs = async (): Promise<string> => {
 }
 
 const getLanguageFromLocalStorage = (): string | null => {
-  return localStorage.getItem('siteLanguage');
-};
+  return localStorage.getItem('siteLanguage')
+}
 
 const getLanguageFromSessionStorage = (): string | null => {
-  return sessionStorage.getItem('siteLanguage');
-};
-
-
+  return sessionStorage.getItem('siteLanguage')
+}
 
 interface LanguageData {
   language: string
   findedPlaces: string[]
   paragraphLang?: boolean
 }
-
-
 
 const checkUrl = (detectedLanguages: string[], detectedPlaces: string[]) => {
   const returnedUrl = parseURL()
@@ -227,20 +256,26 @@ const checkStorage = (detectedLanguages: string[], detectedPlaces: string[]) => 
   const localStorageLang = getLanguageFromLocalStorage()
   const sessionStorageLang = getLanguageFromSessionStorage()
 
-  if (localStorageLang && detectedLanguages.length > 0 && detectedLanguages[0] === localStorageLang) {
+  if (
+    localStorageLang &&
+    detectedLanguages.length > 0 &&
+    detectedLanguages[0] === localStorageLang
+  ) {
     detectedLanguages.push(localStorageLang)
     detectedPlaces.push('local storage')
-  }
-  else if (localStorageLang && detectedLanguages.length === 0){
+  } else if (localStorageLang && detectedLanguages.length === 0) {
     detectedLanguages.push(localStorageLang)
     detectedPlaces.push('local storage')
   }
 
-  if (sessionStorageLang && detectedLanguages.length > 0 && detectedLanguages[0] === sessionStorageLang) {
+  if (
+    sessionStorageLang &&
+    detectedLanguages.length > 0 &&
+    detectedLanguages[0] === sessionStorageLang
+  ) {
     detectedLanguages.push(sessionStorageLang)
     detectedPlaces.push('session storage')
   }
-
 }
 
 const checkMetaTag = (detectedLanguages: string[], detectedPlaces: string[]) => {
@@ -269,15 +304,13 @@ const checkParagraphs = async (
   }
 }
 
-
-
 const sendResponse = (
   detectedLanguages: string[],
   detectedPlaces: string[],
   paragraphCorrectObj: { value: boolean }
-) : LanguageData =>  {
+): LanguageData => {
   if (detectedLanguages.length === 1) {
-    console.log("paragphh in sendresponse");
+    console.log('paragphh in sendresponse')
     const data = {
       language: detectedLanguages[0],
       findedPlaces: detectedPlaces,
@@ -296,7 +329,7 @@ const sendResponse = (
 const languageDetectPrediction = async (): Promise<LanguageData> => {
   let detectedLanguages: string[] | any[] = []
   let detectedPlaces: string[] = []
-  let paragraphCorrectObj = { value: false };
+  let paragraphCorrectObj = { value: false }
 
   checkUrl(detectedLanguages, detectedPlaces)
   checkHtmlLang(detectedLanguages, detectedPlaces)
@@ -306,9 +339,8 @@ const languageDetectPrediction = async (): Promise<LanguageData> => {
 
   console.log('detected places : ', detectedPlaces)
   console.log('detected languages : ', detectedLanguages)
-  console.log("paragraph Correct : ", paragraphCorrectObj.value);
+  console.log('paragraph Correct : ', paragraphCorrectObj.value)
   return sendResponse(detectedLanguages, detectedPlaces, paragraphCorrectObj)
-
 }
 
 const languageDetectPrediction2 = async (): Promise<LanguageData> => {
