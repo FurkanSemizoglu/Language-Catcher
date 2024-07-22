@@ -1,11 +1,12 @@
-import { register } from "module";
+
 
 const express = require("express");
 const router = express.Router();
 /* const cors = require("cors");
  */
+import { registerUser, loginUser, logoutUser, getUser } from "../controllers/authControllers";
 
-const { registerUser, loginUser, logoutUser, getUser } = require("../controllers/authController");
+/* const { registerUser, loginUser, logoutUser, getUser } = require("../controllers/authControllers"); */
 
 //middlew
 /* router.use( );
