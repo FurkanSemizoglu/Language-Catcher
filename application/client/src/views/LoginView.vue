@@ -7,10 +7,20 @@ import { useRouter } from 'vue-router';
 const email = ref<string>('');
 const password = ref<string>('');
 const router = useRouter();
+const eyeOpen = ref<boolean>(false);
 
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { faEye } from '@fortawesome/free-solid-svg-icons';
+import { faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import { useToast } from 'vue-toastification';
 
 const toast = useToast();
+
+const passwordFieldType = ref('password');
+
+const togglePasswordVisibility = () => {
+  passwordFieldType.value = passwordFieldType.value === 'password' ? 'text' : 'password';
+};
 
 const login = async () => {
   console.log(email.value + ' ' + password.value);
@@ -67,22 +77,26 @@ const login = async () => {
       <img
         src="../../public/world.jpg"
         alt="World"
-        class="h-full max-h-full w-full max-w-full object-cover"
+        class="h-full max-h-full max-w-full object-cover"
       />
-      <div class="animate__animated animate__fadeInDown font-900 absolute text-4xl text-white">
+      <div
+        class="animate__animated animate__fadeInDown font-900 absolute flex items-center text-4xl text-white"
+      >
+        <!-- <img width="100" src="../../public/efilliBar.svg" alt="Logo" /> -->
         Efilli Dil Algılama Uygulaması
       </div>
     </div>
     <div class="flex w-2/5 flex-col items-center justify-center bg-[#FFFFFF] p-4">
-      <div class="font-900 mb-4 text-3xl text-[#2C39A6]">Giriş</div>
-      <div class="mr-3 flex w-3/4 flex-col items-center gap-4">
-        <!-- <input
+      <div class="mx-a ml-4 flex w-[90%] flex-col items-center justify-center">
+        <div class="font-900 mb-4 text-3xl text-[#2C39A6]">Giriş</div>
+        <div class="mr-3 flex w-4/5 flex-col items-center gap-4">
+          <!-- <input
           v-model="email"
           type="email"
           placeholder="Email"
           class="bg-#F2F2F2 w-full rounded-lg border-none p-4"
         /> -->
-        <!--      <div class="w-full">
+          <!--      <div class="w-full">
           <input
             v-model="password"
             type="password"
@@ -98,48 +112,59 @@ const login = async () => {
             class="bg-#F2F2F2 w-full rounded-lg border-none p-4"
           />
         </div> -->
-        <div class="relative w-full">
-          <input
-            v-model="email"
-            placeholder=""
-            type="email"
-            class="inputt bg-#F2F2F2 w-full rounded-lg border-none p-4 text-black"
-          />
-          <label>Email</label>
-        </div>
+          <div class="relative w-full">
+            <input
+              v-model="email"
+              placeholder=""
+              type="email"
+              class="inputt bg-#F2F2F2 w-full rounded-lg border-none p-4 text-black"
+            />
+            <label>Email</label>
+          </div>
 
-        <div class="relative w-full">
-          <input
-            v-model="password"
-            placeholder=""
-            type="password"
-            class="inputt bg-#F2F2F2 w-full rounded-lg border-none p-4"
-          />
-          <label>Password</label>
-        </div>
+          <div class="relative w-full">
+            <input
+              v-model="password"
+              placeholder=""
+              :type="passwordFieldType"
+              class="inputt bg-#F2F2F2 w-full rounded-lg border-none p-4"
+            />
+            <label>Password</label>
+            <FontAwesomeIcon
+              @click="togglePasswordVisibility"
+              :icon="passwordFieldType === 'password' ? faEye : faEyeSlash"
+              class="absolute right-0 top-0 mt-5 cursor-pointer"
+              style="color: #6f6f6f"
+            />
+          </div>
 
-        <!--    <div class="relative mb-2 w-full">
+          <!--    <div class="relative mb-2 w-full">
           <div class="absolute left-0 cursor-pointer text-lg text-blue-500">şifremi unuttum</div>
         </div> -->
 
-        <div class="mt-2 flex gap-4">
-          <RouterLink to="/register"
-            ><button
-              class="font-500 cursor-pointer rounded-md border-none bg-[#FFFFFF] p-4 text-[#2C39A6] transition-colors duration-300 ease-in-out hover:bg-[#E7E8EE]"
-            >
-              Kayıt ol
-            </button>
-          </RouterLink>
+          <div class="mt-2 flex gap-4">
+            <RouterLink to="/register"
+              ><button
+                class="font-500 cursor-pointer rounded-md border-none bg-[#FFFFFF] p-4 text-[#2C39A6] transition-colors duration-300 ease-in-out hover:bg-[#E7E8EE]"
+              >
+                Kayıt ol
+              </button>
+            </RouterLink>
 
-          <button
-            class="font-500 cursor-pointer rounded-md border-none bg-[#FFFFFF] p-4 text-[#2C39A6] transition-colors duration-300 ease-in-out hover:bg-[#E7E8EE]"
-            @click="login"
-          >
-            Giriş
-          </button>
+            <button
+              class="font-500 cursor-pointer rounded-md border-none bg-[#FFFFFF] p-4 text-[#2C39A6] transition-colors duration-300 ease-in-out hover:bg-[#E7E8EE]"
+              @click="login"
+            >
+              Giriş
+            </button>
+          </div>
         </div>
       </div>
     </div>
+  </div>
+
+  <div class="absolute bottom-0 right-0">
+    <img width="75" src="../../public/efilliBar.svg" alt="Logo" />
   </div>
 </template>
 

@@ -11,6 +11,8 @@ const isAuthenticated  =  async() : Promise<boolean> => {
   console.log("token var ve çalışmalı");
 
   if (!token) return false;
+
+  // aslında buna gerek yok çünkü token varsa zaten user var demektir.
   const response = await axios.post('http://localhost:5000/auth/user', {
     token: token
   });
@@ -50,7 +52,7 @@ router.beforeEach( async(to, from, next) => {
     console.log("burada çalışcak");
     next({ name: 'home' })
   }
-  else if(to.name !== 'login' && (await isAuthenticated() === false)){
+  else if(to.name === 'home' && (await isAuthenticated() === false)){
     next({ name: 'login' })
   }
   else next()

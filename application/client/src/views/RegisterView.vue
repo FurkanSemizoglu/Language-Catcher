@@ -9,8 +9,30 @@ const password2 = ref<string>('');
 
 import { useToast } from 'vue-toastification';
 
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { faEye } from '@fortawesome/free-solid-svg-icons';
+import { faEyeSlash } from '@fortawesome/free-solid-svg-icons';
+import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
+
+const passwordFieldType = ref('password');
+const passwordFieldType2 = ref('password');
+
+const togglePasswordVisibility = () => {
+  passwordFieldType.value = passwordFieldType.value === 'password' ? 'text' : 'password';
+};
+
+const togglePasswordVisibility2 = () => {
+  passwordFieldType2.value = passwordFieldType2.value === 'password' ? 'text' : 'password';
+};
+
+
+
 const toast = useToast();
 const router = useRouter();
+
+const returnToLogin = () => {
+  router.push('/');
+};
 
 const register = async () => {
   if (email.value && password.value && password2.value) {
@@ -67,55 +89,80 @@ const register = async () => {
       </div>
     </div>
     <div class="flex w-2/5 flex-col items-center justify-center bg-[#FFFFFF] p-4">
-      <div class="flex flex-col items-center w-3/4 ">
+      <div class="flex w-3/4 flex-col items-center">
         <div class="font-900 mb-4 text-3xl text-[#2C39A6]">Kayıt Ol</div>
-        <div class="flex w-full flex-col items-center gap-4">
-          <input
-            v-model="email"
-            type="email"
-            placeholder="Email"
-            class="w-full rounded-md border-none p-4 bg-#F2F2F2"
-          />
-     <!--      <div class="relative w-full">
-            <input placeholder="" type="email" class="w-full p-4" />
-            <label>Email</label>
-          </div>
-          <div class="relative w-full">
-            <input placeholder="" type="email" class="w-full p-4" />
-            <label>Email</label>
-          </div>
-          <div class="relative w-full">
-            <input placeholder="" type="email" class="w-full p-4" />
-            <label>Email</label>
-          </div>
-          <div class="relative w-full">
-            <input placeholder="" type="email" class="w-full p-4" />
-            <label>Email</label>
-          </div> -->
+        <div class="mr-3 flex w-full flex-col items-center gap-4">
 
-          <input
-            v-model="password"
-            type="password"
-            placeholder="Password"
-            class="w-full rounded-md border-none p-4 bg-#F2F2F2"             
-          />
-          <input
-            v-model="password2"
-            type="password"
-            placeholder="Password tekrar giriniz"
-            class="w-full rounded-md border-none p-4 bg-#F2F2F2"
-          />
+          <div class="relative w-full">
+            <input
+              v-model="email"
+              placeholder=""
+              type="email"
+              class="inputt bg-#F2F2F2 w-full rounded-lg border-none p-4 text-black"
+            />
+            <label>Email</label>
+          </div>
+
+          <div class="relative w-full">
+            <input
+              v-model="password"
+              placeholder=""
+              :type="passwordFieldType"
+              class="inputt bg-#F2F2F2 w-full rounded-lg border-none p-4"
+            />
+            <label>Password</label>
+            <FontAwesomeIcon
+              @click="togglePasswordVisibility"
+              :icon="passwordFieldType === 'password' ? faEye : faEyeSlash"
+              class="absolute right-0 top-0 mt-5 cursor-pointer"
+              style="color: #6f6f6f"
+            />
+          </div>
+
+          <div class="relative w-full">
+            <input
+              v-model="password2"
+              :type="passwordFieldType2"
+              placeholder=""
+              class="inputt bg-#F2F2F2 w-full rounded-lg border-none p-4"
+            />
+            <label>Password</label>
+
+            <FontAwesomeIcon
+              @click="togglePasswordVisibility2"
+              :icon="passwordFieldType2 === 'password' ? faEye : faEyeSlash"
+              class="absolute right-0 top-0 mt-5 cursor-pointer"
+              style="color: #6f6f6f"
+            />
+          </div>
+
           <div class="flex gap-4">
+
+            <button
+              class="font-500 cursor-pointer rounded-md border-none bg-[#FFFFFF] p-4 text-[#2C39A6] transition-colors duration-300 ease-in-out hover:bg-[#E7E8EE]"
+              @click="returnToLogin"
+            >
+            <FontAwesomeIcon :icon="faArrowLeft" class="mr-1" style="color: #373ba6;" />
+              Girişe Dön
+            </button>
+
+
             <button
               @click="register"
-              class="cursor-pointer rounded-md border-none font-500 bg-[#FFFFFF] p-4 text-[#2C39A6] transition-colors duration-300 ease-in-out hover:bg-[#E7E8EE]"
+              class="font-500 cursor-pointer rounded-md border-none bg-[#FFFFFF] p-4 text-[#2C39A6] transition-colors duration-300 ease-in-out hover:bg-[#E7E8EE]"
             >
               Kayıt ol
             </button>
           </div>
+
+        
         </div>
       </div>
     </div>
+  </div>
+
+  <div class="absolute bottom-0 right-0">
+    <img width="75" src="../../public/efilliBar.svg" alt="Logo" />
   </div>
 </template>
 
@@ -127,34 +174,30 @@ const register = async () => {
 label {
   position: absolute;
   font-size: 1rem;
-  left: 0;
+  left: 1rem;
   top: 50%;
   transform: translateY(-50%);
-  background-color: white;
+  background-color: #f2f2f2;
   color: gray;
   padding: 0 0.3rem;
-  margin: 0 0.5rem;
+  margin: 0;
   transition: 0.1s ease-out;
   transform-origin: left top;
   pointer-events: none;
 }
-input {
+.inputt {
   font-size: 1rem;
   outline: none;
-/*   border: 1px solid gray;
-  border-radius: 5px; */
+  border: 0.5px solid #ffffff;
   padding: 1rem 0.7rem;
-  color: gray;
   transition: 0.1s ease-out;
 }
-/* input:focus {
-  border-color: #6200EE;  
-} */
-input:focus + label {
-  top: 0;
-  transform: translateY(-50%) scale(0.9);
+.inputt:focus {
+  border-color: #2c39a6;
 }
-input:not(:placeholder-shown) + label {
+.inputt:focus + label,
+.inputt:not(:placeholder-shown) + label {
+  color: #2c39a6;
   top: 0;
   transform: translateY(-50%) scale(0.9);
 }
