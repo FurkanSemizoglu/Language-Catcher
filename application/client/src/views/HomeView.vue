@@ -1,3 +1,8 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { ref } from 'vue';
+const token  = ref<string|null>(''); 
+token.value= localStorage.getItem('token');
 
-<template>Main screeen</template>
+</script>
+
+<template>Main screeen   {{ token }}</template>

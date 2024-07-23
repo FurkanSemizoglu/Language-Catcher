@@ -8,15 +8,13 @@ const email = ref<string>('');
 const password = ref<string>('');
 const router = useRouter();
 
-import { useToast } from "vue-toastification";
+import { useToast } from 'vue-toastification';
 
-const toast = useToast(); 
-
+const toast = useToast();
 
 const login = async () => {
   console.log(email.value + ' ' + password.value);
 
- 
   if (email.value && password.value) {
     const bodyFormData = {
       email: email.value,
@@ -31,10 +29,11 @@ const login = async () => {
       });
 
       console.log(response.data);
-      localStorage.setItem('YourItem', response.data)
+
       if (response.status) {
         toast.success('Login successful');
-     /*    localStorage.setItem('token', response.data.token); */
+        /*    localStorage.setItem('token', response.data.token); */
+        localStorage.setItem('token', response.data.token);
         router.push('/home');
       }
     } catch (err) {
@@ -43,7 +42,7 @@ const login = async () => {
         console.error('Axios error data:', err.response?.data);
 
         toast.error(err.response?.data.message);
-/* 
+        /* 
         if (err.response?.status === 400) {
           console.log(`Error 400: ${err.response.data.message}`);
         } else if (err.response?.status === 401) {
@@ -57,36 +56,58 @@ const login = async () => {
       }
     }
   } else {
-    toast.error("Email or password input not found");
+    toast.error('Email or password input not found');
     /* console.log('Email or password input not found'); */
   }
 };
 </script>
 <template>
-  <div class="flex h-screen">
+  <div class="m-0 flex h-screen w-full">
     <div class="relative flex w-full items-center justify-center bg-gray-100">
       <img
         src="../../public/world.jpg"
         alt="World"
-        class="h-full max-h-full max-w-full object-cover"
+        class="h-full max-h-full w-full max-w-full object-cover"
       />
-      <div class="font-900 absolute text-4xl text-white">Efilli Dil Algılama Uygulaması</div>
+      <div class="animate__animated animate__fadeInDown font-900 absolute text-4xl text-white">
+        Efilli Dil Algılama Uygulaması
+      </div>
     </div>
-    <div class="flex w-2/5 flex-col items-center justify-center bg-[#010C1D] p-4">
-      <div class="font-900 mb-4 text-3xl text-white">Giriş</div>
-      <div class="flex w-3/4 flex-col items-center gap-4">
-        <input
+    <div class="flex w-2/5 flex-col items-center justify-center bg-[#FFFFFF] p-4">
+      <div class="font-900 mb-4 text-3xl text-[#2C39A6]">Giriş</div>
+      <div class="flex w-3/4 flex-col items-center gap-4 mr-3">
+        <!-- <input
           v-model="email"
           type="email"
           placeholder="Email"
-          class="w-full rounded-xl border p-4"
-        />
-        <input
-          v-model="password"
-          type="password"
-          placeholder="Password"
-          class="w-full rounded-xl border p-4"
-        />
+          class="bg-#F2F2F2 w-full rounded-lg border-none p-4"
+        /> -->
+   <!--      <div class="w-full">
+          <input
+            v-model="password"
+            type="password"
+            placeholder="Password"
+            class="bg-#F2F2F2 w-full rounded-lg border-none p-4"
+          />
+        </div>
+        <div class="w-full">
+          <input
+            v-model="password"
+            type="password"
+            placeholder="Password"
+            class="bg-#F2F2F2 w-full rounded-lg border-none p-4"
+          />
+        </div> -->
+        <div class="relative w-full">
+          <input placeholder="" type="email" class="inputt rounded-lg w-full p-4 bg-#F2F2F2 border-none text-black" />
+          <label>Email</label>
+        </div>
+
+        <div class="relative w-full">
+          <input placeholder="" type="password" class="inputt rounded-lg w-full p-4 bg-#F2F2F2 border-none" />
+          <label>Password</label>
+        </div>
+
         <!--    <div class="relative mb-2 w-full">
           <div class="absolute left-0 cursor-pointer text-lg text-blue-500">şifremi unuttum</div>
         </div> -->
@@ -94,14 +115,14 @@ const login = async () => {
         <div class="mt-2 flex gap-4">
           <RouterLink to="/register"
             ><button
-              class="cursor-pointer rounded-xl border bg-blue-500 p-4 text-white hover:bg-blue-600"
+              class="font-500 cursor-pointer rounded-md border-none bg-[#FFFFFF] p-4 text-[#2C39A6] hover:bg-[#E7E8EE]"
             >
               Kayıt ol
             </button>
           </RouterLink>
 
           <button
-            class="cursor-pointer rounded-xl border bg-green-500 p-4 text-white hover:bg-green-600"
+            class="font-500 cursor-pointer rounded-md border-none bg-[#FFFFFF] p-4 text-[#2C39A6] hover:bg-[#E7E8EE]"
             @click="login"
           >
             Giriş
@@ -111,3 +132,45 @@ const login = async () => {
     </div>
   </div>
 </template>
+
+<style scoped>
+.material-textfield {
+  position: relative;
+}
+
+label {
+  position: absolute;
+  font-size: 1rem;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: #F2F2F2;
+  color: gray;
+  padding: 0 0.3rem;
+  margin: 0 0.5rem;
+  transition: .1s ease-out;
+  transform-origin: left top;
+  pointer-events: none;
+}
+.inputt {
+  font-size: 1rem;
+  outline: none;
+  border: 0.5px solid #FFFFFF;
+
+  padding: 1rem 0.7rem;
+ 
+  transition: 0.1s ease-out;
+}
+input:focus {
+  border-color: #2C39A6;  
+}
+.inputt:focus + label {
+  color: #2C39A6;
+  top: 0;
+  transform: translateY(-50%) scale(0.9);
+}
+.inputt:not(:placeholder-shown) + label {
+  top: 0;
+  transform: translateY(-50%) scale(0.9);
+}
+</style>
