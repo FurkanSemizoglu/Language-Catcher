@@ -1,5 +1,25 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import LoginView from '@/views/LoginView.vue'
+import axios from 'axios';
+
+
+const isAuthenticated  =  async() : Promise<boolean> => {
+  const token = localStorage.getItem('token');
+  // Bu yeterli mi ?
+  /* if (!token) return false;
+  return true; */
+  console.log("token var ve çalışmalı");
+
+  if (!token) return false;
+  const response = await axios.post('http://localhost:5000/auth/user', {
+    token: token
+  });
+
+  return response.data.status === 'OK' ? true : false;
+
+}
+
+
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -23,6 +43,17 @@ const router = createRouter({
       component: () => import('../views/HomeView.vue')
     },
   ]
+})
+
+router.beforeEach( async(to, from, next) => {
+  if (to.name !== 'home' && (await isAuthenticated() === true)) {
+    console.log("burada çalışcak");
+    next({ name: 'home' })
+  }
+  else if(to.name !== 'login' && (await isAuthenticated() === false)){
+    next({ name: 'login' })
+  }
+  else next()
 })
 
 export default router

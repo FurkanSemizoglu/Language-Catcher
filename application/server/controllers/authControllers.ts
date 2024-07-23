@@ -159,7 +159,7 @@ const getUser = async (req: Request, res: Response) => {
     /* const user = await User.findById(decodedToken.id); */
     const user = await User.findOne({ email: decodedToken.email });
     if (user) {
-      return res.status(200).json({ message: "User finded", user });
+      return res.status(200).json({ status : "OK" , message: "User finded", user });
     } else {
       return res.status(200).json({ message: "User could not finded" });
     }
