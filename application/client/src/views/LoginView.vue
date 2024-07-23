@@ -75,14 +75,14 @@ const login = async () => {
     </div>
     <div class="flex w-2/5 flex-col items-center justify-center bg-[#FFFFFF] p-4">
       <div class="font-900 mb-4 text-3xl text-[#2C39A6]">Giriş</div>
-      <div class="flex w-3/4 flex-col items-center gap-4 mr-3">
+      <div class="mr-3 flex w-3/4 flex-col items-center gap-4">
         <!-- <input
           v-model="email"
           type="email"
           placeholder="Email"
           class="bg-#F2F2F2 w-full rounded-lg border-none p-4"
         /> -->
-   <!--      <div class="w-full">
+        <!--      <div class="w-full">
           <input
             v-model="password"
             type="password"
@@ -99,12 +99,22 @@ const login = async () => {
           />
         </div> -->
         <div class="relative w-full">
-          <input placeholder="" type="email" class="inputt rounded-lg w-full p-4 bg-#F2F2F2 border-none text-black" />
+          <input
+            v-model="email"
+            placeholder=""
+            type="email"
+            class="inputt bg-#F2F2F2 w-full rounded-lg border-none p-4 text-black"
+          />
           <label>Email</label>
         </div>
 
         <div class="relative w-full">
-          <input placeholder="" type="password" class="inputt rounded-lg w-full p-4 bg-#F2F2F2 border-none" />
+          <input
+            v-model="password"
+            placeholder=""
+            type="password"
+            class="inputt bg-#F2F2F2 w-full rounded-lg border-none p-4"
+          />
           <label>Password</label>
         </div>
 
@@ -115,14 +125,14 @@ const login = async () => {
         <div class="mt-2 flex gap-4">
           <RouterLink to="/register"
             ><button
-              class="font-500 cursor-pointer rounded-md border-none bg-[#FFFFFF] p-4 text-[#2C39A6] hover:bg-[#E7E8EE]"
+              class="font-500 cursor-pointer rounded-md border-none bg-[#FFFFFF] p-4 text-[#2C39A6] transition-colors duration-300 ease-in-out hover:bg-[#E7E8EE]"
             >
               Kayıt ol
             </button>
           </RouterLink>
 
           <button
-            class="font-500 cursor-pointer rounded-md border-none bg-[#FFFFFF] p-4 text-[#2C39A6] hover:bg-[#E7E8EE]"
+            class="font-500 cursor-pointer rounded-md border-none bg-[#FFFFFF] p-4 text-[#2C39A6] transition-colors duration-300 ease-in-out hover:bg-[#E7E8EE]"
             @click="login"
           >
             Giriş
@@ -144,28 +154,28 @@ label {
   left: 0;
   top: 50%;
   transform: translateY(-50%);
-  background-color: #F2F2F2;
+  background-color: #f2f2f2;
   color: gray;
   padding: 0 0.3rem;
   margin: 0 0.5rem;
-  transition: .1s ease-out;
+  transition: 0.1s ease-out;
   transform-origin: left top;
   pointer-events: none;
 }
 .inputt {
   font-size: 1rem;
   outline: none;
-  border: 0.5px solid #FFFFFF;
+  border: 0.5px solid #ffffff;
 
   padding: 1rem 0.7rem;
- 
+
   transition: 0.1s ease-out;
 }
 input:focus {
-  border-color: #2C39A6;  
+  border-color: #2c39a6;
 }
 .inputt:focus + label {
-  color: #2C39A6;
+  color: #2c39a6;
   top: 0;
   transform: translateY(-50%) scale(0.9);
 }

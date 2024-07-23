@@ -149,13 +149,28 @@ const logoutUser = async (req: Request, res: Response) => {
 };
 
 const getUser = async (req: Request, res: Response) => {
-  const { email } = req.body;
-  const user = await User.findOne({ email });
-  if (user) {
+  const { token } = req.body;
+  
+  jwt.verify(token, process.env.JWT_SECRET, async (err: any, decodedToken: any) => {
+    if (err) {
+      console.log(err);
+      return res.status(400).json({ message: "User could not finded" });
+    }
+    /* const user = await User.findById(decodedToken.id); */
+    const user = await User.findOne({ email: decodedToken.email });
+    if (user) {
+      return res.status(200).json({ message: "User finded", user });
+    } else {
+      return res.status(200).json({ message: "User could not finded" });
+    }
+  }
+  );
+  
+/*   if (user) {
     return res.status(200).json({ message: "User finded", user });
   } else {
     return res.status(200).json({ message: "User could not finded" });
-  }
+  } */
 };
 
 /* module.exports = {

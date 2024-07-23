@@ -97,7 +97,7 @@ const register = async () => {
             v-model="password"
             type="password"
             placeholder="Password"
-            class="w-full rounded-md border-none p-4 bg-#F2F2F2" 
+            class="w-full rounded-md border-none p-4 bg-#F2F2F2"             
           />
           <input
             v-model="password2"
@@ -108,7 +108,7 @@ const register = async () => {
           <div class="flex gap-4">
             <button
               @click="register"
-              class="cursor-pointer rounded-md border-none font-500 bg-[#FFFFFF] p-4 text-[#2C39A6] hover:bg-[#E7E8EE]"
+              class="cursor-pointer rounded-md border-none font-500 bg-[#FFFFFF] p-4 text-[#2C39A6] transition-colors duration-300 ease-in-out hover:bg-[#E7E8EE]"
             >
               Kayıt ol
             </button>
