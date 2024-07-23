@@ -13,8 +13,11 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
+    "@types/web": "^0.0.151",
+    "axios": "^1.7.2",
     "vue": "^3.4.29",
-    "vue-router": "^4.4.0"
+    "vue-router": "^4.4.0",
+    "vue-toastification": "^2.0.0-rc.5"
   },
   "devDependencies": {
     "@rushstack/eslint-patch": "^1.8.0",

@@ -20,7 +20,7 @@ const comparePassword = (
   password: string,
   hashed: string
 ): Promise<boolean> => {
-  return bcrypt.compare(password, hashed).catch((error :any) => {
+  return bcrypt.compare(password, hashed).catch((error: any) => {
     console.log(error);
     return false;
   });
@@ -42,4 +42,12 @@ function isEmail(email: string): boolean {
   return false;
 }
 
-export { hashPassword, comparePassword, isEmail };
+const isPassword = (password: string): boolean => {
+  const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+  if (!regex.test(password)) {
+    return false;
+  }
+  return true;
+};
+
+export { hashPassword, comparePassword, isEmail  , isPassword};

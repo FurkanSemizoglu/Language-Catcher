@@ -2,7 +2,7 @@ const User = require("../models/user");
 /* const Request = require('express');
 const Response = require('express'); */
 import { Request, Response } from "express";
-import { comparePassword, hashPassword, isEmail } from "../helpers/auth";
+import { comparePassword, hashPassword, isEmail  , isPassword} from "../helpers/auth";
 const jwt = require("jsonwebtoken");
 
 const registerUser = async (req: Request, res: Response) => {
@@ -16,14 +16,18 @@ const registerUser = async (req: Request, res: Response) => {
 
     console.log("email", email);
 
+    if (!isEmail(email)) {
+      return res.status(400).json({ message: "Not exist email type" });
+    }
+
     if (password.length < 6) {
       return res
         .status(400)
         .json({ message: "Password less than 6 characters" });
     }
 
-    if (!isEmail(email)) {
-      return res.status(400).json({ message: "Not exist email type" });
+    if(!isPassword(password)){
+      return res.status(401).json({ message: "Password must be at least 8 characters, one uppercase, one lowercase, one number and one special character" });
     }
 
     const existingUser = await User.findOne({ email });
@@ -48,22 +52,21 @@ const registerUser = async (req: Request, res: Response) => {
       },
       process.env.JWT_SECRET,
       {
-        expiresIn: maxAge,
+        expiresIn: maxAge, // 3 saat olması lazım
       }
     );
 
     console.log("okeyy");
     res.cookie("jwt", token, {
       httpOnly: true,
-      maxAge: maxAge * 1000, // 3hrs in ms
+      maxAge: maxAge * 1000, 
     });
     return res.status(201).json({
       status: "OK",
       newUser,
       token,
     });
-    /*     const token = await user.generateAuthToken();
-     */
+
   } catch (error) {
     res.status(400).send(error);
   }
@@ -73,28 +76,35 @@ const loginUser = async (req: Request, res: Response) => {
     try {
       const { email, password } = req.body;
   
+      console.log(email, password);
       if (!email || !password) {
         return res.status(400).json({
           message: "Email or Password not provided",
         });
       }
-  
-      if (password.length < 6) {
-        return res.status(400).json({ message: "Password must be at least 6 characters" });
-      }
-  
       if (!isEmail(email)) {
-        return res.status(400).json({ message: "Invalid email format" });
+        return res.status(401).json({ message: "Invalid email format" });
       }
+
+      if (password.length < 6) {
+        return res.status(401).json({ message: "Password must be at least 6 characters" });
+      }
+      
+      if(!isPassword(password)){
+        return res.status(401).json({ message: "Password must be at least 8 characters, one uppercase, one lowercase, one number and one special character" });
+      }
+
+  
+    
   
       const user = await User.findOne({ email });
       if (!user) {
-        return res.status(401).json({ error: "Login failed! Check authentication credentials" });
+        return res.status(401).json({ message: "Login failed! Check authentication credentials" });
       }
   
       const isMatch = await comparePassword(password, user.password);
       if (!isMatch) {
-        return res.status(401).json({ error: "Password is wrong" });
+        return res.status(401).json({ message: "Password is wrong" });
       }
   
       const maxAge = 3 * 60 * 60;
@@ -111,10 +121,10 @@ const loginUser = async (req: Request, res: Response) => {
   
       res.cookie("jwt", token, {
         httpOnly: true,
-        maxAge: maxAge * 1000, // 3hrs in ms
+        maxAge: maxAge * 1000, 
       });
   
-      res.status(200).json({ message: "User successfully logged in", user, token });
+      res.status(200).json({ status : "OK" ,  message: "User successfully logged in", user, token });
   
     } catch (error: any) {
       res.status(500).json({
