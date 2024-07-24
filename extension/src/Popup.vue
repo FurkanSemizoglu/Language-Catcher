@@ -22,7 +22,18 @@ window.addEventListener('language-catcher-start', (e) => {
   console.log(domain)
 })
 
-const showLanguageButtonClicked = () => {
+chrome.runtime.sendMessage({ message: 'show-language-in-same-page' }, (response: any) => {
+  language.value = response.language
+  detectedPlaces.value = response.findedPlaces
+  paragraphExist.value = response.paragraphLang
+
+  langName.value = languages[response.language].name
+  langNativeName.value = languages[response.language].nativeName
+  console.log('message sent to background for show language in same page')
+  console.log('response from background  : ', response)
+})
+
+/* const showLanguageButtonClicked = () => {
   showLanguage.value = !showLanguage.value
 
   if (showLanguage.value === true) {
@@ -37,10 +48,9 @@ const showLanguageButtonClicked = () => {
       console.log('response from background  : ', response)
     })
   }
-}
+} */
 
-const searchButtonClicked = () => {
-
+/* const searchButtonClicked = () => {
   console.log(URL.value)
 
   showLanguage.value = true
@@ -55,13 +65,12 @@ const searchButtonClicked = () => {
     console.log('message sent to background for show language in same page')
     console.log('response from background  : ', response)
   })
-}
-
+} */
 </script>
 
 <template>
   <div class="min-w-md max-w-md flex flex-col items-center py-2 gap-1">
-    <div v-if="showUrl" class="flex">
+  <!--   <div v-if="showUrl" class="flex">
       <input
         v-model="URL"
         class="w-270px p-2"
@@ -69,14 +78,13 @@ const searchButtonClicked = () => {
         placeholder="Type a url to detect the language"
       />
       <button @click="searchButtonClicked">Search</button>
-    </div>
+    </div> -->
 
-    <div class="flex gap-1">
+ <!--    <div class="flex gap-1">
       <button
         class="p-2 bg-#0059f7 border rounded-lg text-white text-xl cursor-pointer shadow-xl"
         @click="showLanguageButtonClicked"
       >
-
         Show The Language
       </button>
 
@@ -86,9 +94,9 @@ const searchButtonClicked = () => {
       >
         Or Write An Url
       </button>
-    </div>
+    </div> -->
 
-    <div v-if="showLanguage" class="flex flex-col w-s mx-a max-w-s px-12">
+    <div  class="flex flex-col w-s mx-a max-w-s px-12">
       <div class="">
         <span class="font-bold text-xl">Language : </span>
         <span v-if="language !== 'not detected'" class="text-lg"
