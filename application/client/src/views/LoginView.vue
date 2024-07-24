@@ -77,7 +77,7 @@ const login = async () => {
       <img
         src="../../public/world.jpg"
         alt="World"
-        class="h-full max-h-full max-w-full object-cover"
+        class="h-full max-h-full max-w-full object-cover rounded-md"
       />
       <div
         class="animate__animated animate__fadeInDown font-900 absolute flex items-center text-4xl text-white"
@@ -133,7 +133,7 @@ const login = async () => {
             <FontAwesomeIcon
               @click="togglePasswordVisibility"
               :icon="passwordFieldType === 'password' ? faEye : faEyeSlash"
-              class="absolute right-0 top-0 mt-5 cursor-pointer"
+              class="absolute right-0 top-0 mt-5 cursor-pointer w-5"
               style="color: #6f6f6f"
             />
           </div>

@@ -82,7 +82,7 @@ const register = async () => {
       <img
         src="../../public/world.jpg"
         alt="World"
-        class="h-full max-h-full max-w-full object-cover"
+        class="h-full max-h-full max-w-full object-cover rounded-md"
       />
       <div class="animate__animated animate__fadeInDown font-900 absolute text-4xl text-white">
         Efilli Dil Algılama Uygulaması
@@ -114,7 +114,7 @@ const register = async () => {
             <FontAwesomeIcon
               @click="togglePasswordVisibility"
               :icon="passwordFieldType === 'password' ? faEye : faEyeSlash"
-              class="absolute right-0 top-0 mt-5 cursor-pointer"
+              class="absolute right-0 top-0 mt-5 cursor-pointer w-5"
               style="color: #6f6f6f"
             />
           </div>
@@ -131,7 +131,7 @@ const register = async () => {
             <FontAwesomeIcon
               @click="togglePasswordVisibility2"
               :icon="passwordFieldType2 === 'password' ? faEye : faEyeSlash"
-              class="absolute right-0 top-0 mt-5 cursor-pointer"
+              class="absolute right-0 top-0 mt-5 cursor-pointer w-5"
               style="color: #6f6f6f"
             />
           </div>
