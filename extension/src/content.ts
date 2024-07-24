@@ -1,15 +1,14 @@
 import DetectLanguage from 'detectlanguage'
 import languages from './types'
 
-window.addEventListener("language-catcher-start", (e) => {
-
-  console.log('Language catcher is starting');
-  const event = e as CustomEvent;
-  const domain = event.detail.domain;
-  console.log("domaain " , domain);
+window.addEventListener('language-catcher-start', (e) => {
+  console.log('Language catcher is starting')
+  const event = e as CustomEvent
+  const domain = event.detail.domain
+  console.log('domaain ', domain)
 
   chrome.runtime.sendMessage({ message: 'URL-sended', url: domain }, (response: any) => {
-/*     language.value = response.language
+    /*     language.value = response.language
     detectedPlaces.value = response.findedPlaces
     paragraphExist.value = response.paragraphLang
 
@@ -18,8 +17,7 @@ window.addEventListener("language-catcher-start", (e) => {
     console.log('message sent to background to run in application')
     console.log('response from background  : ', response)
   })
-
-});
+})
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   console.log('content received message', request)
@@ -42,6 +40,9 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       window.dispatchEvent(languageCatcherResult)
 
       sendResponse(data)
+    /*   chrome.tabs.query({ active: true, currentWindow: true }, (tabs: any) => {
+        chrome.tabs.remove(tabs[0].id)
+      }) */
     })
   } else if (request.action === 'show-language-in-same-page') {
     console.log('show-language-in-same-page in content.ts')
