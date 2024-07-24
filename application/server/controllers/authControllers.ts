@@ -57,6 +57,8 @@ const registerUser = async (req: Request, res: Response) => {
     );
 
     console.log("okeyy");
+
+    // Aslında şu an kullanmıyorum
     res.cookie("jwt", token, {
       httpOnly: true,
       maxAge: maxAge * 1000, 
@@ -88,18 +90,12 @@ const loginUser = async (req: Request, res: Response) => {
 
       if (password.length < 6) {
         return res.status(401).json({ message: "Password must be at least 6 characters" });
-      }
-      
-      if(!isPassword(password)){
-        return res.status(401).json({ message: "Password must be at least 8 characters, one uppercase, one lowercase, one number and one special character" });
-      }
-
-  
+      }  
     
   
       const user = await User.findOne({ email });
       if (!user) {
-        return res.status(401).json({ message: "Login failed! Check authentication credentials" });
+        return res.status(401).json({ message: "Login failed! User could not find" });
       }
   
       const isMatch = await comparePassword(password, user.password);
@@ -136,6 +132,12 @@ const loginUser = async (req: Request, res: Response) => {
 
 const logoutUser = async (req: Request, res: Response) => {
   try {
+
+    const { token } = req.body;
+
+    // burası tam olmadı
+    jwt.destroy(token);
+
     res.cookie("jwt", "", {
       httpOnly: true,
       maxAge: 0,
