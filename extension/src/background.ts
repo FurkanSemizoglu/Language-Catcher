@@ -51,11 +51,13 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                     
                     if(response){
 
-                      chrome.tabs.remove(tabs[0].id)
+                      /* chrome.tabs.remove(tabs[0].id) */
+                      console.log('lang data checker for ready-to-detect', langData)
+                      console.log('lang data checker for ready to detect', langData.findedPlaces)
+                      sendResponse(langData)
+                      return true
                     }
-                    console.log('lang data checker for ready-to-detect', langData)
-                    console.log('lang data checker for ready to detect', langData.findedPlaces)
-                    sendResponse(langData)
+                   
                   }
                 )
               })

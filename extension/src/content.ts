@@ -38,7 +38,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       })
 
       window.dispatchEvent(languageCatcherResult)
-
+      console.log("requested tab id " , request.tabID);
+      /* chrome.tabs.remove(request.tabID) */
       sendResponse(data)
     /*   chrome.tabs.query({ active: true, currentWindow: true }, (tabs: any) => {
         chrome.tabs.remove(tabs[0].id)
