@@ -9,18 +9,28 @@ window.addEventListener('language-catcher-start', (e) => {
   console.log('domaain ', url)
 
   chrome.runtime.sendMessage({ message: 'URL-sended', url: url }, (response: any) => {
-    /*     language.value = response.language
-    detectedPlaces.value = response.findedPlaces
-    paragraphExist.value = response.paragraphLang
-
-    langName.value = languages[response.language].name
-    langNativeName.value = languages[response.language].nativeName */
+ 
     console.log('message sent to background to run in application')
     console.log('response from background  : ', response)
+
+
+    const languageCatcherResult = new CustomEvent('languageCatcherResult', {
+      detail: {
+        status: 'completed',
+        domain: 'example.com',
+        language: response.language,
+        languageFetchedFrom: response.findedPlaces,
+        languageAccuracy: 'high'
+      }
+    })
+
+    window.dispatchEvent(languageCatcherResult)
+
   })
 })
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  console.log("who is sender"  ,sender);
   console.log('content received message', request)
   if (request.action === 'ready-to-detect') {
     console.log('ready-to-detect')

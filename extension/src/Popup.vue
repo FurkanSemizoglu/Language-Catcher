@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref  , onMounted} from 'vue'
 
 const showUrl = ref<boolean>(false)
 const showLanguage = ref<boolean>(false)
@@ -22,15 +22,17 @@ window.addEventListener('language-catcher-start', (e) => {
   console.log(domain)
 })
 
-chrome.runtime.sendMessage({ message: 'show-language-in-same-page' }, (response: any) => {
-  language.value = response.language
-  detectedPlaces.value = response.findedPlaces
-  paragraphExist.value = response.paragraphLang
+onMounted(() => {
+  chrome.runtime.sendMessage({ message: 'show-language-in-same-page' }, (response: any) => {
+    language.value = response.language
+    detectedPlaces.value = response.findedPlaces
+    paragraphExist.value = response.paragraphLang
 
-  langName.value = languages[response.language].name
-  langNativeName.value = languages[response.language].nativeName
-  console.log('message sent to background for show language in same page')
-  console.log('response from background  : ', response)
+    langName.value = languages[response.language].name
+    langNativeName.value = languages[response.language].nativeName
+    console.log('message sent to background for show language in same page')
+    console.log('response from background  : ', response)
+  })
 })
 
 /* const showLanguageButtonClicked = () => {
@@ -70,7 +72,7 @@ chrome.runtime.sendMessage({ message: 'show-language-in-same-page' }, (response:
 
 <template>
   <div class="min-w-md max-w-md flex flex-col items-center py-2 gap-1">
-  <!--   <div v-if="showUrl" class="flex">
+    <!--   <div v-if="showUrl" class="flex">
       <input
         v-model="URL"
         class="w-270px p-2"
@@ -80,7 +82,7 @@ chrome.runtime.sendMessage({ message: 'show-language-in-same-page' }, (response:
       <button @click="searchButtonClicked">Search</button>
     </div> -->
 
- <!--    <div class="flex gap-1">
+    <!--    <div class="flex gap-1">
       <button
         class="p-2 bg-#0059f7 border rounded-lg text-white text-xl cursor-pointer shadow-xl"
         @click="showLanguageButtonClicked"
@@ -96,7 +98,7 @@ chrome.runtime.sendMessage({ message: 'show-language-in-same-page' }, (response:
       </button>
     </div> -->
 
-    <div  class="flex flex-col w-s mx-a max-w-s px-12">
+    <div class="flex flex-col w-s mx-a max-w-s px-12">
       <div class="">
         <span class="font-bold text-xl">Language : </span>
         <span v-if="language !== 'not detected'" class="text-lg"

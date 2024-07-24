@@ -7,6 +7,15 @@ const user = ref<string | null>('');
 const url = ref<string>('');
 token.value = localStorage.getItem('token');
 
+window.addEventListener('languageCatcherResult' , (e) => {
+  console.log('Result from extension' , e)
+  const event = e as CustomEvent
+  const language = event.detail.language
+  console.log(language)
+
+})
+
+
 onMounted(async () => {
   console.log('token', token.value);
 
