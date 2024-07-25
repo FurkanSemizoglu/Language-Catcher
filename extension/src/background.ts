@@ -55,7 +55,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                         console.log('lang data checker for ready to detect', langData.findedPlaces);
                         sendResponse(langData);
 
-                        // Close the new tab
                         chrome.tabs.remove(tabs[0].id);
                       }
                     }
