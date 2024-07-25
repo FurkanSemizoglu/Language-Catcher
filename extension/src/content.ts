@@ -179,7 +179,7 @@ const takeParagraphs = async (): Promise<string> => {
     console.log(text.length)
   })
 
-  if (searchDivText) {
+/*   if (searchDivText) {
     document.querySelectorAll('div').forEach((div) => {
       if (
         div.innerText.trim().length > 50 &&
@@ -189,7 +189,7 @@ const takeParagraphs = async (): Promise<string> => {
         pTagTextsArray.push(div.innerText)
       }
     })
-  }
+  } */
 
   try {
     const detectLang = new DetectLanguage('73902226a060dd3911c0419b0dec1c66')

@@ -14,6 +14,7 @@ interface LanguageLocation {
   url: boolean
   paragraph: boolean
 }
+
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   console.log('background received message', request);
   console.log('URL : ', request.url);

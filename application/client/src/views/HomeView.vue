@@ -1,15 +1,19 @@
 <script setup lang="ts">
 import axios from 'axios';
 import { onMounted, ref } from 'vue';
+import Buttonn from 'primevue/button';
 const token = ref<string | null>('');
 const user = ref<string | null>('');
 
 const url = ref<string>('');
+
+let loadingButton = ref<boolean>(false)
 token.value = localStorage.getItem('token');
 
 const returnedValues = ref<string[]>([])
 
 window.addEventListener('languageCatcherResult' , (e) => {
+  loadingButton.value = false
   console.log('Result from extension' , e)
   const event = e as CustomEvent
   const language = event.detail.language
@@ -17,6 +21,7 @@ window.addEventListener('languageCatcherResult' , (e) => {
   returnedValues.value.push(event.detail)
   console.log(language)
   console.log("array : "  ,returnedValues.value)
+ 
 })
 
 
@@ -32,13 +37,13 @@ onMounted(async () => {
   user.value = response.data.user.email;
 });
 
-import Buttonn from 'primevue/button';
 
 
 
 const sendUrlToExtension = () => {
   console.log(url.value)
   
+  loadingButton.value = true
   const sendedURL = new CustomEvent('language-catcher-start', {
         detail: {
           status: 'OK',
@@ -53,6 +58,7 @@ const sendUrlToExtension = () => {
 
 <template>
   <InputText v-model="url" type="text" size="large" placeholder="Large" />
-  <Buttonn type="button" label="Search" icon="pi pi-search"  @click="sendUrlToExtension" />
-
+  <Button type="button" label="Search" icon="pi pi-search" :loading="loadingButton" @click="sendUrlToExtension" />
+  <Buttonn type="button" label="Search" icon="pi pi-search" :loading="loadingButton"  @click="sendUrlToExtension" />
+  <Button label="Primary" />
 </template>

@@ -52,14 +52,7 @@ const login = async () => {
         console.error('Axios error data:', err.response?.data);
 
         toast.error(err.response?.data.message);
-        /* 
-        if (err.response?.status === 400) {
-          console.log(`Error 400: ${err.response.data.message}`);
-        } else if (err.response?.status === 401) {
-          console.log(`Error 401: ${err.response.data.message}`);
-        } else {
-          console.log(`Error: ${err.response?.data?.message || 'An error occurred'}`);
-        } */
+
       } else {
         console.error('Unexpected error:', err);
         console.log('Unexpected error occurred');
@@ -87,32 +80,11 @@ const login = async () => {
       </div>
     </div>
     <div class="flex w-2/5 flex-col items-center justify-center bg-[#FFFFFF] p-4">
-      <div class="mx-a ml-4 flex w-[90%] flex-col items-center justify-center">
+      <div class=" mx-a ml-4 flex w-[90%] flex-col items-center justify-center">
         <div class="font-900 mb-4 text-3xl text-[#2C39A6]">Giriş</div>
-        <div class="mr-3 flex w-4/5 flex-col items-center gap-4">
-          <!-- <input
-          v-model="email"
-          type="email"
-          placeholder="Email"
-          class="bg-#F2F2F2 w-full rounded-lg border-none p-4"
-        /> -->
-          <!--      <div class="w-full">
-          <input
-            v-model="password"
-            type="password"
-            placeholder="Password"
-            class="bg-#F2F2F2 w-full rounded-lg border-none p-4"
-          />
-        </div>
-        <div class="w-full">
-          <input
-            v-model="password"
-            type="password"
-            placeholder="Password"
-            class="bg-#F2F2F2 w-full rounded-lg border-none p-4"
-          />
-        </div> -->
-          <div class="relative w-full">
+        <div class="mt-2 flex w-full flex-col items-center justify-center gap-4">
+
+          <div class="relative w-[85%]">
             <input
               v-model="email"
               placeholder=""
@@ -122,7 +94,7 @@ const login = async () => {
             <label>Email</label>
           </div>
 
-          <div class="relative w-full">
+          <div class="relative w-[85%]">
             <input
               v-model="password"
               placeholder=""
@@ -133,7 +105,7 @@ const login = async () => {
             <FontAwesomeIcon
               @click="togglePasswordVisibility"
               :icon="passwordFieldType === 'password' ? faEye : faEyeSlash"
-              class="absolute right-0 top-0 mt-5 cursor-pointer w-5"
+              class="absolute right-4 top-0 mt-5 cursor-pointer w-5"
               style="color: #6f6f6f"
             />
           </div>

@@ -89,11 +89,11 @@ const register = async () => {
       </div>
     </div>
     <div class="flex w-2/5 flex-col items-center justify-center bg-[#FFFFFF] p-4">
-      <div class="flex w-3/4 flex-col items-center">
+      <div class="mx-a ml-4 flex w-[90%] flex-col items-center justify-center">
         <div class="font-900 mb-4 text-3xl text-[#2C39A6]">Kayıt Ol</div>
-        <div class="mr-3 flex w-full flex-col items-center gap-4">
+        <div class="mt-1 flex w-full flex-col items-center justify-center gap-4">
 
-          <div class="relative w-full">
+          <div class="relative w-[85%]">
             <input
               v-model="email"
               placeholder=""
@@ -103,7 +103,7 @@ const register = async () => {
             <label>Email</label>
           </div>
 
-          <div class="relative w-full">
+          <div class="relative w-[85%]">
             <input
               v-model="password"
               placeholder=""
@@ -114,12 +114,12 @@ const register = async () => {
             <FontAwesomeIcon
               @click="togglePasswordVisibility"
               :icon="passwordFieldType === 'password' ? faEye : faEyeSlash"
-              class="absolute right-0 top-0 mt-5 cursor-pointer w-5"
+              class="absolute right-4 top-0 mt-5 cursor-pointer w-5"
               style="color: #6f6f6f"
             />
           </div>
 
-          <div class="relative w-full">
+          <div class="relative w-[85%]">
             <input
               v-model="password2"
               :type="passwordFieldType2"
@@ -131,7 +131,7 @@ const register = async () => {
             <FontAwesomeIcon
               @click="togglePasswordVisibility2"
               :icon="passwordFieldType2 === 'password' ? faEye : faEyeSlash"
-              class="absolute right-0 top-0 mt-5 cursor-pointer w-5"
+              class="absolute right-4 top-0 mt-5 cursor-pointer w-5"
               style="color: #6f6f6f"
             />
           </div>
