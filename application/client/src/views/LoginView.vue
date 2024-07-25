@@ -94,12 +94,12 @@ const login = async () => {
             <label>Email</label>
           </div>
 
-          <div class="relative w-[85%]">
+          <div class="relative w-[85%] ">
             <input
               v-model="password"
               placeholder=""
               :type="passwordFieldType"
-              class="inputt bg-#F2F2F2 w-full rounded-lg border-none p-4"
+              class="inputt bg-#F2F2F2 w-full rounded-lg border-none p-4 focus:border-[#2C39A6] text-black"
             />
             <label>Password</label>
             <FontAwesomeIcon
@@ -110,9 +110,6 @@ const login = async () => {
             />
           </div>
 
-          <!--    <div class="relative mb-2 w-full">
-          <div class="absolute left-0 cursor-pointer text-lg text-blue-500">şifremi unuttum</div>
-        </div> -->
 
           <div class="mt-2 flex gap-4">
             <RouterLink to="/register"
@@ -163,13 +160,12 @@ label {
   font-size: 1rem;
   outline: none;
   border: 0.5px solid #ffffff;
-
   padding: 1rem 0.7rem;
-
   transition: 0.1s ease-out;
+  background-color: #F2F2F2;
 }
-input:focus {
-  border-color: #2c39a6;
+.inputt:focus {
+  border-color: #2c39a6  !important;
 }
 .inputt:focus + label {
   color: #2c39a6;
@@ -181,3 +177,4 @@ input:focus {
   transform: translateY(-50%) scale(0.9);
 }
 </style>
+
