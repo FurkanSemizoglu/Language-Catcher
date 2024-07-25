@@ -39,6 +39,10 @@ app.use(vuetify);
 app.component('Button', Button);
 app.component('InputText', InputText);
 
+app.config.errorHandler = (err, vm, info) => {
+  console.error('Vue Global Error Handler:', err, info);
+};
+
 app.use(router);
 app.use(Toast);
 app.mount('#app');

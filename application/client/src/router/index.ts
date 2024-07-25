@@ -8,7 +8,7 @@ const isAuthenticated  =  async() : Promise<boolean> => {
   // Bu yeterli mi ?
   /* if (!token) return false;
   return true; */
-  console.log("token var ve çalışmalı");
+  console.log("token var ve çalışmalı" , token);
 
   if (!token) return false;
 

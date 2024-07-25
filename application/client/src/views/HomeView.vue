@@ -22,7 +22,25 @@ const toast = useToast();
 let loadingButton = ref<boolean>(false);
 token.value = localStorage.getItem('token');
 
-const returnedValues = ref<string[]>([]);
+interface LanguageLocation {
+  locacalStorage: boolean;
+  sessionnStorage: boolean;
+  metaTag: boolean;
+  htmlTag: boolean;
+  url: boolean;
+  paragraph: boolean;
+}
+
+interface extensionResult {
+  status: string;
+  domain: string;
+  language: string;
+  languageFetchedFrom: string[];
+  languageLocation: LanguageLocation;
+  languageAccuracy: string;
+}
+
+const returnedValues = ref<extensionResult[]>([]);
 
 const products = ref<
   Array<{ url: string; language: string; detectedPlaces: string; accuracy: number }>
@@ -100,16 +118,16 @@ const toggleDetails = () => {
 
 <template>
   <div>
-    <div class="topBar m-a flex w-4/5 items-center justify-between px-4 py-6">
+    <div class="topBar m-a flex w-full items-center justify-between px-8 py-6">
       <div>{{ user }}</div>
       <div class="mr-3 flex items-center">
-        <input
+        <!--   <input
           type="text"
           v-model="url"
           placeholder="URL"
           class="border-1 w-[400px] rounded-md border p-2"
-        />
-        <Button
+        /> -->
+        <!--   <Button
           type="button"
           label="Search"
           icon="pi pi-search"
@@ -118,65 +136,32 @@ const toggleDetails = () => {
           severity="secondary"
           class="bg-[#2C39A6] text-white"
           button.primary.color="blue"
-        />
+        /> -->
       </div>
       <div>Çıkış Yap</div>
     </div>
     <div class="m-a mt-5 w-4/5">
-      <!--       <table class="w-full">
-        <tr>
-          <th>URL</th>
-          <th>LANGUAGE</th>
-          <th>DETECTED PlACES</th>
-        </tr>
-        <tr class="">
-          <td>Alfreds Futterkiste</td>
-          <td>Maria Anders</td>
-          <td>Germany</td>
-        </tr>
-        <tr>
-          <td>Centro comercial Moctezuma</td>
-          <td>Francisco Chang</td>
-          <td>Mexico</td>
-        </tr>
-        <tr>
-          <td>Ernst Handel</td>
-          <td>Roland Mendel</td>
-          <td>Austria</td>
-        </tr>
-        <tr>
-          <td>Island Trading</td>
-          <td>Helen Bennett</td>
-          <td>UK</td>
-        </tr>
-        <tr>
-          <td>Laughing Bacchus Winecellars</td>
-          <td>Yoshi Tannamuri</td>
-          <td>Canada</td>
-        </tr>
-        <tr>
-          <td>Magazzini Alimentari Riuniti</td>
-          <td>Giovanni Rovelli</td>
-          <td>Italy</td>
-        </tr>
-      </table> -->
-      <!-- 
-      <div class="bg-#F2F2F2 cols-2 grid w-full">
-        <div class="cols-3 grid" @click="toggleDetails()">
-          <div>url</div>
-          <div>language</div>
-          <div>detectedPlaces</div>
-          <transition name="detailTransition">
-            <div v-if="showDetails" class="col-span-3">uzun açıklama</div>
-          </transition>
-        </div>
-        <div class="cols-3 grid">
-          <div>url</div>
-          <div>language</div>
-          <div>detectedPlaces</div>
-        </div>
+      <div class="m-a relative mt-8 inline-block flex w-[600px] items-center justify-center">
+        <input
+          type="text"
+          v-model="url"
+          placeholder="Dil algılamak için url giriniz..."
+          class="bg-#F2F2F2 border-b-coolGray w-full rounded-3xl p-4 focus:border-none"
+        />
+        <button
+          class="absolute right-0 rounded-r-3xl bg-[#0059F7] p-4 text-white"
+          @click="sendUrlToExtension"
+        >
+          Search
+        </button>
       </div>
- -->
+
+      <!--  <div class="col-3">
+        <input class="effect-9 p-4 bg-#F2F2F2 w-full  p-4" type="text" placeholder="Placeholder Text" />
+        <span class="focus-border">
+          <i></i>
+        </span>
+      </div> -->
 
       <div class="mt-25">
         <div class="cols-3 font-600 grid rounded-md border border-gray-300">
@@ -185,73 +170,47 @@ const toggleDetails = () => {
           <div class="h-full w-full rounded-md border border-gray-300 p-4">
             <div>DETECTED PLACES</div>
           </div>
-          <!--    <transition name="detailTransition">
-            <div v-if="showDetails" class="col-span-3">uzun açıklama</div>
-          </transition> -->
         </div>
 
-        <div class="cols-3 mt-3 grid rounded-md border border-gray-300"">
-          <div class="h-full p-4">https://panel.efilli.com/login</div>
-          <div class="h-full w-full p-4">en-Englısh</div>
-          <div class="flex h-full w-full items-center justify-between p-4">
-            <div>lang url</div>
-            <div>
-              <FontAwesomeIcon
-                :icon="faTrashCan"
-                class="mr-3 transform cursor-pointer transition-transform duration-300"
-                :class="{ hidden: !showDetails }"
-              />
-              
-              <FontAwesomeIcon
-              
-                :icon="faAngleDown"
-                class="mr-2 transform cursor-pointer transition-transform duration-300"
-                :class="{ 'rotate-0': showDetails, 'rotate-90': !showDetails }"
-                @click="toggleDetails()"
-              />
+        <div v-for="(value, index) in returnedValues">
+          <div class="cols-3 mt-3 grid rounded-md border border-gray-300">
+            <div class="h-full p-4">https://panel.efilli.com/login</div>
+            <div class="h-full w-full p-4">en-Englısh</div>
+            <div class="flex h-full w-full items-center justify-between p-4">
+              <div>lang url</div>
+              <div>
+                <FontAwesomeIcon
+                  :icon="faTrashCan"
+                  class="mr-4 transform cursor-pointer transition-transform duration-300"
+                  :class="{ hidden: !showDetails }"
+                  color="red"
+                />
+
+                <FontAwesomeIcon
+                  :icon="faAngleDown"
+                  class="mr-2 transform cursor-pointer transition-transform duration-300"
+                  :class="{ 'rotate-0': showDetails, 'rotate-90': !showDetails }"
+                  @click="toggleDetails()"
+                />
+              </div>
             </div>
+            <transition name="detailTransition">
+              <div v-if="showDetails" class="col-span-3">uzun açıklama</div>
+            </transition>
           </div>
-          <transition name="detailTransition">
-            <div v-if="showDetails" class="col-span-3">uzun açıklama</div>
-          </transition>
         </div>
 
-        <div class="cols-3 mt-3 grid rounded-md border border-gray-300">
+        <!--  <div class="cols-3 mt-3 grid rounded-md border border-gray-300">
           <div class="h-full p-4">https://panel.efilli.com/login</div>
           <div class="h-full w-full p-4">en-Englısh</div>
           <div class="h-full w-full p-4">lang url</div>
-          <!--   <transition name="detailTransition">
-            <div v-if="showDetails" class="col-span-3">uzun açıklama</div>
-          </transition> -->
-        </div>
+        </div> -->
       </div>
-
-      <!--  <v-data-table :items="products" class="text-red"></v-data-table> -->
-      <!--   <v-data-table-virtual
-        :headers="columns"
-        :items="products"
-        height="400"
-        item-value="name"
-      ></v-data-table-virtual> -->
-      <!--  <DataTable :value="products" class="w-full ">
-        <Column
-          v-for="col of columns"
-          :key="col.field"
-          :field="col.field"
-          :header="col.header"
-          class="w-1/4"
-        ></Column>
-      </DataTable> -->
     </div>
   </div>
 </template>
 
 <style scoped>
-.topBar {
-  background-color: #f8f9fa;
-  border-bottom: 1px solid #e9ecef;
-}
-
 td,
 th {
   border: 1px solid #dddddd;
@@ -272,4 +231,70 @@ th {
 .detailTransition-leave-to {
   opacity: 0;
 }
+
+/* :focus {
+  outline: none;
+}
+
+.col-3 {
+  float: left;
+  width: 27.33%;
+  margin: 40px 3%;
+  position: relative;
+}  */ /* necessary to give position: relative to parent. */
+
+/* .effect-9 ~ .focus-border:before,
+.effect-9 ~ .focus-border:after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 0;
+  height: 2px;
+  background-color: #373BA6;
+  transition: 0.2s;
+  transition-delay: 0.2s;
+}
+.effect-9 ~ .focus-border:after {
+  top: auto;
+  bottom: 0;
+  right: auto;
+  left: 0;
+  transition-delay: 0.6s;
+}
+.effect-9 ~ .focus-border i:before,
+.effect-9 ~ .focus-border i:after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 2px;
+  height: 0;
+  background-color: #373BA6;
+  transition: 0.2s;
+}
+.effect-9 ~ .focus-border i:after {
+  left: auto;
+  right: 0;
+  top: auto;
+  bottom: 0;
+  transition-delay: 0.4s;
+}
+.effect-9:focus ~ .focus-border:before,
+.effect-9:focus ~ .focus-border:after {
+  width: 100%;
+  transition: 0.2s;
+  transition-delay: 0.6s;
+}
+.effect-9:focus ~ .focus-border:after {
+  transition-delay: 0.2s;
+}
+.effect-9:focus ~ .focus-border i:before,
+.effect-9:focus ~ .focus-border i:after {
+  height: 100%;
+  transition: 0.2s;
+}
+.effect-9:focus ~ .focus-border i:after {
+  transition-delay: 0.4s;
+} */
 </style>

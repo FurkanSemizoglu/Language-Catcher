@@ -18,6 +18,8 @@ window.addEventListener('language-catcher-start', (e) => {
     console.log('message sent to background to run in application')
     console.log('response from background for url sended : ', response)
 
+      
+    
     const languageCatcherResult = new CustomEvent('languageCatcherResult', {
       detail: {
         status: 'completed',
@@ -32,6 +34,7 @@ window.addEventListener('language-catcher-start', (e) => {
     window.dispatchEvent(languageCatcherResult)
   })
 })
+
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   console.log('who is sender', sender)
