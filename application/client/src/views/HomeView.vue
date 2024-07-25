@@ -7,12 +7,15 @@ const user = ref<string | null>('');
 const url = ref<string>('');
 token.value = localStorage.getItem('token');
 
+const returnedValues = ref<string[]>([])
+
 window.addEventListener('languageCatcherResult' , (e) => {
   console.log('Result from extension' , e)
   const event = e as CustomEvent
   const language = event.detail.language
+  returnedValues.value.push(event.detail)
   console.log(language)
-
+  console.log(returnedValues.value)
 })
 
 
@@ -49,6 +52,6 @@ const sendUrlToExtension = () => {
 
 <template>
   <InputText v-model="url" type="text" size="large" placeholder="Large" />
-  <Buttonn type="button" label="Search" icon="pi pi-search" :loading="loading" @click="sendUrlToExtension" />
+  <Buttonn type="button" label="Search" icon="pi pi-search"  @click="sendUrlToExtension" />
 
 </template>

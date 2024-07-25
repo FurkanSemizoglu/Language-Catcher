@@ -1,6 +1,12 @@
 import DetectLanguage from 'detectlanguage'
 import languages from './types'
 
+let htmlTag: boolean = false
+let metaTag: boolean = false
+let urlFlag: boolean = false
+let paragraph: boolean = false
+let locallStorage: boolean = false
+let sessionnStorage: boolean = false
 
 window.addEventListener('language-catcher-start', (e) => {
   console.log('Language catcher is starting')
@@ -9,12 +15,10 @@ window.addEventListener('language-catcher-start', (e) => {
   console.log('domaain ', url)
 
   chrome.runtime.sendMessage({ message: 'URL-sended', url: url }, (response: any) => {
- 
     console.log('message sent to background to run in application')
-    console.log('response from background  : ', response)
+    console.log('response from background for url sended : ', response)
 
-
-    const languageCatcherResult = new CustomEvent('languageCatcherResult', {
+/*     const languageCatcherResult = new CustomEvent('languageCatcherResult', {
       detail: {
         status: 'completed',
         domain: 'example.com',
@@ -24,13 +28,12 @@ window.addEventListener('language-catcher-start', (e) => {
       }
     })
 
-    window.dispatchEvent(languageCatcherResult)
-
+    window.dispatchEvent(languageCatcherResult) */
   })
 })
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  console.log("who is sender"  ,sender);
+  console.log('who is sender', sender)
   console.log('content received message', request)
   if (request.action === 'ready-to-detect') {
     console.log('ready-to-detect')
@@ -44,6 +47,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
           domain: 'example.com',
           language: data.language,
           languageFetchedFrom: data.findedPlaces,
+          languageLocation: data.languageLocation,
           languageAccuracy: 'high'
         }
       })
@@ -235,15 +239,27 @@ interface LanguageData {
   language: string
   findedPlaces: string[]
   paragraphLang?: boolean
+  languageLocation?: LanguageLocation
+}
+
+interface LanguageLocation {
+  locacalStorage: boolean
+  sessionnStorage: boolean
+  metaTag: boolean
+  htmlTag: boolean
+  url: boolean
+  paragraph: boolean
 }
 
 const checkUrl = (detectedLanguages: string[], detectedPlaces: string[]) => {
   const returnedUrl = parseURL()
+  urlFlag = false
   if (returnedUrl !== '') {
     detectedLanguages.push(returnedUrl)
     detectedPlaces.push('url')
 
     console.log('detected languages from url : ', returnedUrl)
+    urlFlag = true
   }
 }
 
@@ -252,11 +268,14 @@ const checkHtmlLang = (detectedLanguages: string[], detectedPlaces: string[]) =>
   if (detectedLangFromHTML !== '') {
     if (detectedLanguages.length > 0 && detectedLanguages[0] === detectedLangFromHTML) {
       detectedPlaces.push('lang etiketi')
+      htmlTag = true
     } else if (detectedLanguages.length === 0) {
       detectedLanguages.push(detectedLangFromHTML)
       detectedPlaces.push('lang etiketi')
+      htmlTag = true
     } else {
       console.log('url lang etiketinden farklı ')
+      htmlTag = false
     }
   }
 }
@@ -272,9 +291,11 @@ const checkStorage = (detectedLanguages: string[], detectedPlaces: string[]) => 
   ) {
     detectedLanguages.push(localStorageLang)
     detectedPlaces.push('local storage')
+    locallStorage = true
   } else if (localStorageLang && detectedLanguages.length === 0) {
     detectedLanguages.push(localStorageLang)
     detectedPlaces.push('local storage')
+    locallStorage = true
   }
 
   if (
@@ -284,6 +305,7 @@ const checkStorage = (detectedLanguages: string[], detectedPlaces: string[]) => 
   ) {
     detectedLanguages.push(sessionStorageLang)
     detectedPlaces.push('session storage')
+    sessionnStorage = true
   }
 }
 
@@ -293,6 +315,7 @@ const checkMetaTag = (detectedLanguages: string[], detectedPlaces: string[]) => 
     detectedLanguages.push(detectedMetaTag)
     detectedPlaces.push('meta tag')
     console.log('detected meta tag : ', detectedMetaTag)
+    metaTag = true
   }
 }
 
@@ -307,23 +330,29 @@ const checkParagraphs = async (
   if (paragraphLang !== '') {
     if (paragraphLang === detectedLanguages[0]) {
       paragraphCorrectObj.value = true
+      paragraph = true
     } else {
       paragraphCorrectObj.value = false
+      paragraph = false
     }
   }
 }
 
+
+
 const sendResponse = (
   detectedLanguages: string[],
   detectedPlaces: string[],
-  paragraphCorrectObj: { value: boolean }
+  paragraphCorrectObj: { value: boolean },
+  languageLocation: LanguageLocation
 ): LanguageData => {
   if (detectedLanguages.length === 1) {
     console.log('paragphh in sendresponse')
     const data = {
       language: detectedLanguages[0],
       findedPlaces: detectedPlaces,
-      paragraphLang: paragraphCorrectObj.value
+      paragraphLang: paragraphCorrectObj.value,
+      languageLocation: languageLocation
     }
     console.log('returned data from content.ts  to send background : ', data)
     return data
@@ -346,77 +375,16 @@ const languageDetectPrediction = async (): Promise<LanguageData> => {
   checkStorage(detectedLanguages, detectedPlaces)
   await checkParagraphs(detectedLanguages, paragraphCorrectObj)
 
+  const languageLocation = {
+    locacalStorage : locallStorage,
+    sessionnStorage : sessionnStorage,
+    metaTag : metaTag,
+    htmlTag : htmlTag,
+    url: urlFlag,
+    paragraph: paragraph
+  }
   console.log('detected places : ', detectedPlaces)
   console.log('detected languages : ', detectedLanguages)
   console.log('paragraph Correct : ', paragraphCorrectObj.value)
-  return sendResponse(detectedLanguages, detectedPlaces, paragraphCorrectObj)
-}
-
-const languageDetectPrediction2 = async (): Promise<LanguageData> => {
-  let detectedLanguages: string[] | any[] = []
-
-  let detectedPlaces: string[] = []
-
-  const detectedLangFromHTML = detectHtmlLang()
-  const returnedUrl = parseURL()
-  const detectedMetaTag = detectMetaTag()
-  const paragraphLang = await takeParagraphs()
-
-  detectedLanguages.push(detectedLangFromHTML)
-  detectedLanguages.push(returnedUrl)
-  detectedLanguages.push(detectedMetaTag)
-  detectedLanguages.push(paragraphLang)
-
-  let paragraphCorrect: boolean = false
-
-  let value = detectedLanguages[0]
-  let count = 0
-  let a = 0
-  console.log('detected languages : ', detectedLanguages)
-  for (let i = 0; i < detectedLanguages.length; i++) {
-    if (detectedLanguages[i] === value) {
-      count += 1
-    }
-
-    if (count >= detectedLanguages.length / 2) {
-      break
-    } else {
-      a += 1
-      value = detectedLanguages[a]
-      i = 0
-    }
-  }
-
-  console.log(value)
-
-  if (value === detectedLangFromHTML) {
-    detectedPlaces.push('lang etiketi')
-  }
-
-  if (value === returnedUrl) {
-    detectedPlaces.push('url')
-  }
-
-  if (value === detectedMetaTag) {
-    detectedPlaces.push('meta tag')
-  }
-
-  if (value === paragraphLang) {
-    paragraphCorrect = true
-  }
-
-  console.log('value : ', value)
-  if (value) {
-    return {
-      language: value,
-      findedPlaces: detectedPlaces,
-      paragraphLang: paragraphCorrect
-    }
-  } else {
-    return {
-      language: 'not detected',
-      findedPlaces: detectedPlaces,
-      paragraphLang: paragraphCorrect
-    }
-  }
+  return sendResponse(detectedLanguages, detectedPlaces, paragraphCorrectObj , languageLocation)
 }

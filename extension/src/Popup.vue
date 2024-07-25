@@ -23,6 +23,7 @@ window.addEventListener('language-catcher-start', (e) => {
 })
 
 onMounted(() => {
+
   chrome.runtime.sendMessage({ message: 'show-language-in-same-page' }, (response: any) => {
     language.value = response.language
     detectedPlaces.value = response.findedPlaces
