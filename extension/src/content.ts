@@ -18,17 +18,18 @@ window.addEventListener('language-catcher-start', (e) => {
     console.log('message sent to background to run in application')
     console.log('response from background for url sended : ', response)
 
-/*     const languageCatcherResult = new CustomEvent('languageCatcherResult', {
+    const languageCatcherResult = new CustomEvent('languageCatcherResult', {
       detail: {
         status: 'completed',
-        domain: 'example.com',
+        domain: url,
         language: response.language,
         languageFetchedFrom: response.findedPlaces,
+        languageLocation: response.languageLocation,
         languageAccuracy: 'high'
       }
     })
 
-    window.dispatchEvent(languageCatcherResult) */
+    window.dispatchEvent(languageCatcherResult)
   })
 })
 
@@ -41,7 +42,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     languageDetectPrediction().then((data) => {
       console.log('data from content.ts for new tab url : ', data)
 
-      const languageCatcherResult = new CustomEvent('languageCatcherResult', {
+ /*      const languageCatcherResult = new CustomEvent('languageCatcherResult', {
         detail: {
           status: 'completed',
           domain: 'example.com',
@@ -53,12 +54,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       })
 
       window.dispatchEvent(languageCatcherResult)
-      console.log("requested tab id " , request.tabID);
-      /* chrome.tabs.remove(request.tabID) */
+      console.log("requested tab id " , request.tabID); */
+
       sendResponse(data)
-    /*   chrome.tabs.query({ active: true, currentWindow: true }, (tabs: any) => {
-        chrome.tabs.remove(tabs[0].id)
-      }) */
+
     })
   } else if (request.action === 'show-language-in-same-page') {
     console.log('show-language-in-same-page in content.ts')

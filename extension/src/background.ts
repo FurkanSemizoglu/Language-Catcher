@@ -4,8 +4,16 @@ interface LanguageData {
   language: string;
   findedPlaces: string[];
   paragraphLang?: boolean;
+  languageLocation: LanguageLocation | null;
 }
-
+interface LanguageLocation {
+  locacalStorage: boolean
+  sessionnStorage: boolean
+  metaTag: boolean
+  htmlTag: boolean
+  url: boolean
+  paragraph: boolean
+}
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   console.log('background received message', request);
   console.log('URL : ', request.url);
@@ -13,7 +21,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   let langData: LanguageData = {
     language: '',
     findedPlaces: [],
-    paragraphLang: false
+    paragraphLang: false,
+    languageLocation: null
   };
 
   if (request.message === 'URL-sended') {
@@ -49,7 +58,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                       if (response.paragraphLang) {
                         langData.paragraphLang = response.paragraphLang;
                       }
+                      if (response.languageLocation){
 
+                        langData.languageLocation = response.languageLocation;
+                      }
                       if (response) {
                         console.log('lang data checker for ready-to-detect', langData);
                         console.log('lang data checker for ready to detect', langData.findedPlaces);
