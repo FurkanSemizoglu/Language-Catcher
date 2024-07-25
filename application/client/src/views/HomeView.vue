@@ -17,7 +17,6 @@ window.addEventListener('languageCatcherResult' , (e) => {
   console.log('Result from extension' , e)
   const event = e as CustomEvent
   const language = event.detail.language
-  console.log("language" , language);
   returnedValues.value.push(event.detail)
   console.log(language)
   console.log("array : "  ,returnedValues.value)
