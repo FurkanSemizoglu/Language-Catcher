@@ -15,8 +15,11 @@ import { faAngleDown, faT } from '@fortawesome/free-solid-svg-icons';
 import { faAngleLeft } from '@fortawesome/free-solid-svg-icons';
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
 import { faTrashCan } from '@fortawesome/free-solid-svg-icons';
+
+
 const url = ref<string>('');
 import { useToast } from 'vue-toastification';
+import UrlCard from '../components/UrlCard.vue';
 
 const toast = useToast();
 let loadingButton = ref<boolean>(false);
@@ -173,8 +176,9 @@ const toggleDetails = () => {
         </div>
 
         <div v-for="(value, index) in returnedValues">
-          <div class="cols-3 mt-3 grid rounded-md border border-gray-300">
-            <div class="h-full p-4">https://panel.efilli.com/login</div>
+          <UrlCard :url="value.domain" :detected-language="value.language" :detected-places="value.languageFetchedFrom"/>
+        <!--   <div class="cols-3 mt-3 grid rounded-md border border-gray-300">
+            <div class="h-full p-4">{{value.domain}}</div>
             <div class="h-full w-full p-4">en-Englısh</div>
             <div class="flex h-full w-full items-center justify-between p-4">
               <div>lang url</div>
@@ -197,7 +201,7 @@ const toggleDetails = () => {
             <transition name="detailTransition">
               <div v-if="showDetails" class="col-span-3">uzun açıklama</div>
             </transition>
-          </div>
+          </div> -->
         </div>
 
         <!--  <div class="cols-3 mt-3 grid rounded-md border border-gray-300">

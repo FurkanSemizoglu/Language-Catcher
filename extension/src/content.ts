@@ -23,7 +23,7 @@ window.addEventListener('language-catcher-start', (e) => {
     const languageCatcherResult = new CustomEvent('languageCatcherResult', {
       detail: {
         status: 'completed',
-        domain: 'example.com',
+        domain: url,
         language: response.language,
         languageFetchedFrom: response.findedPlaces,
         languageLocation: response.languageLocation,
