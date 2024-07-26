@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { AsyncLocalStorage } from 'async_hooks';
+
 import axios from 'axios';
 import { ref } from 'vue';
 import { RouterLink } from 'vue-router';
@@ -7,7 +7,7 @@ import { useRouter } from 'vue-router';
 const email = ref<string>('');
 const password = ref<string>('');
 const router = useRouter();
-const eyeOpen = ref<boolean>(false);
+
 
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { faEye } from '@fortawesome/free-solid-svg-icons';

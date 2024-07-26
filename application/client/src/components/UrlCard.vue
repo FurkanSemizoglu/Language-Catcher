@@ -19,14 +19,6 @@ interface LanguageLocation {
   paragraph: boolean;
 }
 
-interface extensionResult {
-  status: string;
-  domain: string;
-  language: string;
-  languageFetchedFrom: string[];
-  languageLocation: LanguageLocation;
-  languageAccuracy: string;
-}
 
 interface result {
   url: string;
@@ -46,7 +38,7 @@ const props = defineProps<result>();
     <div class="h-full w-full p-4">{{ props.detectedLanguage }} - {{ props.langName }} - {{ props.langNativeName }}</div>
     <div class="flex h-full w-full items-center justify-between p-4">
       <div>
-        <span v-for="place in props.detectedPlaces"
+        <span v-for="(place , index) in props.detectedPlaces" :key="index"
           >{{ place
           }}<span v-if="place !== props.detectedPlaces[props.detectedPlaces.length - 1]">, </span>
         </span>

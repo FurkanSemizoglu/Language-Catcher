@@ -1,24 +1,10 @@
 <script setup lang="ts">
 import axios from 'axios';
 import { onMounted, ref } from 'vue';
-import Buttonn from 'primevue/button';
+
 const token = ref<string | null>('');
 const user = ref<string | null>('');
 
-import DataTable from 'primevue/datatable';
-import Column from 'primevue/column';
-import ColumnGroup from 'primevue/columngroup'; // optional
-import Row from 'primevue/row'; // optional
-
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { faAngleDown, faT } from '@fortawesome/free-solid-svg-icons';
-import { faAngleLeft } from '@fortawesome/free-solid-svg-icons';
-import { faTrash } from '@fortawesome/free-solid-svg-icons';
-import { faTrashCan } from '@fortawesome/free-solid-svg-icons';
-
-/* import "vue3-circle-progress/dist/circle-progress.css";
-import CircleProgress from "vue3-circle-progress";
- */
 const url = ref<string>('');
 import { useToast } from 'vue-toastification';
 import UrlCard from '../components/UrlCard.vue';
@@ -109,20 +95,6 @@ const sendUrlToExtension = () => {
   window.dispatchEvent(sendedURL);
 };
 
-const columns = [
-  { field: 'code', header: 'Code' },
-  { field: 'name', header: 'Name' },
-  { field: 'category', header: 'Category' },
-  { field: 'quantity', header: 'Quantity' }
-];
-
-const showDetails = ref<boolean>(false);
-
-const toggleDetails = () => {
-  showDetails.value = !showDetails.value;
-  console.log(showDetails.value);
-};
-
 const logout = () => {
   localStorage.removeItem('token');
   window.location.href = '/';
@@ -151,7 +123,7 @@ const logout = () => {
           button.primary.color="blue"
         />
       </div> -->
-      <div class="cursor-pointer text-[#888AD3] hover:text-[#C0C5E5] mr-3" @click="logout">
+      <div class="mr-3 cursor-pointer text-[#888AD3] hover:text-[#C0C5E5]" @click="logout">
         Çıkış Yap
       </div>
     </div>
@@ -171,13 +143,6 @@ const logout = () => {
         </button>
       </div>
 
-      <!--  <div class="col-3">
-        <input class="effect-9 p-4 bg-#F2F2F2 w-full  p-4" type="text" placeholder="Placeholder Text" />
-        <span class="focus-border">
-          <i></i>
-        </span>
-      </div> -->
-
       <div class="mt-25">
         <div class="cols-3 font-600 grid rounded-md border border-gray-300">
           <div class="h-full w-full rounded-md border border-gray-300 p-4 text-[#273464]">URL</div>
@@ -189,8 +154,9 @@ const logout = () => {
           </div>
         </div>
 
-        <div v-for="(value, index) in returnedValues">
+        <div v-for="(value, index) in returnedValues" :key="index">
           <UrlCard
+           
             :url="value.domain"
             :detected-language="value.language"
             :detected-places="value.languageFetchedFrom"
@@ -198,38 +164,7 @@ const logout = () => {
             :lang-name="value.langName"
             :lang-native-name="value.langNativeName"
           />
-          <!--   <div class="cols-3 mt-3 grid rounded-md border border-gray-300">
-            <div class="h-full p-4">{{value.domain}}</div>
-            <div class="h-full w-full p-4">en-Englısh</div>
-            <div class="flex h-full w-full items-center justify-between p-4">
-              <div>lang url</div>
-              <div>
-                <FontAwesomeIcon
-                  :icon="faTrashCan"
-                  class="mr-4 transform cursor-pointer transition-transform duration-300"
-                  :class="{ hidden: !showDetails }"
-                  color="red"
-                />
-
-                <FontAwesomeIcon
-                  :icon="faAngleDown"
-                  class="mr-2 transform cursor-pointer transition-transform duration-300"
-                  :class="{ 'rotate-0': showDetails, 'rotate-90': !showDetails }"
-                  @click="toggleDetails()"
-                />
-              </div>
-            </div>
-            <transition name="detailTransition">
-              <div v-if="showDetails" class="col-span-3">uzun açıklama</div>
-            </transition>
-          </div> -->
         </div>
-
-        <!--  <div class="cols-3 mt-3 grid rounded-md border border-gray-300">
-          <div class="h-full p-4">https://panel.efilli.com/login</div>
-          <div class="h-full w-full p-4">en-Englısh</div>
-          <div class="h-full w-full p-4">lang url</div>
-        </div> -->
       </div>
     </div>
   </div>
@@ -256,70 +191,4 @@ th {
 .detailTransition-leave-to {
   opacity: 0;
 }
-
-/* :focus {
-  outline: none;
-}
-
-.col-3 {
-  float: left;
-  width: 27.33%;
-  margin: 40px 3%;
-  position: relative;
-}  */ /* necessary to give position: relative to parent. */
-
-/* .effect-9 ~ .focus-border:before,
-.effect-9 ~ .focus-border:after {
-  content: '';
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 0;
-  height: 2px;
-  background-color: #373BA6;
-  transition: 0.2s;
-  transition-delay: 0.2s;
-}
-.effect-9 ~ .focus-border:after {
-  top: auto;
-  bottom: 0;
-  right: auto;
-  left: 0;
-  transition-delay: 0.6s;
-}
-.effect-9 ~ .focus-border i:before,
-.effect-9 ~ .focus-border i:after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 2px;
-  height: 0;
-  background-color: #373BA6;
-  transition: 0.2s;
-}
-.effect-9 ~ .focus-border i:after {
-  left: auto;
-  right: 0;
-  top: auto;
-  bottom: 0;
-  transition-delay: 0.4s;
-}
-.effect-9:focus ~ .focus-border:before,
-.effect-9:focus ~ .focus-border:after {
-  width: 100%;
-  transition: 0.2s;
-  transition-delay: 0.6s;
-}
-.effect-9:focus ~ .focus-border:after {
-  transition-delay: 0.2s;
-}
-.effect-9:focus ~ .focus-border i:before,
-.effect-9:focus ~ .focus-border i:after {
-  height: 100%;
-  transition: 0.2s;
-}
-.effect-9:focus ~ .focus-border i:after {
-  transition-delay: 0.4s;
-} */
 </style>

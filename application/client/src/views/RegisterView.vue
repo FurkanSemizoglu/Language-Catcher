@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import axios from 'axios';
 import { ref } from 'vue';
-import { RouterLink } from 'vue-router';
+
 import { useRouter } from 'vue-router';
 const email = ref<string>('');
 const password = ref<string>('');

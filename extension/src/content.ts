@@ -159,7 +159,7 @@ const detectHtmlLang = (): string => {
 const takeParagraphs = async (): Promise<string> => {
   const listOfParagraphTags = document.getElementsByTagName('p')
   const newArray = Array.from(listOfParagraphTags)
-/*   let searchDivText: boolean = false */
+/*   const searchDivText: boolean = false */
   const pTagTextsArray: string[] = []
 
   for (let index = 0; index < newArray.length; index++) {
