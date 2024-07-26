@@ -4,54 +4,17 @@ import { onMounted, ref } from 'vue';
 
 const token = ref<string | null>('');
 const user = ref<string | null>('');
-
 const url = ref<string>('');
+let loadingButton = ref<boolean>(false);
+
 import { useToast } from 'vue-toastification';
 import UrlCard from '../components/UrlCard.vue';
+import { extensionResult } from '../types';
 
 const toast = useToast();
-let loadingButton = ref<boolean>(false);
 token.value = localStorage.getItem('token');
 
-interface LanguageLocation {
-  locacalStorage: boolean;
-  sessionnStorage: boolean;
-  metaTag: boolean;
-  htmlTag: boolean;
-  url: boolean;
-  paragraph: boolean;
-}
-
-interface extensionResult {
-  status: string;
-  domain: string;
-  language: string;
-  languageFetchedFrom: string[];
-  langName: string;
-  langNativeName: string;
-  languageLocation: LanguageLocation;
-  languageAccuracy: string;
-}
-
 const returnedValues = ref<extensionResult[]>([]);
-
-/* const products = ref<
-  Array<{ url: string; language: string; detectedPlaces: string; accuracy: number }>
->([]);
-products.value = [
-  { url: 'P001', language: 'en', detectedPlaces: 'Category 1', accuracy: 10 },
-  { url: 'P002', language: 'Product 2', detectedPlaces: 'Category 2', accuracy: 20 },
-  { url: 'P003', language: 'Product 3', detectedPlaces: 'Category 1', accuracy: 30 },
-  { url: 'P004', language: 'Product 4', detectedPlaces: 'Category 3', accuracy: 40 },
-  { url: 'P004', language: 'Product 4', detectedPlaces: 'Category 3', accuracy: 40 },
-  { url: 'P004', language: 'Product 4', detectedPlaces: 'Category 3', accuracy: 40 },
-  { url: 'P004', language: 'Product 4', detectedPlaces: 'Category 3', accuracy: 40 },
-  { url: 'P004', language: 'Product 4', detectedPlaces: 'Category 3', accuracy: 40 },
-  { url: 'P004', language: 'Product 4', detectedPlaces: 'Category 3', accuracy: 40 },
-  { url: 'P004', language: 'Product 4', detectedPlaces: 'Category 3', accuracy: 40 },
-  { url: 'P004', language: 'Product 4', detectedPlaces: 'Category 3', accuracy: 40 },
-  { url: 'P004', language: 'Product 4', detectedPlaces: 'Category 3', accuracy: 40 }
-]; */
 
 window.addEventListener('languageCatcherResult', (e) => {
   loadingButton.value = false;
@@ -105,24 +68,7 @@ const logout = () => {
   <div>
     <div class="topBar m-a flex w-full items-center justify-between px-8 py-6">
       <div class="cursor-pointer text-[#888AD3] hover:text-[#C0C5E5]">{{ user }}</div>
-      <!-- <div class="flex items-center">
-        <input
-          type="text"
-          v-model="url"
-          placeholder="URL"
-          class="border-1 w-[400px] rounded-md border p-2"
-        />
-        <Button
-          type="button"
-          label="Search"
-          icon="pi pi-search"
-          :loading="loadingButton"
-          @click="sendUrlToExtension"
-          severity="secondary"
-          class="bg-[#2C39A6] text-white"
-          button.primary.color="blue"
-        />
-      </div> -->
+
       <div class="mr-3 cursor-pointer text-[#888AD3] hover:text-[#C0C5E5]" @click="logout">
         Çıkış Yap
       </div>
@@ -143,7 +89,7 @@ const logout = () => {
         </button>
       </div>
 
-      <div class="mt-25">
+      <div class="mt-20">
         <div class="cols-3 font-600 grid rounded-md border border-gray-300">
           <div class="h-full w-full rounded-md border border-gray-300 p-4 text-[#273464]">URL</div>
           <div class="h-full w-full rounded-md border border-gray-300 p-4 text-[#273464]">
@@ -156,7 +102,6 @@ const logout = () => {
 
         <div v-for="(value, index) in returnedValues" :key="index">
           <UrlCard
-           
             :url="value.domain"
             :detected-language="value.language"
             :detected-places="value.languageFetchedFrom"
