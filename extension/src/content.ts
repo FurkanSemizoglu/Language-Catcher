@@ -157,10 +157,10 @@ const detectHtmlLang = (): string => {
 }
 
 const takeParagraphs = async (): Promise<string> => {
-  let listOfParagraphTags = document.getElementsByTagName('p')
+  const listOfParagraphTags = document.getElementsByTagName('p')
   const newArray = Array.from(listOfParagraphTags)
-  let searchDivText: boolean = false
-  let pTagTextsArray: string[] = []
+/*   let searchDivText: boolean = false */
+  const pTagTextsArray: string[] = []
 
   for (let index = 0; index < newArray.length; index++) {
     if (
@@ -176,9 +176,9 @@ const takeParagraphs = async (): Promise<string> => {
     }
   }
 
-  if (pTagTextsArray.length < 2) {
+  /* if (pTagTextsArray.length < 2) {
     searchDivText = true
-  }
+  } */
 
   console.log('pTagsArray', pTagTextsArray)
   pTagTextsArray.forEach((text) => {
@@ -381,9 +381,9 @@ const sendResponse = (
 }
 
 const languageDetectPrediction = async (): Promise<LanguageData> => {
-  let detectedLanguages: string[] | any[] = []
-  let detectedPlaces: string[] = []
-  let paragraphCorrectObj = { value: false }
+  const detectedLanguages: string[] | any[] = []
+  const detectedPlaces: string[] = []
+  const paragraphCorrectObj = { value: false }
 
   checkUrl(detectedLanguages, detectedPlaces)
   checkHtmlLang(detectedLanguages, detectedPlaces)

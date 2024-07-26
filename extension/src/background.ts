@@ -19,7 +19,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   console.log('background received message', request)
   console.log('URL : ', request.url)
 
-  let langData: LanguageData = {
+  const langData: LanguageData = {
     language: '',
     findedPlaces: [],
     paragraphLang: false,

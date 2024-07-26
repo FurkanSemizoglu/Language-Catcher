@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { ref  , onMounted} from 'vue'
 
-const showUrl = ref<boolean>(false)
+/* const showUrl = ref<boolean>(false)
 const showLanguage = ref<boolean>(false)
-const URL = ref<string>('')
+const URL = ref<string>('') */
 let language = ref<string>('')
 let detectedPlaces = ref<string[]>([])
 let paragraphExist = ref<boolean>(false)
@@ -11,9 +11,9 @@ let langName = ref<string>('')
 let langNativeName = ref<string>('')
 import languages from './types'
 
-const showUrlButtonClicked = () => {
+/* const showUrlButtonClicked = () => {
   showUrl.value = !showUrl.value
-}
+} */
 
 window.addEventListener('language-catcher-start', (e) => {
   console.log('Language catcher is starting')
