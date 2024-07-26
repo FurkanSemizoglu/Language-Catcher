@@ -58,7 +58,10 @@ const sendUrlToExtension = () => {
   window.dispatchEvent(sendedURL);
 };
 
-const logout = () => {
+const logout = async() => {
+
+  const response = await axios.get('http://localhost:5000/auth/logout');
+
   localStorage.removeItem('token');
   window.location.href = '/';
 };

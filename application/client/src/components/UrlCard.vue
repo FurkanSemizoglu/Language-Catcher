@@ -11,25 +11,7 @@ const toggleDetails = () => {
   showDetails.value = !showDetails.value;
 };
 
-/* interface LanguageLocation {
-  locacalStorage: boolean;
-  sessionnStorage: boolean;
-  metaTag: boolean;
-  htmlTag: boolean;
-  url: boolean;
-  paragraph: boolean;
-}
 
-
-interface result {
-  url: string;
-  detectedLanguage: string;
-  detectedPlaces: string[];
-  languageLocation: LanguageLocation;
-  langName: string;
-  langNativeName: string;
-}
- */
 const props = defineProps<urlCardResultProps>();
 </script>
 
