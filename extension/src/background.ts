@@ -1,10 +1,10 @@
-console.log('background is running');
+console.log('background is running')
 
 interface LanguageData {
-  language: string;
-  findedPlaces: string[];
-  paragraphLang?: boolean;
-  languageLocation?: LanguageLocation | null;
+  language: string
+  findedPlaces: string[]
+  paragraphLang?: boolean
+  languageLocation: LanguageLocation
 }
 
 interface LanguageLocation {
@@ -16,33 +16,40 @@ interface LanguageLocation {
   paragraph: boolean
 }
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  console.log('background received message', request);
-  console.log('URL : ', request.url);
+  console.log('background received message', request)
+  console.log('URL : ', request.url)
 
   let langData: LanguageData = {
     language: '',
     findedPlaces: [],
     paragraphLang: false,
-    languageLocation : null
-  };
+    languageLocation: {
+      locacalStorage: false,
+      sessionnStorage: false,
+      metaTag: false,
+      htmlTag: false,
+      url: false,
+      paragraph: false
+    }
+  }
 
   if (request.message === 'URL-sended') {
-    console.log('URL-sended');
-    const newURL: string = request.url;
+    console.log('URL-sended')
+    const newURL: string = request.url
 
     try {
-      console.log('trying new tab creation');
+      console.log('trying new tab creation')
       chrome.windows.create({ url: newURL }).then((window: chrome.windows.Window) => {
-        console.log('tab created successfully');
+        console.log('tab created successfully')
 
         chrome.tabs.onUpdated.addListener(function listener(tabId, changeInfo, tab) {
-          console.log('new window has been triggered');
+          console.log('new window has been triggered')
 
           if (changeInfo.status === 'complete' && tab.windowId === window.id) {
-            console.log('tab is complete');
+            console.log('tab is complete')
 
             try {
-              chrome.tabs.query({ active: true, windowId: window.id }, (tabs : any) => {
+              chrome.tabs.query({ active: true, windowId: window.id }, (tabs: any) => {
                 if (tabs.length > 0) {
                   chrome.tabs.sendMessage(
                     tabs[0].id,
@@ -52,60 +59,53 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                       tabUrl: tabs[0].url
                     },
                     (response) => {
-                      console.log('response from content languages data  : ', response);
-                      langData.language = response.language;
-                      langData.findedPlaces = response.findedPlaces;
-
-                      if (response.paragraphLang) {
-                        langData.paragraphLang = response.paragraphLang;
-                      }
-
+                      console.log('response from content languages data  : ', response)
+                      
                       if (response) {
-                        console.log('lang data checker for ready-to-detect', langData);
-                        console.log('lang data checker for ready to detect', langData.findedPlaces);
-                        sendResponse(langData);
+                        langData.language = response.language
+                        langData.findedPlaces = response.findedPlaces
+                        langData.paragraphLang = response.paragraphLang ?? false
+                        langData.languageLocation = response.languageLocation;                    
 
-                        chrome.tabs.remove(tabs[0].id);
+                        sendResponse(langData)
+
+                        chrome.tabs.remove(tabs[0].id)
                       }
                     }
-                  );
+                  )
                 }
-              });
+              })
 
-              return true; // Indicate that sendResponse will be called asynchronously
+              return true // Indicate that sendResponse will be called asynchronously
             } catch (error) {
-              console.log('error in background', error);
+              console.log('error in background', error)
             }
           }
-        });
-      });
+        })
+      })
     } catch (error) {
-      console.log('error while creating new tab', error);
+      console.log('error while creating new tab', error)
     }
-    return true; // Indicate that sendResponse will be called asynchronously
+    return true // Indicate that sendResponse will be called asynchronously
   } else if (request.message === 'show-language-in-same-page') {
-    console.log('show-language-in-same-page task is working in background.ts');
+    console.log('show-language-in-same-page task is working in background.ts')
 
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs :any) => {
-      chrome.tabs.sendMessage(
-        tabs[0].id,
-        { action: 'show-language-in-same-page' },
-        (response) => {
-          console.log('response from content languages data  : ', response);
-          langData.language = response.language;
-          langData.findedPlaces = response.findedPlaces;
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs: any) => {
+      chrome.tabs.sendMessage(tabs[0].id, { action: 'show-language-in-same-page' }, (response) => {
+        console.log('response from content languages data  : ', response)
+        langData.language = response.language
+        langData.findedPlaces = response.findedPlaces
 
-          if (response.paragraphLang) {
-            langData.paragraphLang = response.paragraphLang;
-          }
-          console.log('lang data checker', langData);
-          console.log('lang data checker', langData.findedPlaces);
-
-          sendResponse(langData);
+        if (response.paragraphLang) {
+          langData.paragraphLang = response.paragraphLang
         }
-      );
-    });
-    return true;
+        console.log('lang data checker', langData)
+        console.log('lang data checker', langData.findedPlaces)
+
+        sendResponse(langData)
+      })
+    })
+    return true
   }
-  return false;
-});
+  return false
+})

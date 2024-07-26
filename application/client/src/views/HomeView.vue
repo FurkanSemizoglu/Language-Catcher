@@ -16,7 +16,9 @@ import { faAngleLeft } from '@fortawesome/free-solid-svg-icons';
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
 import { faTrashCan } from '@fortawesome/free-solid-svg-icons';
 
-
+/* import "vue3-circle-progress/dist/circle-progress.css";
+import CircleProgress from "vue3-circle-progress";
+ */
 const url = ref<string>('');
 import { useToast } from 'vue-toastification';
 import UrlCard from '../components/UrlCard.vue';
@@ -71,6 +73,7 @@ window.addEventListener('languageCatcherResult', (e) => {
   returnedValues.value.push(event.detail);
   console.log(language);
   console.log('array : ', returnedValues.value);
+  url.value = '';
 });
 
 onMounted(async () => {
@@ -117,20 +120,25 @@ const toggleDetails = () => {
   showDetails.value = !showDetails.value;
   console.log(showDetails.value);
 };
+
+const logout = () => {
+  localStorage.removeItem('token');
+  window.location.href = '/';
+};
 </script>
 
 <template>
   <div>
     <div class="topBar m-a flex w-full items-center justify-between px-8 py-6">
-      <div>{{ user }}</div>
-      <div class="mr-3 flex items-center">
-        <!--   <input
+      <div class="cursor-pointer text-[#888AD3] hover:text-[#C0C5E5]">{{ user }}</div>
+      <!-- <div class="flex items-center">
+        <input
           type="text"
           v-model="url"
           placeholder="URL"
           class="border-1 w-[400px] rounded-md border p-2"
-        /> -->
-        <!--   <Button
+        />
+        <Button
           type="button"
           label="Search"
           icon="pi pi-search"
@@ -139,9 +147,11 @@ const toggleDetails = () => {
           severity="secondary"
           class="bg-[#2C39A6] text-white"
           button.primary.color="blue"
-        /> -->
+        />
+      </div> -->
+      <div class="cursor-pointer text-[#888AD3] hover:text-[#C0C5E5] mr-3" @click="logout">
+        Çıkış Yap
       </div>
-      <div>Çıkış Yap</div>
     </div>
     <div class="m-a mt-5 w-4/5">
       <div class="m-a relative mt-8 inline-block flex w-[600px] items-center justify-center">
@@ -149,10 +159,10 @@ const toggleDetails = () => {
           type="text"
           v-model="url"
           placeholder="Dil algılamak için url giriniz..."
-          class="bg-#F2F2F2 border-b-coolGray w-full rounded-3xl p-4 focus:border-none"
+          class="bg-#F2F2F2 border-b-coolGray w-full rounded-3xl p-4 focus:border-none focus:outline-[#DCE2EE]"
         />
         <button
-          class="absolute right-0 rounded-r-3xl bg-[#0059F7] p-4 text-white"
+          class="absolute right-0 rounded-r-3xl bg-[#0059F7] p-4 text-white transition duration-300 ease-in-out hover:bg-[#3E83F7]"
           @click="sendUrlToExtension"
         >
           Search
@@ -168,16 +178,23 @@ const toggleDetails = () => {
 
       <div class="mt-25">
         <div class="cols-3 font-600 grid rounded-md border border-gray-300">
-          <div class="h-full w-full rounded-md border border-gray-300 p-4">URL</div>
-          <div class="h-full w-full rounded-md border border-gray-300 p-4">LANGUAGE</div>
-          <div class="h-full w-full rounded-md border border-gray-300 p-4">
+          <div class="h-full w-full rounded-md border border-gray-300 p-4 text-[#273464]">URL</div>
+          <div class="h-full w-full rounded-md border border-gray-300 p-4 text-[#273464]">
+            LANGUAGE
+          </div>
+          <div class="h-full w-full rounded-md border border-gray-300 p-4 text-[#273464]">
             <div>DETECTED PLACES</div>
           </div>
         </div>
 
         <div v-for="(value, index) in returnedValues">
-          <UrlCard :url="value.domain" :detected-language="value.language" :detected-places="value.languageFetchedFrom"/>
-        <!--   <div class="cols-3 mt-3 grid rounded-md border border-gray-300">
+          <UrlCard
+            :url="value.domain"
+            :detected-language="value.language"
+            :detected-places="value.languageFetchedFrom"
+            :language-location="value.languageLocation"
+          />
+          <!--   <div class="cols-3 mt-3 grid rounded-md border border-gray-300">
             <div class="h-full p-4">{{value.domain}}</div>
             <div class="h-full w-full p-4">en-Englısh</div>
             <div class="flex h-full w-full items-center justify-between p-4">

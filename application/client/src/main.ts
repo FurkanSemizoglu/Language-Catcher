@@ -9,7 +9,7 @@ import '../src/assets/global.css';
 import PrimeVue from 'primevue/config';
 import Aura from '@primevue/themes/aura';
 import 'animate.css';
-
+import "vue3-circle-progress/dist/circle-progress.css";
 // Vuetify
 import 'vuetify/styles';
 import { createVuetify } from 'vuetify';

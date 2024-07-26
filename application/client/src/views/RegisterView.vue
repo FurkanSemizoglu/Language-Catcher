@@ -25,8 +25,6 @@ const togglePasswordVisibility2 = () => {
   passwordFieldType2.value = passwordFieldType2.value === 'password' ? 'text' : 'password';
 };
 
-
-
 const toast = useToast();
 const router = useRouter();
 
@@ -36,6 +34,10 @@ const returnToLogin = () => {
 
 const register = async () => {
   if (email.value && password.value && password2.value) {
+    if (password.value !== password2.value) {
+      toast.error('Passwords do not match');
+      return;
+    }
     const bodyFormData = {
       email: email.value,
       password: password.value
@@ -68,11 +70,6 @@ const register = async () => {
   } else {
     toast.error('Email or password input not found');
   }
-
-  if (password.value !== password2.value) {
-    toast.error('Passwords do not match');
-    return;
-  }
 };
 </script>
 
@@ -82,7 +79,7 @@ const register = async () => {
       <img
         src="../../public/world.jpg"
         alt="World"
-        class="h-full max-h-full max-w-full object-cover rounded-md"
+        class="h-full max-h-full max-w-full rounded-md object-cover"
       />
       <div class="animate__animated animate__fadeInDown font-900 absolute text-4xl text-white">
         Efilli Dil Algılama Uygulaması
@@ -92,7 +89,6 @@ const register = async () => {
       <div class="mx-a ml-4 flex w-[90%] flex-col items-center justify-center">
         <div class="font-900 mb-4 text-3xl text-[#2C39A6]">Kayıt Ol</div>
         <div class="mt-1 flex w-full flex-col items-center justify-center gap-4">
-
           <div class="relative w-[85%]">
             <input
               v-model="email"
@@ -114,7 +110,7 @@ const register = async () => {
             <FontAwesomeIcon
               @click="togglePasswordVisibility"
               :icon="passwordFieldType === 'password' ? faEye : faEyeSlash"
-              class="absolute right-4 top-0 mt-5 cursor-pointer w-5"
+              class="absolute right-4 top-0 mt-5 w-5 cursor-pointer"
               style="color: #6f6f6f"
             />
           </div>
@@ -131,21 +127,19 @@ const register = async () => {
             <FontAwesomeIcon
               @click="togglePasswordVisibility2"
               :icon="passwordFieldType2 === 'password' ? faEye : faEyeSlash"
-              class="absolute right-4 top-0 mt-5 cursor-pointer w-5"
+              class="absolute right-4 top-0 mt-5 w-5 cursor-pointer"
               style="color: #6f6f6f"
             />
           </div>
 
           <div class="flex gap-4">
-
             <button
               class="font-500 cursor-pointer rounded-md border-none bg-[#FFFFFF] p-4 text-[#2C39A6] transition-colors duration-300 ease-in-out hover:bg-[#E7E8EE]"
               @click="returnToLogin"
             >
-            <FontAwesomeIcon :icon="faArrowLeft" class="mr-1" style="color: #373ba6;" />
+              <FontAwesomeIcon :icon="faArrowLeft" class="mr-1" style="color: #373ba6" />
               Girişe Dön
             </button>
-
 
             <button
               @click="register"
@@ -154,8 +148,6 @@ const register = async () => {
               Kayıt ol
             </button>
           </div>
-
-        
         </div>
       </div>
     </div>

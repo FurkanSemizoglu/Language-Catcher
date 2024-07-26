@@ -16,7 +16,7 @@ window.addEventListener('language-catcher-start', (e) => {
 
   chrome.runtime.sendMessage({ message: 'URL-sended', url: url }, (response: any) => {
     console.log('message sent to background to run in application')
-    console.log('response from background for url sended : ', response)
+    console.log('response from background for url sended for application ', response)
 
       
     
