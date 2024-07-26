@@ -18,14 +18,16 @@ window.addEventListener('language-catcher-start', (e) => {
     console.log('message sent to background to run in application')
     console.log('response from background for url sended for application ', response)
 
-      
-    
+    const langName = languages[response.language].name
+    const langNativeName = languages[response.language].nativeName
     const languageCatcherResult = new CustomEvent('languageCatcherResult', {
       detail: {
         status: 'completed',
         domain: url,
         language: response.language,
         languageFetchedFrom: response.findedPlaces,
+        langName: langName,
+        langNativeName: langNativeName,
         languageLocation: response.languageLocation,
         languageAccuracy: 'high'
       }
@@ -34,7 +36,6 @@ window.addEventListener('language-catcher-start', (e) => {
     window.dispatchEvent(languageCatcherResult)
   })
 })
-
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   console.log('who is sender', sender)
@@ -45,7 +46,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     languageDetectPrediction().then((data) => {
       console.log('data from content.ts for new tab url : ', data)
 
-  /*     const languageCatcherResult = new CustomEvent('languageCatcherResult', {
+      /*     const languageCatcherResult = new CustomEvent('languageCatcherResult', {
         detail: {
           status: 'completed',
           domain: 'example.com',
@@ -57,10 +58,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       })
 
       window.dispatchEvent(languageCatcherResult) */
-      console.log("requested tab id " , request.tabID);
+      console.log('requested tab id ', request.tabID)
       /* chrome.tabs.remove(request.tabID) */
       sendResponse(data)
-    /*   chrome.tabs.query({ active: true, currentWindow: true }, (tabs: any) => {
+      /*   chrome.tabs.query({ active: true, currentWindow: true }, (tabs: any) => {
         chrome.tabs.remove(tabs[0].id)
       }) */
     })
@@ -184,7 +185,7 @@ const takeParagraphs = async (): Promise<string> => {
     console.log(text.length)
   })
 
-/*   if (searchDivText) {
+  /*   if (searchDivText) {
     document.querySelectorAll('div').forEach((div) => {
       if (
         div.innerText.trim().length > 50 &&
@@ -320,10 +321,19 @@ const checkStorage = (detectedLanguages: string[], detectedPlaces: string[]) => 
 const checkMetaTag = (detectedLanguages: string[], detectedPlaces: string[]) => {
   const detectedMetaTag = detectMetaTag()
   if (detectedMetaTag !== '') {
-    detectedLanguages.push(detectedMetaTag)
-    detectedPlaces.push('meta tag')
-    console.log('detected meta tag : ', detectedMetaTag)
-    metaTag = true
+    if (detectedLanguages.length > 0 && detectedLanguages[0] === detectedMetaTag) {
+      detectedLanguages.push(detectedMetaTag)
+      detectedPlaces.push('meta tag')
+      console.log('detected meta tag : ', detectedMetaTag)
+      metaTag = true
+    } else if (detectedLanguages.length === 0) {
+      detectedLanguages.push(detectedMetaTag)
+      detectedPlaces.push('meta tag')
+      console.log('detected meta tag : ', detectedMetaTag)
+      metaTag = true
+    } else {
+      metaTag = false
+    }
   }
 }
 
@@ -345,8 +355,6 @@ const checkParagraphs = async (
     }
   }
 }
-
-
 
 const sendResponse = (
   detectedLanguages: string[],
@@ -384,15 +392,15 @@ const languageDetectPrediction = async (): Promise<LanguageData> => {
   await checkParagraphs(detectedLanguages, paragraphCorrectObj)
 
   const languageLocation = {
-    locacalStorage : locallStorage,
-    sessionnStorage : sessionnStorage,
-    metaTag : metaTag,
-    htmlTag : htmlTag,
+    locacalStorage: locallStorage,
+    sessionnStorage: sessionnStorage,
+    metaTag: metaTag,
+    htmlTag: htmlTag,
     url: urlFlag,
     paragraph: paragraph
   }
   console.log('detected places : ', detectedPlaces)
   console.log('detected languages : ', detectedLanguages)
   console.log('paragraph Correct : ', paragraphCorrectObj.value)
-  return sendResponse(detectedLanguages, detectedPlaces, paragraphCorrectObj , languageLocation)
+  return sendResponse(detectedLanguages, detectedPlaces, paragraphCorrectObj, languageLocation)
 }

@@ -41,13 +41,15 @@ interface extensionResult {
   domain: string;
   language: string;
   languageFetchedFrom: string[];
+  langName: string;
+  langNativeName: string;
   languageLocation: LanguageLocation;
   languageAccuracy: string;
 }
 
 const returnedValues = ref<extensionResult[]>([]);
 
-const products = ref<
+/* const products = ref<
   Array<{ url: string; language: string; detectedPlaces: string; accuracy: number }>
 >([]);
 products.value = [
@@ -63,7 +65,7 @@ products.value = [
   { url: 'P004', language: 'Product 4', detectedPlaces: 'Category 3', accuracy: 40 },
   { url: 'P004', language: 'Product 4', detectedPlaces: 'Category 3', accuracy: 40 },
   { url: 'P004', language: 'Product 4', detectedPlaces: 'Category 3', accuracy: 40 }
-];
+]; */
 
 window.addEventListener('languageCatcherResult', (e) => {
   loadingButton.value = false;
@@ -193,6 +195,8 @@ const logout = () => {
             :detected-language="value.language"
             :detected-places="value.languageFetchedFrom"
             :language-location="value.languageLocation"
+            :lang-name="value.langName"
+            :lang-native-name="value.langNativeName"
           />
           <!--   <div class="cols-3 mt-3 grid rounded-md border border-gray-300">
             <div class="h-full p-4">{{value.domain}}</div>

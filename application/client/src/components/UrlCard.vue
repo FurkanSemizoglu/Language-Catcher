@@ -33,6 +33,8 @@ interface result {
   detectedLanguage: string;
   detectedPlaces: string[];
   languageLocation: LanguageLocation;
+  langName: string;
+  langNativeName: string;
 }
 
 const props = defineProps<result>();
@@ -41,7 +43,7 @@ const props = defineProps<result>();
 <template>
   <div class="cols-3 mt-3 grid rounded-md border border-gray-300">
     <div class="h-full p-4">{{ props.url }}</div>
-    <div class="h-full w-full p-4">{{ props.detectedLanguage }}</div>
+    <div class="h-full w-full p-4">{{ props.detectedLanguage }} - {{ props.langName }} - {{ props.langNativeName }}</div>
     <div class="flex h-full w-full items-center justify-between p-4">
       <div>
         <span v-for="place in props.detectedPlaces"
