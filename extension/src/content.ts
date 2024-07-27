@@ -18,11 +18,17 @@ window.addEventListener('language-catcher-start', (e) => {
     console.log('message sent to background to run in application')
     console.log('response from background for url sended for application ', response)
 
-    const langName = languages[response.language].name
-    const langNativeName = languages[response.language].nativeName
+    let langName: string = '-'
+    let langNativeName: string = '-'
+    const status = response.language === 'not detected' ? 'failed' : 'completed'
+    if (status === 'completed') {
+      langName = languages[response.language].name
+      langNativeName = languages[response.language].nativeName
+    }
+
     const languageCatcherResult = new CustomEvent('languageCatcherResult', {
       detail: {
-        status: 'completed',
+        status: status,
         domain: url,
         language: response.language,
         languageFetchedFrom: response.findedPlaces,
@@ -159,7 +165,7 @@ const detectHtmlLang = (): string => {
 const takeParagraphs = async (): Promise<string> => {
   const listOfParagraphTags = document.getElementsByTagName('p')
   const newArray = Array.from(listOfParagraphTags)
-/*   const searchDivText: boolean = false */
+  /*   const searchDivText: boolean = false */
   const pTagTextsArray: string[] = []
 
   for (let index = 0; index < newArray.length; index++) {
@@ -249,7 +255,7 @@ interface LanguageData {
   findedPlaces: string[]
   paragraphLang?: boolean
   languageLocation?: LanguageLocation
-  accuracy : string
+  accuracy: string
 }
 
 interface LanguageLocation {
@@ -381,7 +387,7 @@ const sendResponse = (
       findedPlaces: detectedPlaces,
       paragraphLang: paragraphCorrectObj.value,
       languageLocation: languageLocation,
-      accuracy : "low"
+      accuracy: 'low'
     }
   }
 }
@@ -390,7 +396,7 @@ const languageDetectPrediction = async (): Promise<LanguageData> => {
   const detectedLanguages: string[] | any[] = []
   const detectedPlaces: string[] = []
   const paragraphCorrectObj = { value: false }
-  let accuracy : string = ''
+  let accuracy: string = ''
   checkUrl(detectedLanguages, detectedPlaces)
   checkHtmlLang(detectedLanguages, detectedPlaces)
   checkMetaTag(detectedLanguages, detectedPlaces)
@@ -409,12 +415,21 @@ const languageDetectPrediction = async (): Promise<LanguageData> => {
   console.log('detected places : ', detectedPlaces)
   console.log('detected languages : ', detectedLanguages)
   console.log('paragraph Correct : ', paragraphCorrectObj.value)
-  return sendResponse(detectedLanguages, detectedPlaces, paragraphCorrectObj, languageLocation ,accuracy)
+  return sendResponse(
+    detectedLanguages,
+    detectedPlaces,
+    paragraphCorrectObj,
+    languageLocation,
+    accuracy
+  )
 }
 
-
-const accuracyCalculator = (detectedPlaces: string[] , paragraphCorrectObj : boolean): string => {
-  if (detectedPlaces[0] === 'url' || (detectedPlaces.length === 1 && paragraphCorrectObj) || (detectedPlaces.length >= 2)) {
+const accuracyCalculator = (detectedPlaces: string[], paragraphCorrectObj: boolean): string => {
+  if (
+    detectedPlaces[0] === 'url' ||
+    (detectedPlaces.length === 1 && paragraphCorrectObj) ||
+    detectedPlaces.length >= 2
+  ) {
     return 'high'
   } else if (detectedPlaces.length === 1) {
     return 'medium'

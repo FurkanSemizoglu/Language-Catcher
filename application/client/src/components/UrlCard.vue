@@ -4,16 +4,27 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { faAngleDown } from '@fortawesome/free-solid-svg-icons';
 import { faTrashCan } from '@fortawesome/free-solid-svg-icons';
 import { urlCardResultProps } from '../types';
+import AccuracyCircle from '../components/AccuracyCircle.vue';
+
+
+const props = defineProps<urlCardResultProps>();
+
+
+const detectedLanguagesText = ref<string>('');
+if(props.detectedLanguage === 'not detected'){
+  detectedLanguagesText.value = 'Dil tespit edilemedi';
+} else {
+  detectedLanguagesText.value = props.detectedLanguage + " - " + props.langName + " - " + props.langNativeName;
+}
+
 
 /* import AccuracyCircle from './AccuracyCircle.vue' */
-import AccuracyCircle from '../components/AccuracyCircle.vue';
 const showDetails = ref<boolean>(false);
 
 const toggleDetails = () => {
   showDetails.value = !showDetails.value;
 };
 
-const props = defineProps<urlCardResultProps>();
 </script>
 
 <template>
@@ -22,7 +33,7 @@ const props = defineProps<urlCardResultProps>();
       {{ props.url }}
     </div>
     <div class="flex h-full w-full items-center justify-between p-4">
-      {{ props.detectedLanguage }} - {{ props.langName }} - {{ props.langNativeName }}
+      {{ detectedLanguagesText }}
     </div>
     <div class="flex h-full w-full items-center justify-between p-4">
       <div>

@@ -10,7 +10,6 @@ let loadingButton = ref<boolean>(false);
 import { useToast } from 'vue-toastification';
 import UrlCard from '../components/UrlCard.vue';
 import { extensionResult } from '../types';
-import AccuracyCircle from '../components/AccuracyCircle.vue';
 
 const toast = useToast();
 token.value = localStorage.getItem('token');
@@ -59,8 +58,7 @@ const sendUrlToExtension = () => {
   window.dispatchEvent(sendedURL);
 };
 
-const logout = async() => {
-
+const logout = async () => {
   const response = await axios.get('http://localhost:5000/auth/logout');
 
   localStorage.removeItem('token');
@@ -69,7 +67,6 @@ const logout = async() => {
 </script>
 
 <template>
-
   <div>
     <div class="topBar m-a flex w-full items-center justify-between px-8 py-6">
       <div class="cursor-pointer text-[#888AD3] hover:text-[#C0C5E5]">{{ user }}</div>
@@ -104,11 +101,10 @@ const logout = async() => {
             <div>DETECTED PLACES</div>
           </div>
           <div class="h-full w-full rounded-md border border-gray-300 p-4 text-[#273464]">
-            <div>ACCURACY </div>
+            <div>ACCURACY</div>
           </div>
         </div>
 
-          
         <div v-for="(value, index) in returnedValues" :key="index">
           <UrlCard
             :url="value.domain"
