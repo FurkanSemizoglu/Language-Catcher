@@ -21,7 +21,6 @@ const languageSchema  = new mongoose.Schema({
         required: true
     },
     languageLocation: {
-        id: { type: mongoose.Schema.Types.ObjectId , ref: 'LanguageLocation' },
         type: mongoose.Schema.Types.ObjectId,
         ref: 'LanguageLocation',
         required: true

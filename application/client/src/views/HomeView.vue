@@ -16,27 +16,23 @@ token.value = localStorage.getItem('token');
 
 const returnedValues = ref<extensionResult[]>([]);
 
-window.addEventListener('languageCatcherResult', async(e) => {
+window.addEventListener('languageCatcherResult', async (e) => {
   loadingButton.value = false;
   console.log('Result from extension', e);
   const event = e as CustomEvent;
   const language = event.detail.language;
 
-
   try {
     const response = await axios.post('http://localhost:5000/api/addLanguage', {
-    email : user.value,
-    languageData : event.detail
-  });
+      email: user.value,
+      languageData: event.detail
+    });
 
-  console.log("abi gitti artık " , response.data);
+    console.log('abi gitti artık ', response.data);
   } catch (error) {
     console.log(error);
-    
   }
 
-
-  
   returnedValues.value.push(event.detail);
   console.log(language);
   console.log('array : ', returnedValues.value);
@@ -46,13 +42,24 @@ window.addEventListener('languageCatcherResult', async(e) => {
 onMounted(async () => {
   console.log('token', token.value);
 
-  const response = await axios.post('http://localhost:5000/auth/user', {
-    token: token.value
-  });
+  try {
+    const response = await axios.post('http://localhost:5000/auth/user', {
+      token: token.value
+    });
 
-  console.log(response.data);
-  console.log('email ', response.data.user.email);
-  user.value = response.data.user.email;
+    console.log(response.data);
+    user.value = response.data.user.email;
+
+    const languagesResponse = await axios.get('http://localhost:5000/api/getUserLanguages', {
+      params: { email: response.data.user.email }
+    });
+
+    console.log('languagesss', languagesResponse.data);
+    console.log('email ', response.data.user.email);
+    user.value = response.data.user.email;
+  } catch (error) {
+    console.log(error);
+  }
 });
 
 const sendUrlToExtension = () => {

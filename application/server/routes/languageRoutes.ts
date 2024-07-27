@@ -1,13 +1,13 @@
 const express = require("express");
 const cors = require("cors");
-const { addLanguageToUser } = require("../controllers/languageControllers");
+const { addLanguageToUser , getUserLanguages } = require("../controllers/languageControllers");
 
 const router = express.Router();
 
 router.use(cors());
 
 router.post('/addLanguage', addLanguageToUser);
-
+router.get('/getUserLanguages', getUserLanguages);
 /* 
 router.get('/api/getLanguageList', getLanguageList);
 router.post('/api/getLanguageById', getLanguageById);
