@@ -5,6 +5,7 @@ interface LanguageData {
   findedPlaces: string[]
   paragraphLang?: boolean
   languageLocation: LanguageLocation
+  accuracy : string
 }
 
 interface LanguageLocation {
@@ -30,7 +31,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       htmlTag: false,
       url: false,
       paragraph: false
-    }
+    },
+    accuracy: 'low'
   }
 
   if (request.message === 'URL-sended') {
@@ -41,13 +43,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       console.log('trying new tab creation')
       chrome.windows.create({ url: newURL }).then((window: chrome.windows.Window) => {
         console.log('tab created successfully')
-
         chrome.tabs.onUpdated.addListener(function listener(tabId, changeInfo, tab) {
           console.log('new window has been triggered')
-
           if (changeInfo.status === 'complete' && tab.windowId === window.id) {
             console.log('tab is complete')
-
             try {
               chrome.tabs.query({ active: true, windowId: window.id }, (tabs: any) => {
                 if (tabs.length > 0) {
@@ -60,13 +59,13 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                     },
                     (response) => {
                       console.log('response from content languages data  : ', response)
-                      
+
                       if (response) {
                         langData.language = response.language
                         langData.findedPlaces = response.findedPlaces
                         langData.paragraphLang = response.paragraphLang ?? false
-                        langData.languageLocation = response.languageLocation;                    
-
+                        langData.languageLocation = response.languageLocation
+                        langData.accuracy = response.accuracy  
                         sendResponse(langData)
 
                         chrome.tabs.remove(tabs[0].id)

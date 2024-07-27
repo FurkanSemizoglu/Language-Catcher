@@ -5,27 +5,39 @@ import { faAngleDown } from '@fortawesome/free-solid-svg-icons';
 import { faTrashCan } from '@fortawesome/free-solid-svg-icons';
 import { urlCardResultProps } from '../types';
 
+/* import AccuracyCircle from './AccuracyCircle.vue' */
+import AccuracyCircle from '../components/AccuracyCircle.vue';
 const showDetails = ref<boolean>(false);
 
 const toggleDetails = () => {
   showDetails.value = !showDetails.value;
 };
 
-
 const props = defineProps<urlCardResultProps>();
 </script>
 
 <template>
-  <div class="cols-3 mt-3 grid rounded-md border border-gray-300">
-    <div class="h-full p-4  flex h-full w-full items-center justify-between overflow-auto" >{{ props.url }}</div>
-    <div class="h-full flex h-full w-full items-center justify-between p-4">{{ props.detectedLanguage }} - {{ props.langName }} - {{ props.langNativeName }}</div>
+  <div class="cols-4 mt-3 grid rounded-md border border-gray-300">
+    <div class="flex h-full w-full items-center justify-between overflow-auto p-4">
+      {{ props.url }}
+    </div>
+    <div class="flex h-full w-full items-center justify-between p-4">
+      {{ props.detectedLanguage }} - {{ props.langName }} - {{ props.langNativeName }}
+    </div>
     <div class="flex h-full w-full items-center justify-between p-4">
       <div>
-        <span v-for="(place , index) in props.detectedPlaces" :key="index"
+        <span v-for="(place, index) in props.detectedPlaces" :key="index"
           >{{ place
           }}<span v-if="place !== props.detectedPlaces[props.detectedPlaces.length - 1]">, </span>
         </span>
       </div>
+    </div>
+    <div class="flex h-full w-full items-center justify-between p-4">
+      <AccuracyCircle :accuracy="props.accuracy" />
+   <!--    <div v-if="props.accuracy === 'high'" class="ml-2">
+        <div class="rounded-full w-5 h-5 bg-green"></div>
+      </div> -->
+
       <div>
         <FontAwesomeIcon
           :icon="faTrashCan"
@@ -44,9 +56,9 @@ const props = defineProps<urlCardResultProps>();
     </div>
     <!-- <div class="w-4/5">-</div> -->
     <transition name="detailTransition">
-      <div v-if="showDetails" class="col-span-3 p-4">
-        <div class="bg-#F2F2F2 mb-5 h-[1px] w-full border-t"></div>
-        <div class="grid cols-2">
+      <div v-if="showDetails" class="col-span-4 p-4">
+        <!-- <div class="bg-#F2F2F2 mb-5 h-[1px] w-full border-t"></div> -->
+        <div class="cols-2 grid">
           <div>
             <span class="font-600 mr-2 text-[#2F33B0]">Description: </span>
             <span v-if="props.languageLocation.paragraph === true" class="font-400"

@@ -4,15 +4,16 @@ import axios from 'axios';
 import { ref } from 'vue';
 import { RouterLink } from 'vue-router';
 import { useRouter } from 'vue-router';
-const email = ref<string>('');
-const password = ref<string>('');
-const router = useRouter();
-
 
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { faEye } from '@fortawesome/free-solid-svg-icons';
 import { faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import { useToast } from 'vue-toastification';
+
+
+const email = ref<string>('');
+const password = ref<string>('');
+const router = useRouter();
 
 const toast = useToast();
 
@@ -60,7 +61,6 @@ const login = async () => {
     }
   } else {
     toast.error('Email or password input not found');
-    /* console.log('Email or password input not found'); */
   }
 };
 </script>

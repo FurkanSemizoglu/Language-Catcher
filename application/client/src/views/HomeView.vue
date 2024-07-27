@@ -10,6 +10,7 @@ let loadingButton = ref<boolean>(false);
 import { useToast } from 'vue-toastification';
 import UrlCard from '../components/UrlCard.vue';
 import { extensionResult } from '../types';
+import AccuracyCircle from '../components/AccuracyCircle.vue';
 
 const toast = useToast();
 token.value = localStorage.getItem('token');
@@ -68,6 +69,7 @@ const logout = async() => {
 </script>
 
 <template>
+
   <div>
     <div class="topBar m-a flex w-full items-center justify-between px-8 py-6">
       <div class="cursor-pointer text-[#888AD3] hover:text-[#C0C5E5]">{{ user }}</div>
@@ -93,7 +95,7 @@ const logout = async() => {
       </div>
 
       <div class="mt-20">
-        <div class="cols-3 font-600 grid rounded-md border border-gray-300">
+        <div class="cols-4 font-600 grid rounded-md border border-gray-300">
           <div class="h-full w-full rounded-md border border-gray-300 p-4 text-[#273464]">URL</div>
           <div class="h-full w-full rounded-md border border-gray-300 p-4 text-[#273464]">
             LANGUAGE
@@ -101,8 +103,12 @@ const logout = async() => {
           <div class="h-full w-full rounded-md border border-gray-300 p-4 text-[#273464]">
             <div>DETECTED PLACES</div>
           </div>
+          <div class="h-full w-full rounded-md border border-gray-300 p-4 text-[#273464]">
+            <div>ACCURACY </div>
+          </div>
         </div>
 
+          
         <div v-for="(value, index) in returnedValues" :key="index">
           <UrlCard
             :url="value.domain"
@@ -111,6 +117,7 @@ const logout = async() => {
             :language-location="value.languageLocation"
             :lang-name="value.langName"
             :lang-native-name="value.langNativeName"
+            :accuracy="value.languageAccuracy"
           />
         </div>
       </div>

@@ -26,6 +26,7 @@ interface urlCardResultProps {
     languageLocation: LanguageLocation;
     langName: string;
     langNativeName: string;
+    accuracy : string;
 }
 
 export type { extensionResult ,urlCardResultProps};

@@ -29,7 +29,7 @@ window.addEventListener('language-catcher-start', (e) => {
         langName: langName,
         langNativeName: langNativeName,
         languageLocation: response.languageLocation,
-        languageAccuracy: 'high'
+        languageAccuracy: response.accuracy
       }
     })
 
@@ -249,6 +249,7 @@ interface LanguageData {
   findedPlaces: string[]
   paragraphLang?: boolean
   languageLocation?: LanguageLocation
+  accuracy : string
 }
 
 interface LanguageLocation {
@@ -360,7 +361,8 @@ const sendResponse = (
   detectedLanguages: string[],
   detectedPlaces: string[],
   paragraphCorrectObj: { value: boolean },
-  languageLocation: LanguageLocation
+  languageLocation: LanguageLocation,
+  accuracy: string
 ): LanguageData => {
   if (detectedLanguages.length === 1) {
     console.log('paragphh in sendresponse')
@@ -368,14 +370,18 @@ const sendResponse = (
       language: detectedLanguages[0],
       findedPlaces: detectedPlaces,
       paragraphLang: paragraphCorrectObj.value,
-      languageLocation: languageLocation
+      languageLocation: languageLocation,
+      accuracy: accuracy
     }
     console.log('returned data from content.ts  to send background : ', data)
     return data
   } else {
     return {
       language: 'not detected',
-      findedPlaces: detectedPlaces
+      findedPlaces: detectedPlaces,
+      paragraphLang: paragraphCorrectObj.value,
+      languageLocation: languageLocation,
+      accuracy : "low"
     }
   }
 }
@@ -384,7 +390,7 @@ const languageDetectPrediction = async (): Promise<LanguageData> => {
   const detectedLanguages: string[] | any[] = []
   const detectedPlaces: string[] = []
   const paragraphCorrectObj = { value: false }
-
+  let accuracy : string = ''
   checkUrl(detectedLanguages, detectedPlaces)
   checkHtmlLang(detectedLanguages, detectedPlaces)
   checkMetaTag(detectedLanguages, detectedPlaces)
@@ -399,8 +405,20 @@ const languageDetectPrediction = async (): Promise<LanguageData> => {
     url: urlFlag,
     paragraph: paragraph
   }
+  accuracy = accuracyCalculator(detectedPlaces, paragraphCorrectObj.value)
   console.log('detected places : ', detectedPlaces)
   console.log('detected languages : ', detectedLanguages)
   console.log('paragraph Correct : ', paragraphCorrectObj.value)
-  return sendResponse(detectedLanguages, detectedPlaces, paragraphCorrectObj, languageLocation)
+  return sendResponse(detectedLanguages, detectedPlaces, paragraphCorrectObj, languageLocation ,accuracy)
+}
+
+
+const accuracyCalculator = (detectedPlaces: string[] , paragraphCorrectObj : boolean): string => {
+  if (detectedPlaces[0] === 'url' || (detectedPlaces.length === 1 && paragraphCorrectObj) || (detectedPlaces.length >= 2)) {
+    return 'high'
+  } else if (detectedPlaces.length === 1) {
+    return 'medium'
+  } else {
+    return 'low'
+  }
 }
