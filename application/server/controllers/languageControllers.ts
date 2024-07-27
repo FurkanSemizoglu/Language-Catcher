@@ -72,4 +72,23 @@ const getUserLanguages = async (req: Request, res: Response) => {
   }
 };
 
-module.exports = { addLanguageToUser, getUserLanguages };
+
+const deleteLanguage = async (req: Request, res: Response) => {
+    try {
+        const { email, languageId } = req.body;
+        const user = await User.findOne({ email });
+        const language = await Language 
+            .findById(languageId)
+            .populate("languageLocation");
+        await LanguageLocation.findByIdAndDelete(language.languageLocation._id);
+        await Language.findByIdAndDelete(languageId);
+        user.languageUrls = user.languageUrls.filter((lang: any) => lang._id != languageId);
+        await user.save();
+        res.status(200).json(user.languageUrls);
+    }
+    catch (error: any) {
+        res.status(500).json({ error: error.message });
+    }
+}
+
+module.exports = { addLanguageToUser, getUserLanguages  , deleteLanguage};
