@@ -1,6 +1,6 @@
 interface LanguageLocation {
-  locacalStorage: boolean;
-  sessionnStorage: boolean;
+  localStorage: boolean;
+  sessionStorage: boolean;
   metaTag: boolean;
   htmlTag: boolean;
   url: boolean;

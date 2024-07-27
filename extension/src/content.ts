@@ -259,8 +259,8 @@ interface LanguageData {
 }
 
 interface LanguageLocation {
-  locacalStorage: boolean
-  sessionnStorage: boolean
+  localStorage: boolean
+  sessionStorage: boolean
   metaTag: boolean
   htmlTag: boolean
   url: boolean
@@ -404,8 +404,8 @@ const languageDetectPrediction = async (): Promise<LanguageData> => {
   await checkParagraphs(detectedLanguages, paragraphCorrectObj)
 
   const languageLocation = {
-    locacalStorage: locallStorage,
-    sessionnStorage: sessionnStorage,
+    localStorage: locallStorage,
+    sessionStorage: sessionnStorage,
     metaTag: metaTag,
     htmlTag: htmlTag,
     url: urlFlag,

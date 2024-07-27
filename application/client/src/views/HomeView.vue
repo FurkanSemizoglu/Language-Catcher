@@ -16,11 +16,27 @@ token.value = localStorage.getItem('token');
 
 const returnedValues = ref<extensionResult[]>([]);
 
-window.addEventListener('languageCatcherResult', (e) => {
+window.addEventListener('languageCatcherResult', async(e) => {
   loadingButton.value = false;
   console.log('Result from extension', e);
   const event = e as CustomEvent;
   const language = event.detail.language;
+
+
+  try {
+    const response = await axios.post('http://localhost:5000/api/addLanguage', {
+    email : user.value,
+    languageData : event.detail
+  });
+
+  console.log("abi gitti artık " , response.data);
+  } catch (error) {
+    console.log(error);
+    
+  }
+
+
+  
   returnedValues.value.push(event.detail);
   console.log(language);
   console.log('array : ', returnedValues.value);
