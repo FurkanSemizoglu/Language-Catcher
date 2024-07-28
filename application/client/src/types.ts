@@ -8,6 +8,7 @@ interface LanguageLocation {
 }
 
 interface extensionResult {
+  _id: string;
   status: string;
   domain: string;
   language: string;
@@ -18,15 +19,16 @@ interface extensionResult {
   languageAccuracy: string;
 }
 
-
 interface urlCardResultProps {
-    url: string;
-    detectedLanguage: string;
-    detectedPlaces: string[];
-    languageLocation: LanguageLocation;
-    langName: string;
-    langNativeName: string;
-    accuracy : string;
+  email: string;
+  url: string;
+  detectedLanguage: string;
+  detectedPlaces: string[];
+  languageLocation: LanguageLocation;
+  langName: string;
+  langNativeName: string;
+  accuracy: string;
+  id : string;
 }
 
-export type { extensionResult ,urlCardResultProps};
+export type { extensionResult, urlCardResultProps };

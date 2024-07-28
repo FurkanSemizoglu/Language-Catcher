@@ -5,18 +5,17 @@ import { faAngleDown } from '@fortawesome/free-solid-svg-icons';
 import { faTrashCan } from '@fortawesome/free-solid-svg-icons';
 import { urlCardResultProps } from '../types';
 import AccuracyCircle from '../components/AccuracyCircle.vue';
-
+import axios from 'axios';
 
 const props = defineProps<urlCardResultProps>();
 
-
 const detectedLanguagesText = ref<string>('');
-if(props.detectedLanguage === 'not detected'){
+if (props.detectedLanguage === 'not detected') {
   detectedLanguagesText.value = 'Dil tespit edilemedi';
 } else {
-  detectedLanguagesText.value = props.detectedLanguage + " - " + props.langName + " - " + props.langNativeName;
+  detectedLanguagesText.value =
+    props.detectedLanguage + ' - ' + props.langName + ' - ' + props.langNativeName;
 }
-
 
 /* import AccuracyCircle from './AccuracyCircle.vue' */
 const showDetails = ref<boolean>(false);
@@ -25,6 +24,19 @@ const toggleDetails = () => {
   showDetails.value = !showDetails.value;
 };
 
+const deleteCard = async () => {
+  console.log('id', props.id);
+  try {
+    const response = await axios.delete('http://localhost:5000/api/deleteLanguage', {
+      params: { email: props.email, languageId: props.id }
+    });
+
+    console.log('abi gitti artık ', response.data);
+    location.reload();
+  } catch (error) {
+    console.log(error);
+  }
+};
 </script>
 
 <template>
@@ -45,7 +57,7 @@ const toggleDetails = () => {
     </div>
     <div class="flex h-full w-full items-center justify-between p-4">
       <AccuracyCircle :accuracy="props.accuracy" />
-   <!--    <div v-if="props.accuracy === 'high'" class="ml-2">
+      <!--    <div v-if="props.accuracy === 'high'" class="ml-2">
         <div class="rounded-full w-5 h-5 bg-green"></div>
       </div> -->
 
@@ -55,6 +67,7 @@ const toggleDetails = () => {
           class="mr-4 transform cursor-pointer transition-transform duration-300"
           :class="{ hidden: !showDetails }"
           color="red"
+          @click="deleteCard()"
         />
 
         <FontAwesomeIcon

@@ -3,7 +3,7 @@ import axios from 'axios';
 import { onMounted, ref } from 'vue';
 
 const token = ref<string | null>('');
-const user = ref<string | null>('');
+const user = ref<string>('');
 const url = ref<string>('');
 let loadingButton = ref<boolean>(false);
 
@@ -28,12 +28,17 @@ window.addEventListener('languageCatcherResult', async (e) => {
       languageData: event.detail
     });
 
+    const languagesResponse = await axios.get('http://localhost:5000/api/getUserLanguages', {
+      params: { email: response.data.user.email }
+    });
+
+    returnedValues.value = languagesResponse.data;
     console.log('abi gitti artık ', response.data);
   } catch (error) {
     console.log(error);
   }
 
-  returnedValues.value.push(event.detail);
+  /*   returnedValues.value.push(event.detail); */
   console.log(language);
   console.log('array : ', returnedValues.value);
   url.value = '';
@@ -53,6 +58,8 @@ onMounted(async () => {
     const languagesResponse = await axios.get('http://localhost:5000/api/getUserLanguages', {
       params: { email: response.data.user.email }
     });
+
+    returnedValues.value = languagesResponse.data;
 
     console.log('languagesss', languagesResponse.data);
     console.log('email ', response.data.user.email);
@@ -108,7 +115,7 @@ const logout = async () => {
         />
         <button
           class="absolute right-0 rounded-r-3xl bg-[#0059F7] p-4 text-white transition duration-300 ease-in-out hover:bg-[#3E83F7]"
-          @click="sendUrlToExtension"
+          @click="sendUrlToExtension()"
         >
           Search
         </button>
@@ -130,6 +137,7 @@ const logout = async () => {
 
         <div v-for="(value, index) in returnedValues" :key="index">
           <UrlCard
+            :email="user"
             :url="value.domain"
             :detected-language="value.language"
             :detected-places="value.languageFetchedFrom"
@@ -137,6 +145,7 @@ const logout = async () => {
             :lang-name="value.langName"
             :lang-native-name="value.langNativeName"
             :accuracy="value.languageAccuracy"
+            :id="value._id"
           />
         </div>
       </div>
