@@ -1,11 +1,20 @@
 console.log('background is running')
 
+interface RealValues {
+  realLangPath: string
+  realLangAttr: string
+  realLangStorage: string
+  realLangLocalStorage: string
+  realLangMeta: string
+}
+
 interface LanguageData {
   language: string
   findedPlaces: string[]
   paragraphLang?: boolean
   languageLocation: LanguageLocation
-  accuracy : string
+  accuracy: string
+  realValues: RealValues
 }
 
 interface LanguageLocation {
@@ -32,7 +41,14 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       url: false,
       paragraph: false
     },
-    accuracy: 'low'
+    accuracy: 'low',
+    realValues: {
+      realLangPath: '',
+      realLangAttr: '',
+      realLangStorage: '',
+      realLangLocalStorage: '',
+      realLangMeta: ''
+    }
   }
 
   if (request.message === 'URL-sended') {
@@ -65,7 +81,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                         langData.findedPlaces = response.findedPlaces
                         langData.paragraphLang = response.paragraphLang ?? false
                         langData.languageLocation = response.languageLocation
-                        langData.accuracy = response.accuracy  
+                        langData.accuracy = response.accuracy
+                        langData.realValues = response.realValues
                         sendResponse(langData)
 
                         chrome.tabs.remove(tabs[0].id)

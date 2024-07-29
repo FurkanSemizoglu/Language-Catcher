@@ -3,6 +3,7 @@ interface Language {
   nativeName: string
 }
 
+
 const languages: { [key: string]: Language } = {
   ab: { name: 'Abkhaz', nativeName: 'аҧсуа' },
   aa: { name: 'Afar', nativeName: 'Afaraf' },

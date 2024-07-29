@@ -28,6 +28,11 @@ const languageSchema  = new mongoose.Schema({
     languageAccuracy: {
         type: String,
         required: true
+    },
+    realLangValues: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'RealLangValues',
+        required: true
     }
 
 }, {timestamps : true});

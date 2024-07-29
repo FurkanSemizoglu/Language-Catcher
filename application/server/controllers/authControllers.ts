@@ -1,4 +1,4 @@
-const User = require("../models/user");
+const User = require("../models/User");
 /* const Request = require('express');
 const Response = require('express'); */
 import { Request, Response } from "express";
@@ -8,7 +8,7 @@ import {
   isEmail,
   isPassword,
 } from "../helpers/auth";
-import exp from "constants";
+
 const jwt = require("jsonwebtoken");
 
 const registerUser = async (req: Request, res: Response) => {

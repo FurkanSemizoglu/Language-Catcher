@@ -8,6 +8,22 @@ let paragraph: boolean = false
 let locallStorage: boolean = false
 let sessionnStorage: boolean = false
 
+interface RealValues {
+  realLangPath: string
+  realLangAttr: string
+  realLangStorage: string
+  realLangLocalStorage: string
+  realLangMeta: string
+}
+
+const realValues : RealValues = {
+  realLangPath  :  "",
+  realLangAttr  :  "",
+  realLangStorage  :  "",
+  realLangLocalStorage  :  "",
+  realLangMeta  :  "",
+}
+
 window.addEventListener('language-catcher-start', (e) => {
   console.log('Language catcher is starting')
   const event = e as CustomEvent
@@ -25,7 +41,7 @@ window.addEventListener('language-catcher-start', (e) => {
       langName = languages[response.language].name
       langNativeName = languages[response.language].nativeName
     }
-
+    console.log("real values : ", response.realValues);
     const languageCatcherResult = new CustomEvent('languageCatcherResult', {
       detail: {
         status: status,
@@ -35,7 +51,8 @@ window.addEventListener('language-catcher-start', (e) => {
         langName: langName,
         langNativeName: langNativeName,
         languageLocation: response.languageLocation,
-        languageAccuracy: response.accuracy
+        languageAccuracy: response.accuracy,
+        realValues: response.realValues
       }
     })
 
@@ -90,8 +107,10 @@ const parseURL = (/* url: string */): string => {
   // if we use lacotion.hostname there is no need to parse with slash
 
   if (url.startsWith('/en')) {
+    realValues.realLangPath = "/en"
     return 'en'
   } else if (url.startsWith('/tr')) {
+     realValues.realLangPath = "/tr"
     return 'tr'
   }
 
@@ -111,6 +130,7 @@ const parseURL = (/* url: string */): string => {
   console.log('language detected from url : ', array)
 
   if (array.length === 1) {
+     realValues.realLangPath = `/${array[0]}`
     return array[0]
   } else {
     return ''
@@ -128,6 +148,7 @@ const detectMetaTag = (): string => {
     ?.getAttribute('content')
 
   if (languageContent) {
+    realValues.realLangMeta = languageContent
     console.log('language was detected by meta tag : ', languageContent)
     return languageContent.toLowerCase()
   } else {
@@ -138,10 +159,10 @@ const detectMetaTag = (): string => {
 
 const detectHtmlLang = (): string => {
   const lang = document.documentElement.lang
-
+  
   if (lang) {
     console.log('language detected from lang attribute: ', lang)
-
+    realValues.realLangAttr = lang
     if (lang.includes('-')) {
       const langArray = lang.split('-')
       console.log('langArray : ', langArray)
@@ -256,6 +277,7 @@ interface LanguageData {
   paragraphLang?: boolean
   languageLocation?: LanguageLocation
   accuracy: string
+  realValues: RealValues
 }
 
 interface LanguageLocation {
@@ -368,7 +390,8 @@ const sendResponse = (
   detectedPlaces: string[],
   paragraphCorrectObj: { value: boolean },
   languageLocation: LanguageLocation,
-  accuracy: string
+  accuracy: string,
+  realValues: RealValues
 ): LanguageData => {
   if (detectedLanguages.length === 1) {
     console.log('paragphh in sendresponse')
@@ -377,7 +400,8 @@ const sendResponse = (
       findedPlaces: detectedPlaces,
       paragraphLang: paragraphCorrectObj.value,
       languageLocation: languageLocation,
-      accuracy: accuracy
+      accuracy: accuracy,
+      realValues: realValues
     }
     console.log('returned data from content.ts  to send background : ', data)
     return data
@@ -387,7 +411,8 @@ const sendResponse = (
       findedPlaces: detectedPlaces,
       paragraphLang: paragraphCorrectObj.value,
       languageLocation: languageLocation,
-      accuracy: 'low'
+      accuracy: 'low',
+      realValues: realValues
     }
   }
 }
@@ -402,6 +427,8 @@ const languageDetectPrediction = async (): Promise<LanguageData> => {
   checkMetaTag(detectedLanguages, detectedPlaces)
   checkStorage(detectedLanguages, detectedPlaces)
   await checkParagraphs(detectedLanguages, paragraphCorrectObj)
+
+  
 
   const languageLocation = {
     localStorage: locallStorage,
@@ -420,7 +447,8 @@ const languageDetectPrediction = async (): Promise<LanguageData> => {
     detectedPlaces,
     paragraphCorrectObj,
     languageLocation,
-    accuracy
+    accuracy,
+    realValues
   )
 }
 

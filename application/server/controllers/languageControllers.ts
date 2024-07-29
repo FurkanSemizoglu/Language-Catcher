@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 const Language = require("../models/language");
 const User = require("../models/user");
 const LanguageLocation = require("../models/languageLocation");
+const RealLangValues = require("../models/realLangValues");
 
 const addLanguageToUser = async (req: Request, res: Response) => {
   try {
@@ -22,22 +23,31 @@ const addLanguageToUser = async (req: Request, res: Response) => {
     });
     await languageLocation.save();
 
+    const realLangValue = new RealLangValues({
+      realLangPath: languageData.realValues.realLangPath,
+      realLangAttr: languageData.realValues.realLangAttr,
+      realLangStorage: languageData.realValues.realLangStorage,
+      realLangLocalStorage: languageData.realValues.realLangLocalStorage,
+      realLangMeta: languageData.realValues.realLangMeta,
+    });
+
+    await realLangValue.save();
+
     const language = new Language({
       domain: languageData.domain,
       language: languageData.language,
       languageFetchedFrom: languageData.languageFetchedFrom,
       langName: languageData.langName,
       langNativeName: languageData.langNativeName,
-      languageLocation: languageLocation._id, // Storing the reference to LanguageLocation
+      languageLocation: languageLocation._id,
       languageAccuracy: languageData.languageAccuracy,
+      realLangValues: realLangValue._id,
     });
     await language.save();
 
     user.languageUrls.push(language);
 
     await user.save();
-
- 
 
     res.status(200).json({
       status: "OK",
@@ -59,15 +69,18 @@ const getUserLanguages = async (req: Request, res: Response) => {
     /*   const user = await User.findOne ({ email }).populate("languageUrls");  */
     const user = await User.findOne({ email }).populate({
       path: "languageUrls",
-      populate: {
-        path: "languageLocation",
-        model: "LanguageLocation",
-      },
+      populate: [
+        {
+          path: "languageLocation",
+          model: "LanguageLocation",
+        },
+        {
+          path: "realLangValues",
+          model: "RealLangValues",
+        },
+      ],
     });
-    /*   console.log(Language.languageLocation._id);
-        user.languageUrls.forEach((language :any) => {
-            language.languageLocation = LanguageLocation.findById(language.languageLocation);
-        }); */
+
     res.status(200).json(user.languageUrls);
   } catch (error: any) {
     res.status(500).json({ error: error.message });
@@ -78,10 +91,10 @@ const deleteLanguage = async (req: Request, res: Response) => {
   try {
     const { email, languageId } = req.query;
     const user = await User.findOne({ email });
-    const language = await Language.findById(languageId).populate(
-      "languageLocation"
-    );
+    const language = await Language.findById(languageId).populate("languageLocation").populate("realLangValues");
+
     await LanguageLocation.findByIdAndDelete(language.languageLocation._id);
+    await RealLangValues.findByIdAndDelete(language.realLangValues._id);
     await Language.findByIdAndDelete(languageId);
     user.languageUrls = user.languageUrls.filter(
       (lang: any) => lang._id != languageId
