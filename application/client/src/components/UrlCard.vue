@@ -38,18 +38,35 @@ const deleteCard = async () => {
   }
 };
 
+const paragraphText = ref<string>('');
+const paragraphTextFunc = () => {
+  if (props.languageLocation.paragraph === true) {
+    paragraphText.value =
+      'Sitenin içeriğinin dilinin de bulunan ögelerle uyuştuğu tespit edilmiştir.';
+  }
+
+  if (props.detectedLanguage === 'not detected') {
+    paragraphText.value = 'Kullanıcıdan ekstra veri alınız';
+  }
+};
+paragraphTextFunc();
 const realValueText = ref<string>('');
 const realValueTextFunc = () => {
- 
   if (props.realLangValues.realLangAttr !== '') {
     realValueText.value = 'Lang Etiketi : ' + props.realLangValues.realLangAttr;
-  } 
+  }
   if (props.realLangValues.realLangPath !== '') {
-  /*   console.log("url card props", props.realLangValues); */
-    realValueText.value += realValueText.value === '' ?  ' Lang Path : ' + props.realLangValues.realLangPath : '  -  Lang Path : ' + props.realLangValues.realLangPath;
+    /*   console.log("url card props", props.realLangValues); */
+    realValueText.value +=
+      realValueText.value === ''
+        ? ' Lang Path : ' + props.realLangValues.realLangPath
+        : '  -  Lang Path : ' + props.realLangValues.realLangPath;
   }
   if (props.realLangValues.realLangMeta !== '') {
-    realValueText.value +=  realValueText.value === '' ? ' Lang Meta : ' + props.realLangValues.realLangMeta : '  -  Lang Meta : ' + props.realLangValues.realLangMeta;
+    realValueText.value +=
+      realValueText.value === ''
+        ? ' Lang Meta : ' + props.realLangValues.realLangMeta
+        : '  -  Lang Meta : ' + props.realLangValues.realLangMeta;
   }
 };
 realValueTextFunc();
@@ -101,9 +118,7 @@ realValueTextFunc();
         <div class="cols-2 grid">
           <div>
             <span class="font-600 mr-2 text-[#2F33B0]">Description: </span>
-            <span v-if="props.languageLocation.paragraph === true" class="font-400"
-              >Sitenin içeriğinin dilinin de bulunan ögelerle uyuştuğu tespit edilmiştir.</span
-            >
+            <span class="font-400">{{ paragraphText }}</span>
           </div>
           <div class="ml-3">
             <span class="font-600 mr-2 text-[#2F33B0]">Real Values: </span>

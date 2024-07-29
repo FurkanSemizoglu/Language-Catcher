@@ -94,7 +94,7 @@ const register = async () => {
               v-model="email"
               placeholder=""
               type="email"
-              class="inputt bg-#F2F2F2 w-full rounded-lg border-none p-4 text-black"
+              class="inputt bg-#F2F2F2 w-full rounded-lg p-4 text-black"
             />
             <label>Email</label>
           </div>
@@ -104,7 +104,7 @@ const register = async () => {
               v-model="password"
               placeholder=""
               :type="passwordFieldType"
-              class="inputt bg-#F2F2F2 w-full rounded-lg border-none p-4"
+              class="inputt bg-#F2F2F2 w-full rounded-lg  py-4 px-3"
             />
             <label>Password</label>
             <FontAwesomeIcon
@@ -120,7 +120,7 @@ const register = async () => {
               v-model="password2"
               :type="passwordFieldType2"
               placeholder=""
-              class="inputt bg-#F2F2F2 w-full rounded-lg border-none p-4"
+              class="inputt bg-#F2F2F2 w-full rounded-lg  p-4"
             />
             <label>Password</label>
 

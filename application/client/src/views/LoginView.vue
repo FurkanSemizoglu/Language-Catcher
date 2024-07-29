@@ -89,7 +89,7 @@ const login = async () => {
               v-model="email"
               placeholder=""
               type="email"
-              class="inputt bg-#F2F2F2 w-full rounded-lg border-none p-4 text-black"
+              class="inputt bg-#F2F2F2 w-full rounded-lg p-4 text-black"
             />
             <label>Email</label>
           </div>
@@ -99,7 +99,7 @@ const login = async () => {
               v-model="password"
               placeholder=""
               :type="passwordFieldType"
-              class="inputt bg-#F2F2F2 w-full rounded-lg border-none p-4 focus:border-[#2C39A6] text-black"
+              class="inputt bg-#F2F2F2 w-full rounded-lg  p-4 focus:border-[#2C39A6] text-black"
             />
             <label>Password</label>
             <FontAwesomeIcon
@@ -165,6 +165,7 @@ label {
   background-color: #F2F2F2;
 }
 .inputt:focus {
+  
   border-color: #2c39a6  !important;
 }
 .inputt:focus + label {
