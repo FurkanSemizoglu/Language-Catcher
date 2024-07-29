@@ -22,6 +22,7 @@ const realValues : RealValues = {
   realLangStorage  :  "",
   realLangLocalStorage  :  "",
   realLangMeta  :  "",
+
 }
 
 window.addEventListener('language-catcher-start', (e) => {

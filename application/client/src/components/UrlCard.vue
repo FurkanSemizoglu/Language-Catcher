@@ -37,6 +37,22 @@ const deleteCard = async () => {
     console.log(error);
   }
 };
+
+const realValueText = ref<string>('');
+const realValueTextFunc = () => {
+ 
+  if (props.realLangValues.realLangAttr !== '') {
+    realValueText.value = 'Lang Etiketi : ' + props.realLangValues.realLangAttr;
+  } 
+  if (props.realLangValues.realLangPath !== '') {
+  /*   console.log("url card props", props.realLangValues); */
+    realValueText.value += realValueText.value === '' ?  ' Lang Path : ' + props.realLangValues.realLangPath : '  -  Lang Path : ' + props.realLangValues.realLangPath;
+  }
+  if (props.realLangValues.realLangMeta !== '') {
+    realValueText.value +=  realValueText.value === '' ? ' Lang Meta : ' + props.realLangValues.realLangMeta : '  -  Lang Meta : ' + props.realLangValues.realLangMeta;
+  }
+};
+realValueTextFunc();
 </script>
 
 <template>
@@ -90,8 +106,8 @@ const deleteCard = async () => {
             >
           </div>
           <div class="ml-3">
-            <span class="font-600 mr-2 text-[#2F33B0]">Accuracy: </span>
-            <span> Yakında güvenilirlik grafiğimiz eklencektir!</span>
+            <span class="font-600 mr-2 text-[#2F33B0]">Real Values: </span>
+            <span> {{ realValueText }}</span>
           </div>
         </div>
       </div>

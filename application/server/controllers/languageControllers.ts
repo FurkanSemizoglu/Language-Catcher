@@ -22,7 +22,7 @@ const addLanguageToUser = async (req: Request, res: Response) => {
       paragraph: languageData.languageLocation.paragraph,
     });
     await languageLocation.save();
-
+    console.log("lang path : ", languageData.realValues.realLangPath);
     const realLangValue = new RealLangValues({
       realLangPath: languageData.realValues.realLangPath,
       realLangAttr: languageData.realValues.realLangAttr,

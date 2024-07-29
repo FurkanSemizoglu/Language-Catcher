@@ -146,6 +146,7 @@ const logout = async () => {
             :lang-native-name="value.langNativeName"
             :accuracy="value.languageAccuracy"
             :id="value._id"
+            :real-lang-values="value.realLangValues"
           />
         </div>
       </div>

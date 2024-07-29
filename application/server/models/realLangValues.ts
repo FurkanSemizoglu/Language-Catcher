@@ -18,7 +18,6 @@ const realLangValuesSchema = new mongoose.Schema({
     realLangMeta: {
         type: String      
     }
-
 }, {timestamps : true});
 
 const RealLangValues = mongoose.model('RealLangValues', realLangValuesSchema ,"realLangValues");

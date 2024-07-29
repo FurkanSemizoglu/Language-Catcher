@@ -7,6 +7,14 @@ interface LanguageLocation {
   paragraph: boolean;
 }
 
+interface realLangValues {
+  realLangPath: string;
+  realLangAttr: string;
+  realLangStorage: string;
+  realLangLocalStorage: string;
+  realLangMeta: string;
+}
+
 interface extensionResult {
   _id: string;
   status: string;
@@ -17,7 +25,10 @@ interface extensionResult {
   langNativeName: string;
   languageLocation: LanguageLocation;
   languageAccuracy: string;
+  realLangValues: realLangValues;
 }
+
+
 
 interface urlCardResultProps {
   email: string;
@@ -29,6 +40,7 @@ interface urlCardResultProps {
   langNativeName: string;
   accuracy: string;
   id : string;
+  realLangValues: realLangValues;
 }
 
 export type { extensionResult, urlCardResultProps };
