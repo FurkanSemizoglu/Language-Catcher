@@ -1,5 +1,7 @@
 import DetectLanguage from 'detectlanguage'
-import languages from './types'
+import {languages} from './types'
+import type { RealValues } from './types'
+import type { LanguageLocation, LanguageData } from './types'
 
 let htmlTag: boolean = false
 let metaTag: boolean = false
@@ -8,13 +10,7 @@ let paragraph: boolean = false
 let locallStorage: boolean = false
 let sessionnStorage: boolean = false
 
-interface RealValues {
-  realLangPath: string
-  realLangAttr: string
-  realLangStorage: string
-  realLangLocalStorage: string
-  realLangMeta: string
-}
+
 
 const realValues : RealValues = {
   realLangPath  :  "",
@@ -272,23 +268,9 @@ const getLanguageFromSessionStorage = (): string | null => {
   return sessionStorage.getItem('siteLanguage')
 }
 
-interface LanguageData {
-  language: string
-  findedPlaces: string[]
-  paragraphLang?: boolean
-  languageLocation?: LanguageLocation
-  accuracy: string
-  realValues: RealValues
-}
 
-interface LanguageLocation {
-  localStorage: boolean
-  sessionStorage: boolean
-  metaTag: boolean
-  htmlTag: boolean
-  url: boolean
-  paragraph: boolean
-}
+
+
 
 const checkUrl = (detectedLanguages: string[], detectedPlaces: string[]) => {
   const returnedUrl = parseURL()

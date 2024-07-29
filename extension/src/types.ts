@@ -3,6 +3,33 @@ interface Language {
   nativeName: string
 }
 
+interface RealValues {
+  realLangPath: string
+  realLangAttr: string
+  realLangStorage: string
+  realLangLocalStorage: string
+  realLangMeta: string
+}
+
+
+interface LanguageData {
+  language: string
+  findedPlaces: string[]
+  paragraphLang?: boolean
+  languageLocation?: LanguageLocation
+  accuracy: string
+  realValues: RealValues
+}
+
+interface LanguageLocation {
+  localStorage: boolean
+  sessionStorage: boolean
+  metaTag: boolean
+  htmlTag: boolean
+  url: boolean
+  paragraph: boolean
+}
+
 
 const languages: { [key: string]: Language } = {
   ab: { name: 'Abkhaz', nativeName: 'аҧсуа' },
@@ -197,4 +224,5 @@ const languages: { [key: string]: Language } = {
 
 
 
-export default languages 
+export { languages }
+export type { RealValues , LanguageLocation  , LanguageData }

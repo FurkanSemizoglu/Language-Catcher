@@ -1,30 +1,8 @@
 console.log('background is running')
 
-interface RealValues {
-  realLangPath: string
-  realLangAttr: string
-  realLangStorage: string
-  realLangLocalStorage: string
-  realLangMeta: string
-}
+import type { LanguageData } from './types'
 
-interface LanguageData {
-  language: string
-  findedPlaces: string[]
-  paragraphLang?: boolean
-  languageLocation: LanguageLocation
-  accuracy: string
-  realValues: RealValues
-}
 
-interface LanguageLocation {
-  locacalStorage: boolean
-  sessionnStorage: boolean
-  metaTag: boolean
-  htmlTag: boolean
-  url: boolean
-  paragraph: boolean
-}
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   console.log('background received message', request)
   console.log('URL : ', request.url)
@@ -34,8 +12,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     findedPlaces: [],
     paragraphLang: false,
     languageLocation: {
-      locacalStorage: false,
-      sessionnStorage: false,
+      localStorage: false,
+      sessionStorage: false,
       metaTag: false,
       htmlTag: false,
       url: false,
