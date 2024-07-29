@@ -1,5 +1,5 @@
 import DetectLanguage from 'detectlanguage'
-import {languages} from './types'
+import { languages } from './types'
 import type { RealValues } from './types'
 import type { LanguageLocation, LanguageData } from './types'
 
@@ -10,15 +10,21 @@ let paragraph: boolean = false
 let locallStorage: boolean = false
 let sessionnStorage: boolean = false
 
-
-const realValues : RealValues = {
-  realLangPath  :  "",
-  realLangAttr  :  "",
-  realLangStorage  :  "",
-  realLangLocalStorage  :  "",
-  realLangMeta  :  "",
-
+const realValues: RealValues = {
+  realLangPath: '',
+  realLangAttr: '',
+  realLangStorage: '',
+  realLangLocalStorage: '',
+  realLangMeta: ''
 }
+
+const languageCatcherExist = new CustomEvent('languageCatcherExist', {
+  detail: {
+    languageCatcherExist: true
+  }
+})
+
+window.dispatchEvent(languageCatcherExist)
 
 window.addEventListener('language-catcher-start', (e) => {
   console.log('Language catcher is starting')
@@ -37,7 +43,8 @@ window.addEventListener('language-catcher-start', (e) => {
       langName = languages[response.language].name
       langNativeName = languages[response.language].nativeName
     }
-    console.log("real values : ", response.realValues);
+    const date = new Date()
+    console.log('real values : ', response.realValues)
     const languageCatcherResult = new CustomEvent('languageCatcherResult', {
       detail: {
         status: status,
@@ -48,7 +55,8 @@ window.addEventListener('language-catcher-start', (e) => {
         langNativeName: langNativeName,
         languageLocation: response.languageLocation,
         languageAccuracy: response.accuracy,
-        realValues: response.realValues
+        realValues: response.realValues,
+        date: date
       }
     })
 
@@ -103,10 +111,10 @@ const parseURL = (/* url: string */): string => {
   // if we use lacotion.hostname there is no need to parse with slash
 
   if (url.startsWith('/en')) {
-    realValues.realLangPath = "/en"
+    realValues.realLangPath = '/en'
     return 'en'
   } else if (url.startsWith('/tr')) {
-     realValues.realLangPath = "/tr"
+    realValues.realLangPath = '/tr'
     return 'tr'
   }
 
@@ -126,7 +134,7 @@ const parseURL = (/* url: string */): string => {
   console.log('language detected from url : ', array)
 
   if (array.length === 1) {
-     realValues.realLangPath = `/${array[0]}`
+    realValues.realLangPath = `/${array[0]}`
     return array[0]
   } else {
     return ''
@@ -155,7 +163,7 @@ const detectMetaTag = (): string => {
 
 const detectHtmlLang = (): string => {
   const lang = document.documentElement.lang
-  
+
   if (lang) {
     console.log('language detected from lang attribute: ', lang)
     realValues.realLangAttr = lang
@@ -267,10 +275,6 @@ const getLanguageFromSessionStorage = (): string | null => {
   return sessionStorage.getItem('siteLanguage')
 }
 
-
-
-
-
 const checkUrl = (detectedLanguages: string[], detectedPlaces: string[]) => {
   const returnedUrl = parseURL()
   urlFlag = false
@@ -375,6 +379,13 @@ const sendResponse = (
   accuracy: string,
   realValues: RealValues
 ): LanguageData => {
+  const updateProgress = new CustomEvent('updateProgress', {
+    detail: {
+      progress: 50
+    }
+  })
+  // Burada update eventi gönderilerek progress barın güncellenmesi sağlanabilir
+  /* window.dispatchEvent(updateProgress) */
   if (detectedLanguages.length === 1) {
     console.log('paragphh in sendresponse')
     const data = {
@@ -409,8 +420,6 @@ const languageDetectPrediction = async (): Promise<LanguageData> => {
   checkMetaTag(detectedLanguages, detectedPlaces)
   checkStorage(detectedLanguages, detectedPlaces)
   await checkParagraphs(detectedLanguages, paragraphCorrectObj)
-
-  
 
   const languageLocation = {
     localStorage: locallStorage,
