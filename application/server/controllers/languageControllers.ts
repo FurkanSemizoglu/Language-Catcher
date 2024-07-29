@@ -8,11 +8,10 @@ const addLanguageToUser = async (req: Request, res: Response) => {
   try {
     const { email, languageData } = req.body;
     console.log(email);
-    console.log(languageData);
+  
     const user = await User.findOne({ email });
 
-    console.log(languageData);
-    console.log("lang storage : ", languageData.languageLocation.localStorage);
+   
     const languageLocation = new LanguageLocation({
       localStorage: languageData.languageLocation.localStorage,
       sessionStorage: languageData.languageLocation.sessionStorage,
