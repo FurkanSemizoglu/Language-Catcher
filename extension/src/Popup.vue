@@ -101,16 +101,16 @@ onMounted(() => {
 
     <div class="flex flex-col w-s mx-a max-w-s px-12">
       <div class="">
-        <span class="font-bold text-xl">Language : </span>
+        <span class="font-bold text-xl text-[#2F33B0]">Language : </span>
         <span v-if="language !== 'not detected'" class="text-lg"
           >{{ language }} - {{ langName }} - {{ langNativeName }}</span
         >
         <span v-else class="text-lg">Not Detected</span>
       </div>
       <br />
-      <div v-if="language !== 'not detected'" class="text-lg">
+      <div v-if="language !== 'not detected'" class="text-lg ">
         <div>
-          <span class="font-bold text-xl">Description : </span>
+          <span class="font-bold text-xl text-[#2F33B0]">Description : </span>
           <span>Veriler buralardan alınmıştır:</span>
           <br />
           <span v-for="place in detectedPlaces" :key="place"
@@ -135,3 +135,11 @@ onMounted(() => {
     </div>
   </div>
 </template>
+
+
+<style scoped>
+
+body{
+    font-family: 'Lexend', sans-serif;
+}
+</style>
