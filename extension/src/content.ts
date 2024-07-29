@@ -11,7 +11,6 @@ let locallStorage: boolean = false
 let sessionnStorage: boolean = false
 
 
-
 const realValues : RealValues = {
   realLangPath  :  "",
   realLangAttr  :  "",
