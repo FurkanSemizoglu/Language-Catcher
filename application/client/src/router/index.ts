@@ -17,6 +17,12 @@ const isAuthenticated  =  async() : Promise<boolean> => {
     token: token
   });
 
+  if (response.data.status === 'failed'){
+    console.log("burası");
+    localStorage.removeItem('token');
+    window.location.href = '/';
+    return false;
+  } 
   return response.data.status === 'OK' ? true : false;
 
 }
