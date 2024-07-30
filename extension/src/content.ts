@@ -30,8 +30,10 @@ window.addEventListener('language-catcher-start', (e) => {
   console.log('Language catcher is starting')
   const event = e as CustomEvent
   const url = event.detail.url
+  const urlList : string[] = event.detail.urlList
   console.log('domaain ', url)
 
+   // Burada kullanıcı bilgisi uygulamadan istenilebliir 
   chrome.runtime.sendMessage({ message: 'URL-sended', url: url }, (response: any) => {
     console.log('message sent to background to run in application')
     console.log('response from background for url sended for application ', response)

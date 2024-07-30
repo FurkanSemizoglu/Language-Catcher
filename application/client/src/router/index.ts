@@ -11,19 +11,26 @@ const isAuthenticated  =  async() : Promise<boolean> => {
   console.log("token var ve çalışmalı" , token);
 
   if (!token) return false;
-
+  
   // aslında buna gerek yok çünkü token varsa zaten user var demektir.
-  const response = await axios.post('http://localhost:5000/auth/user', {
-    token: token
-  });
+  try {
+    const response = await axios.post('http://localhost:5000/auth/user', {
+      token: token
+    });
+    return response.data.status === 'OK' ? true : false;
+  } catch (error) {
+    localStorage.removeItem('token');
+    window.location.href = '/';
+    return false;
+  }
 
-  if (response.data.status === 'failed'){
+ /*  if (response.data.status === 'failed'){
     console.log("burası");
     localStorage.removeItem('token');
     window.location.href = '/';
     return false;
-  } 
-  return response.data.status === 'OK' ? true : false;
+  }  */
+ /*  return response.data.status === 'OK' ? true : false; */
 
 }
 
