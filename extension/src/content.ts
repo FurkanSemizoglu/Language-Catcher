@@ -30,11 +30,117 @@ window.addEventListener('language-catcher-start', (e) => {
   console.log('Language catcher is starting')
   const event = e as CustomEvent
   const url = event.detail.url
-  const urlList : string[] = event.detail.urlList
-  console.log('domaain ', url)
+  const urlList: string[] = event.detail.url.split(',')
+  console.log('domaain ', urlList)
 
-   // Burada kullanıcı bilgisi uygulamadan istenilebliir 
-  chrome.runtime.sendMessage({ message: 'URL-sended', url: url }, (response: any) => {
+  interface extensionResponse {
+    status: string
+    domain: string
+    language: string
+    languageFetchedFrom: string[]
+    langName: string
+    langNativeName: string
+    languageLocation: LanguageLocation
+    languageAccuracy: string
+    realValues: RealValues
+    date: Date
+  }
+  let index = 0
+
+  const languageCatcherResultArray: extensionResponse[] = []
+  
+  urlList.forEach((urlListUrl) => {
+    chrome.runtime.sendMessage({ message: 'URL-sended', url: urlListUrl }, (response: any) => {
+      
+      console.log('message sent to background to run in application')
+      console.log('response from background for url sended for application ', response)
+
+      let langName: string = '-'
+      let langNativeName: string = '-'
+      const status = response.language === 'not detected' ? 'failed' : 'completed'
+      if (status === 'completed') {
+        langName = languages[response.language].name
+        langNativeName = languages[response.language].nativeName
+      }
+      const date = new Date()
+      console.log('real values : ', response.realValues)
+      const languageCatcherResult = new CustomEvent('languageCatcherResult', {
+        detail: {
+          status: status,
+          domain: urlListUrl,
+          language: response.language,
+          languageFetchedFrom: response.findedPlaces,
+          langName: langName,
+          langNativeName: langNativeName,
+          languageLocation: response.languageLocation,
+          languageAccuracy: response.accuracy,
+          realValues: response.realValues,
+          date: date
+        }
+      })
+
+      
+      languageCatcherResultArray.push(languageCatcherResult.detail)
+      console.log('languageCatcherResultArray : ', languageCatcherResultArray)
+    /*   languageCatcherResultArray.forEach((result) => {
+        const languageCatcherResult = new CustomEvent('languageCatcherResult', {
+          detail: result
+        })
+        window.dispatchEvent(languageCatcherResult)
+      })
+    */
+    })
+  })
+
+  console.log('languageCatcherResultArray : ', languageCatcherResultArray)
+  const languageCatcherResultArrayEvent = new CustomEvent('languageCatcherResult', {
+    detail: languageCatcherResultArray
+  })
+
+  window.dispatchEvent(languageCatcherResultArrayEvent)
+  // Burada kullanıcı bilgisi uygulamadan istenilebliir
+  // Burasında uygulama bütün siteleri açıp yapıyor
+  /*  for (let index = 0; index < urlList.length; index++) {
+    chrome.runtime.sendMessage({ message: 'URL-sended', url: urlList[index] }, (response: any) => {
+      console.log('message sent to background to run in application')
+      console.log('response from background for url sended for application ', response)
+  
+      let langName: string = '-'
+      let langNativeName: string = '-'
+      const status = response.language === 'not detected' ? 'failed' : 'completed'
+      if (status === 'completed') {
+        langName = languages[response.language].name
+        langNativeName = languages[response.language].nativeName
+      }
+      const date = new Date()
+      console.log('real values : ', response.realValues)
+      const languageCatcherResult = new CustomEvent('languageCatcherResult', {
+        detail: {
+          status: status,
+          domain: urlList[index],
+          language: response.language,
+          languageFetchedFrom: response.findedPlaces,
+          langName: langName,
+          langNativeName: langNativeName,
+          languageLocation: response.languageLocation,
+          languageAccuracy: response.accuracy,
+          realValues: response.realValues,
+          date: date
+        }
+      })
+
+      const languageCatcherResultArray : extensionResponse[] =  []
+      languageCatcherResultArray.push(languageCatcherResult.detail)
+      console.log('languageCatcherResultArray : ', languageCatcherResultArray)
+      languageCatcherResultArray.forEach((result) => {
+        const languageCatcherResult = new CustomEvent('languageCatcherResult', {
+          detail: result
+        });
+        window.dispatchEvent(languageCatcherResult);
+      });
+    }) */
+
+  /*  chrome.runtime.sendMessage({ message: 'URL-sended', url: url }, (response: any) => {
     console.log('message sent to background to run in application')
     console.log('response from background for url sended for application ', response)
 
@@ -63,8 +169,12 @@ window.addEventListener('language-catcher-start', (e) => {
     })
 
     window.dispatchEvent(languageCatcherResult)
-  })
+  }) */
 })
+
+
+
+
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   console.log('who is sender', sender)
@@ -339,7 +449,6 @@ const checkMetaTag = (detectedLanguages: string[], detectedPlaces: string[]) => 
   const detectedMetaTag = detectMetaTag()
   if (detectedMetaTag !== '') {
     if (detectedLanguages.length > 0 && detectedLanguages[0] === detectedMetaTag) {
-      detectedLanguages.push(detectedMetaTag)
       detectedPlaces.push('meta tag')
       console.log('detected meta tag : ', detectedMetaTag)
       metaTag = true
