@@ -2,7 +2,6 @@ console.log('background is running')
 
 import type { LanguageData } from './types'
 
-
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   console.log('background received message', request)
   console.log('URL : ', request.url)
@@ -35,7 +34,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
     try {
       console.log('trying new tab creation')
-      chrome.windows.create({ url: newURL }).then((window: chrome.windows.Window) => {
+      chrome.windows.create({ url: newURL  , state : "minimized"}).then((window: chrome.windows.Window) => {
         console.log('tab created successfully')
         chrome.tabs.onUpdated.addListener(function listener(tabId, changeInfo, tab) {
           console.log('new window has been triggered')

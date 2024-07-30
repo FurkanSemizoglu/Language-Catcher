@@ -136,9 +136,6 @@ const recurciveProcess = (
 
 
 
-
-
-
     if (index < urlList.length - 1) {
       recurciveProcess(URL, languageCatcherResultArray, urlList, index + 1)
     } else {
