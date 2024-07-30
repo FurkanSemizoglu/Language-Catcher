@@ -3,22 +3,41 @@ import axios from 'axios';
 import { onMounted, ref } from 'vue';
 import { extensionResult, extensionResponse } from '../types';
 
-
-
 import { useToast } from 'vue-toastification';
 import UrlCard from '../components/UrlCard.vue';
 import LoadingBarCard from '../components/LoadingBarCard.vue';
-
 
 const token = ref<string | null>('');
 const user = ref<string>('');
 const url = ref<string>('');
 let loadingButton = ref<boolean>(false);
-
+let extensionExist = ref<boolean | null>(true);
 const toast = useToast();
 token.value = localStorage.getItem('token');
 
 const returnedValues = ref<extensionResult[]>([]);
+
+/* extensionExist.value = localStorage.getItem('languageCatcherExist') === 'true' ? true : false;
+localStorage.removeItem('languageCatcherExist');
+ */
+
+
+
+window.addEventListener('updateProgress' , (e) => {
+  const event = e as CustomEvent;
+  console.log('update progress :', event.detail.progress);
+})
+
+window.addEventListener('language-catcher-exist', (e) => {
+  const event = e as CustomEvent;
+  console.log("event detail", event.detail);
+  if (event.detail.languageCatcherExist) {
+    extensionExist.value = true;
+    console.log('extensionExist.value', extensionExist.value);
+  } else {
+    extensionExist.value = false;
+  }
+});
 
 window.addEventListener('languageCatcherResult', async (e) => {
   loadingButton.value = false;
@@ -126,7 +145,8 @@ const logout = async () => {
         <input
           type="text"
           v-model="url"
-          placeholder="Dil algılamak için url giriniz..."
+          :placeholder="extensionExist === false ? 'Eklentiniz aktif değil' : 'URL giriniz'"
+          :disabled="extensionExist === false ? true : false"
           class="bg-#F2F2F2 border-b-coolGray w-full rounded-3xl p-4 focus:border-none focus:outline-[#DCE2EE]"
         />
         <button
@@ -170,7 +190,6 @@ const logout = async () => {
   </div>
 
   <LoadingBarCard :loadingButton="loadingButton" />
-
 </template>
 
 <style scoped>

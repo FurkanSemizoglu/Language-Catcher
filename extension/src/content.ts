@@ -18,17 +18,27 @@ const realValues: RealValues = {
   realLangMeta: ''
 }
 
-const languageCatcherExist = new CustomEvent('languageCatcherExist', {
-  detail: {
-    languageCatcherExist: true
-  }
-})
 
-window.dispatchEvent(languageCatcherExist)
+const dispatchExtensionExistence = () => {
+  const languageCatcherExist = new CustomEvent('language-catcher-exist', {
+    detail: {
+      languageCatcherExist: true
+    }
+  })
+  window.dispatchEvent(languageCatcherExist)
+}
 
 
+dispatchExtensionExistence()
 
 window.addEventListener('language-catcher-start', (e) => {
+/*   const languageCatcherExist = new CustomEvent('language-catcher-exist', {
+    detail: {
+      languageCatcherExist: true
+    }
+  })
+  
+  window.dispatchEvent(languageCatcherExist) */
   console.log('Language catcher is starting')
   const event = e as CustomEvent
   const url = event.detail.url
@@ -125,7 +135,9 @@ const recurciveProcess = (
 
     const progressLength = urlList.length % 2 === 0 ? urlList.length : urlList.length + 1
     const progress = (index / progressLength) * 100
-    if(  progress % 25 === 0 ){
+    console.log("progress content: ", progress);
+    // burda sadece yüzde elli yeterli mi yoksa 25 75 civarı değerlerde de gönderilmeli mi
+    if( progress % 25 === 0  || progress % 20 === 0){
       const updateProgress = new CustomEvent('updateProgress', {
         detail: {
           progress: progress
@@ -134,6 +146,8 @@ const recurciveProcess = (
       window.dispatchEvent(updateProgress)
     }
 
+
+    
 
 
     if (index < urlList.length - 1) {
