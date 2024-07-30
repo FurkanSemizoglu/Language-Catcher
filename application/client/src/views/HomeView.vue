@@ -1,60 +1,55 @@
 <script setup lang="ts">
 import axios from 'axios';
 import { onMounted, ref } from 'vue';
+import { extensionResult, extensionResponse } from '../types';
+
+
+
+import { useToast } from 'vue-toastification';
+import UrlCard from '../components/UrlCard.vue';
+import LoadingBarCard from '../components/LoadingBarCard.vue';
+
 
 const token = ref<string | null>('');
 const user = ref<string>('');
 const url = ref<string>('');
 let loadingButton = ref<boolean>(false);
 
-import { useToast } from 'vue-toastification';
-import UrlCard from '../components/UrlCard.vue';
-import { extensionResult , extensionResponse } from '../types';
-
 const toast = useToast();
 token.value = localStorage.getItem('token');
 
 const returnedValues = ref<extensionResult[]>([]);
-
-
 
 window.addEventListener('languageCatcherResult', async (e) => {
   loadingButton.value = false;
   console.log('Result from extension', e);
   const event = e as CustomEvent;
   const language = event.detail.language;
-  const resultArray : extensionResponse[] = event.detail;
+  const resultArray: extensionResponse[] = event.detail;
   try {
-   
-    
-      for (let index = 0; index < resultArray.length; index++) {
-        const element = resultArray[index];
-        console.log("element", element);
-        const response = await axios.post('http://localhost:5000/api/addLanguage', {
-          email: user.value,
-          languageData: element
+    for (let index = 0; index < resultArray.length; index++) {
+      const element = resultArray[index];
+      console.log('element', element);
+      const response = await axios.post('http://localhost:5000/api/addLanguage', {
+        email: user.value,
+        languageData: element
+      });
+
+      if (index === resultArray.length - 1) {
+        const languagesResponse = await axios.get('http://localhost:5000/api/getUserLanguages', {
+          params: { email: response.data.user.email }
         });
 
-        if(index === resultArray.length - 1){
-          const languagesResponse = await axios.get('http://localhost:5000/api/getUserLanguages', {
-            params: { email: response.data.user.email }
-          });
-          
-          returnedValues.value = languagesResponse.data;
-          console.log('abi gitti artık ', response.data);
-        }
+        returnedValues.value = languagesResponse.data;
+        console.log('abi gitti artık ', response.data);
       }
-   
-
-  
-
+    }
 
     const languagesResponse = await axios.get('http://localhost:5000/api/getUserLanguages', {
       params: { email: user.value }
     });
-    console.log("languagesResponse", languagesResponse.data);
+    console.log('languagesResponse', languagesResponse.data);
     returnedValues.value = languagesResponse.data;
-   
   } catch (error) {
     console.log(error);
   }
@@ -173,6 +168,9 @@ const logout = async () => {
       </div>
     </div>
   </div>
+
+  <LoadingBarCard :loadingButton="loadingButton" />
+
 </template>
 
 <style scoped>
