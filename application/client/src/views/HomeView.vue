@@ -9,31 +9,52 @@ let loadingButton = ref<boolean>(false);
 
 import { useToast } from 'vue-toastification';
 import UrlCard from '../components/UrlCard.vue';
-import { extensionResult } from '../types';
+import { extensionResult , extensionResponse } from '../types';
 
 const toast = useToast();
 token.value = localStorage.getItem('token');
 
 const returnedValues = ref<extensionResult[]>([]);
 
+
+
 window.addEventListener('languageCatcherResult', async (e) => {
   loadingButton.value = false;
   console.log('Result from extension', e);
   const event = e as CustomEvent;
   const language = event.detail.language;
-
+  const resultArray : extensionResponse[] = event.detail;
   try {
-    const response = await axios.post('http://localhost:5000/api/addLanguage', {
-      email: user.value,
-      languageData: event.detail
-    });
+   
+    
+      for (let index = 0; index < resultArray.length; index++) {
+        const element = resultArray[index];
+        console.log("element", element);
+        const response = await axios.post('http://localhost:5000/api/addLanguage', {
+          email: user.value,
+          languageData: element
+        });
+
+        if(index === resultArray.length - 1){
+          const languagesResponse = await axios.get('http://localhost:5000/api/getUserLanguages', {
+            params: { email: response.data.user.email }
+          });
+          
+          returnedValues.value = languagesResponse.data;
+          console.log('abi gitti artık ', response.data);
+        }
+      }
+   
+
+  
+
 
     const languagesResponse = await axios.get('http://localhost:5000/api/getUserLanguages', {
-      params: { email: response.data.user.email }
+      params: { email: user.value }
     });
-
+    console.log("languagesResponse", languagesResponse.data);
     returnedValues.value = languagesResponse.data;
-    console.log('abi gitti artık ', response.data);
+   
   } catch (error) {
     console.log(error);
   }

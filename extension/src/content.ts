@@ -1,7 +1,7 @@
 import DetectLanguage from 'detectlanguage'
 import { languages } from './types'
-import type { RealValues } from './types'
-import type { LanguageLocation, LanguageData } from './types'
+import type { LanguageLocation, LanguageData  , RealValues , ExtensionResponse} from './types'
+
 
 let htmlTag: boolean = false
 let metaTag: boolean = false
@@ -26,6 +26,8 @@ const languageCatcherExist = new CustomEvent('languageCatcherExist', {
 
 window.dispatchEvent(languageCatcherExist)
 
+
+
 window.addEventListener('language-catcher-start', (e) => {
   console.log('Language catcher is starting')
   const event = e as CustomEvent
@@ -33,71 +35,13 @@ window.addEventListener('language-catcher-start', (e) => {
   const urlList: string[] = event.detail.url.split(',')
   console.log('domaain ', urlList)
 
-  interface extensionResponse {
-    status: string
-    domain: string
-    language: string
-    languageFetchedFrom: string[]
-    langName: string
-    langNativeName: string
-    languageLocation: LanguageLocation
-    languageAccuracy: string
-    realValues: RealValues
-    date: Date
-  }
   let index = 0
 
-  const languageCatcherResultArray: extensionResponse[] = []
-  
-  urlList.forEach((urlListUrl) => {
-    chrome.runtime.sendMessage({ message: 'URL-sended', url: urlListUrl }, (response: any) => {
-      
-      console.log('message sent to background to run in application')
-      console.log('response from background for url sended for application ', response)
+  const languageCatcherResultArray: ExtensionResponse[] = []
 
-      let langName: string = '-'
-      let langNativeName: string = '-'
-      const status = response.language === 'not detected' ? 'failed' : 'completed'
-      if (status === 'completed') {
-        langName = languages[response.language].name
-        langNativeName = languages[response.language].nativeName
-      }
-      const date = new Date()
-      console.log('real values : ', response.realValues)
-      const languageCatcherResult = new CustomEvent('languageCatcherResult', {
-        detail: {
-          status: status,
-          domain: urlListUrl,
-          language: response.language,
-          languageFetchedFrom: response.findedPlaces,
-          langName: langName,
-          langNativeName: langNativeName,
-          languageLocation: response.languageLocation,
-          languageAccuracy: response.accuracy,
-          realValues: response.realValues,
-          date: date
-        }
-      })
+  recurciveProcess(url, languageCatcherResultArray, urlList, index)
+ 
 
-      
-      languageCatcherResultArray.push(languageCatcherResult.detail)
-      console.log('languageCatcherResultArray : ', languageCatcherResultArray)
-    /*   languageCatcherResultArray.forEach((result) => {
-        const languageCatcherResult = new CustomEvent('languageCatcherResult', {
-          detail: result
-        })
-        window.dispatchEvent(languageCatcherResult)
-      })
-    */
-    })
-  })
-
-  console.log('languageCatcherResultArray : ', languageCatcherResultArray)
-  const languageCatcherResultArrayEvent = new CustomEvent('languageCatcherResult', {
-    detail: languageCatcherResultArray
-  })
-
-  window.dispatchEvent(languageCatcherResultArrayEvent)
   // Burada kullanıcı bilgisi uygulamadan istenilebliir
   // Burasında uygulama bütün siteleri açıp yapıyor
   /*  for (let index = 0; index < urlList.length; index++) {
@@ -140,7 +84,16 @@ window.addEventListener('language-catcher-start', (e) => {
       });
     }) */
 
-  /*  chrome.runtime.sendMessage({ message: 'URL-sended', url: url }, (response: any) => {
+
+})
+
+const recurciveProcess = (
+  URL: string,
+  languageCatcherResultArray: ExtensionResponse[],
+  urlList: string[],
+  index: number
+) => {
+  chrome.runtime.sendMessage({ message: 'URL-sended', url: urlList[index] }, (response: any) => {
     console.log('message sent to background to run in application')
     console.log('response from background for url sended for application ', response)
 
@@ -156,7 +109,7 @@ window.addEventListener('language-catcher-start', (e) => {
     const languageCatcherResult = new CustomEvent('languageCatcherResult', {
       detail: {
         status: status,
-        domain: url,
+        domain: urlList[index],
         language: response.language,
         languageFetchedFrom: response.findedPlaces,
         langName: langName,
@@ -168,13 +121,35 @@ window.addEventListener('language-catcher-start', (e) => {
       }
     })
 
-    window.dispatchEvent(languageCatcherResult)
-  }) */
-})
+    languageCatcherResultArray.push(languageCatcherResult.detail)
+
+    const progressLength = urlList.length % 2 === 0 ? urlList.length : urlList.length + 1
+    const progress = (index / progressLength) * 100
+    if(  progress % 25 === 0 ){
+      const updateProgress = new CustomEvent('updateProgress', {
+        detail: {
+          progress: progress
+        }
+      })
+      window.dispatchEvent(updateProgress)
+    }
 
 
 
 
+
+
+    if (index < urlList.length - 1) {
+      recurciveProcess(URL, languageCatcherResultArray, urlList, index + 1)
+    } else {
+      const languageCatcherResultArrayEvent = new CustomEvent('languageCatcherResult', {
+        detail: languageCatcherResultArray
+      })
+
+      window.dispatchEvent(languageCatcherResultArrayEvent)
+    }
+  })
+}
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   console.log('who is sender', sender)
@@ -185,24 +160,9 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     languageDetectPrediction().then((data) => {
       console.log('data from content.ts for new tab url : ', data)
 
-      /*     const languageCatcherResult = new CustomEvent('languageCatcherResult', {
-        detail: {
-          status: 'completed',
-          domain: 'example.com',
-          language: data.language,
-          languageFetchedFrom: data.findedPlaces,
-          languageLocation: data.languageLocation,
-          languageAccuracy: 'high'
-        }
-      })
-
-      window.dispatchEvent(languageCatcherResult) */
       console.log('requested tab id ', request.tabID)
-      /* chrome.tabs.remove(request.tabID) */
+
       sendResponse(data)
-      /*   chrome.tabs.query({ active: true, currentWindow: true }, (tabs: any) => {
-        chrome.tabs.remove(tabs[0].id)
-      }) */
     })
   } else if (request.action === 'show-language-in-same-page') {
     console.log('show-language-in-same-page in content.ts')

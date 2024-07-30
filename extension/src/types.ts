@@ -30,6 +30,18 @@ interface LanguageLocation {
   paragraph: boolean
 }
 
+interface ExtensionResponse {
+  status: string
+  domain: string
+  language: string
+  languageFetchedFrom: string[]
+  langName: string
+  langNativeName: string
+  languageLocation: LanguageLocation
+  languageAccuracy: string
+  realValues: RealValues
+  date: Date
+}
 
 const languages: { [key: string]: Language } = {
   ab: { name: 'Abkhaz', nativeName: 'аҧсуа' },
@@ -225,4 +237,4 @@ const languages: { [key: string]: Language } = {
 
 
 export { languages }
-export type { RealValues , LanguageLocation  , LanguageData }
+export type { RealValues , LanguageLocation  , LanguageData , ExtensionResponse }
