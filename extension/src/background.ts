@@ -2,6 +2,8 @@ console.log('background is running')
 
 import type { LanguageData } from './types'
 
+
+
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   console.log('background received message', request)
   console.log('URL : ', request.url)

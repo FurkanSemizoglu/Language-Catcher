@@ -17,23 +17,19 @@ token.value = localStorage.getItem('token');
 
 const returnedValues = ref<extensionResult[]>([]);
 
-/* extensionExist.value = localStorage.getItem('languageCatcherExist') === 'true' ? true : false;
-localStorage.removeItem('languageCatcherExist');
- */
-
-
-
-window.addEventListener('updateProgress' , (e) => {
+window.addEventListener('updateProgress', (e) => {
   const event = e as CustomEvent;
   console.log('update progress :', event.detail.progress);
-})
+});
 
+extensionExist.value = false;
+// Burada hep dinleyebiliriz ya da sadece bi kere de dinlenebilir
 window.addEventListener('language-catcher-exist', (e) => {
   const event = e as CustomEvent;
-  console.log("event detail", event.detail);
+
   if (event.detail.languageCatcherExist) {
     extensionExist.value = true;
-    console.log('extensionExist.value', extensionExist.value);
+   /*  console.log('extensionExist.value', extensionExist.value); */
   } else {
     extensionExist.value = false;
   }

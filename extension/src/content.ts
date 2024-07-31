@@ -1,7 +1,7 @@
 import DetectLanguage from 'detectlanguage'
 import { languages } from './types'
-import type { LanguageLocation, LanguageData  , RealValues , ExtensionResponse} from './types'
-
+import type { LanguageLocation, LanguageData, RealValues, ExtensionResponse } from './types'
+console.log('content is running for language-catcher-extension')
 
 let htmlTag: boolean = false
 let metaTag: boolean = false
@@ -18,7 +18,21 @@ const realValues: RealValues = {
   realLangMeta: ''
 }
 
+setTimeout(() => {
+  const languageCatcherExist = new CustomEvent('language-catcher-exist', {
+    detail: {
+      languageCatcherExist: true
+    }
+  })
 
+  window.dispatchEvent(languageCatcherExist)
+}, 1000)
+
+window.addEventListener('language-catcher-start', (e) => {
+  console.log('Language catcher is frommm apppppp starting')
+  const event = e as CustomEvent
+  console.log('domaain ', event)
+})
 const dispatchExtensionExistence = () => {
   const languageCatcherExist = new CustomEvent('language-catcher-exist', {
     detail: {
@@ -28,11 +42,11 @@ const dispatchExtensionExistence = () => {
   window.dispatchEvent(languageCatcherExist)
 }
 
-
-dispatchExtensionExistence()
+/* 
+dispatchExtensionExistence() */
 
 window.addEventListener('language-catcher-start', (e) => {
-/*   const languageCatcherExist = new CustomEvent('language-catcher-exist', {
+  /*   const languageCatcherExist = new CustomEvent('language-catcher-exist', {
     detail: {
       languageCatcherExist: true
     }
@@ -50,7 +64,6 @@ window.addEventListener('language-catcher-start', (e) => {
   const languageCatcherResultArray: ExtensionResponse[] = []
 
   recurciveProcess(url, languageCatcherResultArray, urlList, index)
- 
 
   // Burada kullanıcı bilgisi uygulamadan istenilebliir
   // Burasında uygulama bütün siteleri açıp yapıyor
@@ -93,8 +106,6 @@ window.addEventListener('language-catcher-start', (e) => {
         window.dispatchEvent(languageCatcherResult);
       });
     }) */
-
-
 })
 
 const recurciveProcess = (
@@ -135,9 +146,9 @@ const recurciveProcess = (
 
     const progressLength = urlList.length % 2 === 0 ? urlList.length : urlList.length + 1
     const progress = (index / progressLength) * 100
-    console.log("progress content: ", progress);
+    console.log('progress content: ', progress)
     // burda sadece yüzde elli yeterli mi yoksa 25 75 civarı değerlerde de gönderilmeli mi
-    if( progress % 25 === 0  || progress % 20 === 0){
+    if (progress % 25 === 0 || progress % 20 === 0) {
       const updateProgress = new CustomEvent('updateProgress', {
         detail: {
           progress: progress
@@ -145,10 +156,6 @@ const recurciveProcess = (
       })
       window.dispatchEvent(updateProgress)
     }
-
-
-    
-
 
     if (index < urlList.length - 1) {
       recurciveProcess(URL, languageCatcherResultArray, urlList, index + 1)
@@ -185,8 +192,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   }
   return true // şurası return true olunca çalıştı
 })
-
-console.log('content is running for language-catcher-extension')
 
 const parseURL = (/* url: string */): string => {
   const url: string = window.location.pathname
