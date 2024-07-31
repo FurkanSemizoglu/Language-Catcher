@@ -12,6 +12,8 @@ const user = ref<string>('');
 const url = ref<string>('');
 let loadingButton = ref<boolean>(false);
 let extensionExist = ref<boolean | null>(true);
+let appReady = ref<boolean>(false);
+
 const toast = useToast();
 token.value = localStorage.getItem('token');
 
@@ -29,7 +31,7 @@ window.addEventListener('language-catcher-exist', (e) => {
 
   if (event.detail.languageCatcherExist) {
     extensionExist.value = true;
-   /*  console.log('extensionExist.value', extensionExist.value); */
+    /*  console.log('extensionExist.value', extensionExist.value); */
   } else {
     extensionExist.value = false;
   }
@@ -95,6 +97,8 @@ onMounted(async () => {
     console.log('languagesss', languagesResponse.data);
     console.log('email ', response.data.user.email);
     user.value = response.data.user.email;
+
+    appReady.value = true;
   } catch (error) {
     console.log(error);
   }
@@ -128,7 +132,7 @@ const logout = async () => {
 </script>
 
 <template>
-  <div>
+  <div v-if="appReady">
     <div class="topBar m-a flex w-full items-center justify-between px-8 py-6">
       <div class="cursor-pointer text-[#888AD3] hover:text-[#C0C5E5]">{{ user }}</div>
 
@@ -153,7 +157,7 @@ const logout = async () => {
         </button>
       </div>
 
-      <div class="mt-20">
+      <div class="mt-10 mb-5">
         <div class="cols-4 font-600 grid rounded-md border border-gray-300">
           <div class="h-full w-full rounded-md border border-gray-300 p-4 text-[#273464]">URL</div>
           <div class="h-full w-full rounded-md border border-gray-300 p-4 text-[#273464]">
@@ -166,25 +170,28 @@ const logout = async () => {
             <div>ACCURACY</div>
           </div>
         </div>
-
-        <div v-for="(value, index) in returnedValues" :key="index">
-          <UrlCard
-            :email="user"
-            :url="value.domain"
-            :detected-language="value.language"
-            :detected-places="value.languageFetchedFrom"
-            :language-location="value.languageLocation"
-            :lang-name="value.langName"
-            :lang-native-name="value.langNativeName"
-            :accuracy="value.languageAccuracy"
-            :id="value._id"
-            :real-lang-values="value.realLangValues"
-          />
+        <div class="max-h-500px overflow-y-auto w-full " > 
+          <div v-for="(value, index) in returnedValues" :key="index" >
+            <UrlCard
+              :email="user"
+              :url="value.domain"
+              :detected-language="value.language"
+              :detected-places="value.languageFetchedFrom"
+              :language-location="value.languageLocation"
+              :lang-name="value.langName"
+              :lang-native-name="value.langNativeName"
+              :accuracy="value.languageAccuracy"
+              :id="value._id"
+              :real-lang-values="value.realLangValues"
+            />
+          </div>
         </div>
       </div>
     </div>
   </div>
-
+  <div v-else class="fixed left-0 top-0 flex h-full w-full items-center justify-center">
+    <v-progress-circular :size="150" color="primary" indeterminate></v-progress-circular>
+  </div>
   <LoadingBarCard :loadingButton="loadingButton" />
 </template>
 

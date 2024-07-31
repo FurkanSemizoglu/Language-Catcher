@@ -26,7 +26,7 @@ setTimeout(() => {
   })
 
   window.dispatchEvent(languageCatcherExist)
-}, 1000)
+}, 500)
 
 window.addEventListener('language-catcher-start', (e) => {
   console.log('Language catcher is frommm apppppp starting')
