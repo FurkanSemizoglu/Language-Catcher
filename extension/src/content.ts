@@ -26,24 +26,9 @@ setTimeout(() => {
   })
 
   window.dispatchEvent(languageCatcherExist)
-}, 500)
+}, 750)
 
-window.addEventListener('language-catcher-start', (e) => {
-  console.log('Language catcher is frommm apppppp starting')
-  const event = e as CustomEvent
-  console.log('domaain ', event)
-})
-const dispatchExtensionExistence = () => {
-  const languageCatcherExist = new CustomEvent('language-catcher-exist', {
-    detail: {
-      languageCatcherExist: true
-    }
-  })
-  window.dispatchEvent(languageCatcherExist)
-}
 
-/* 
-dispatchExtensionExistence() */
 
 window.addEventListener('language-catcher-start', (e) => {
   /*   const languageCatcherExist = new CustomEvent('language-catcher-exist', {

@@ -19,10 +19,10 @@ token.value = localStorage.getItem('token');
 
 const returnedValues = ref<extensionResult[]>([]);
 
-window.addEventListener('updateProgress', (e) => {
+/* window.addEventListener('updateProgress', (e) => {
   const event = e as CustomEvent;
   console.log('update progress :', event.detail.progress);
-});
+}); */
 
 extensionExist.value = false;
 // Burada hep dinleyebiliriz ya da sadece bi kere de dinlenebilir
@@ -56,24 +56,25 @@ window.addEventListener('languageCatcherResult', async (e) => {
         const languagesResponse = await axios.get('http://localhost:5000/api/getUserLanguages', {
           params: { email: response.data.user.email }
         });
+        console.log("language response", languagesResponse.data);
 
         returnedValues.value = languagesResponse.data;
         console.log('abi gitti artık ', response.data);
       }
     }
 
-    const languagesResponse = await axios.get('http://localhost:5000/api/getUserLanguages', {
+   /*  const languagesResponse = await axios.get('http://localhost:5000/api/getUserLanguages', {
       params: { email: user.value }
     });
     console.log('languagesResponse', languagesResponse.data);
-    returnedValues.value = languagesResponse.data;
+    returnedValues.value = languagesResponse.data; */
   } catch (error) {
     console.log(error);
   }
 
   /*   returnedValues.value.push(event.detail); */
-  console.log(language);
-  console.log('array : ', returnedValues.value);
+ /*  console.log(language);
+  console.log('array : ', returnedValues.value); */
   url.value = '';
 });
 
@@ -164,7 +165,7 @@ const logout = async () => {
       </div>
 
       <div class="mb-5 mt-10">
-        <div class="cols-4 font-600 grid rounded-md border border-gray-300">
+        <div class="cols-5 font-600 grid rounded-md border border-gray-300">
           <div class="h-full w-full rounded-md border border-gray-300 p-4 text-[#273464]">URL</div>
           <div class="h-full w-full rounded-md border border-gray-300 p-4 text-[#273464]">
             LANGUAGE
@@ -174,6 +175,9 @@ const logout = async () => {
           </div>
           <div class="h-full w-full rounded-md border border-gray-300 p-4 text-[#273464]">
             <div>ACCURACY</div>
+          </div>
+          <div class="h-full w-full rounded-md border border-gray-300 p-4 text-[#273464]">
+            <div>DATE</div>
           </div>
         </div>
         <div class="max-h-500px w-full overflow-y-auto">
@@ -189,6 +193,7 @@ const logout = async () => {
               :accuracy="value.languageAccuracy"
               :id="value._id"
               :real-lang-values="value.realLangValues"
+              :date="value.date"
             />
           </div>
         </div>
@@ -198,7 +203,7 @@ const logout = async () => {
   <div v-else class="fixed left-0 top-0 flex h-full w-full items-center justify-center">
     <v-progress-circular :size="150" color="primary" indeterminate></v-progress-circular>
   </div>
-  <LoadingBarCard :loadingButton="loadingButton" />
+  <LoadingBarCard  :loadingButton="loadingButton" />
 </template>
 
 <style scoped>

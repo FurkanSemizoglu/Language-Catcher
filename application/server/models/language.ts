@@ -33,6 +33,9 @@ const languageSchema  = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'RealLangValues',
         required: true
+    },
+    date: {
+        type: Date,
     }
 
 }, {timestamps : true});

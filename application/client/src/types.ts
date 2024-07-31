@@ -26,6 +26,7 @@ interface extensionResult {
   languageLocation: LanguageLocation;
   languageAccuracy: string;
   realLangValues: realLangValues;
+  date : Date
 }
 
 
@@ -41,6 +42,7 @@ interface urlCardResultProps {
   accuracy: string;
   id : string;
   realLangValues: realLangValues;
+  date : Date;
 }
 
 interface RealValues {

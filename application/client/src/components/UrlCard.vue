@@ -8,7 +8,7 @@ import AccuracyCircle from '../components/AccuracyCircle.vue';
 import axios from 'axios';
 
 const props = defineProps<urlCardResultProps>();
-
+const localeDate = new Date(props.date).toLocaleString('tr-TR');
 const detectedLanguagesText = ref<string>('');
 if (props.detectedLanguage === 'not detected') {
   detectedLanguagesText.value = 'Dil tespit edilemedi';
@@ -73,7 +73,7 @@ realValueTextFunc();
 </script>
 
 <template>
-  <div class="cols-4 mt-3 grid rounded-md border border-gray-300">
+  <div class="cols-5 mt-3 grid rounded-md border border-gray-300">
     <div class="flex h-full w-full items-center justify-between overflow-auto p-4">
       {{ props.url }}
     </div>
@@ -93,7 +93,9 @@ realValueTextFunc();
       <!--    <div v-if="props.accuracy === 'high'" class="ml-2">
         <div class="rounded-full w-5 h-5 bg-green"></div>
       </div> -->
-
+    </div>
+    <div class="flex h-full w-full items-center justify-between p-4">
+      <div>{{ localeDate  }}</div>
       <div>
         <FontAwesomeIcon
           :icon="faTrashCan"

@@ -41,6 +41,7 @@ const addLanguageToUser = async (req: Request, res: Response) => {
       languageLocation: languageLocation._id,
       languageAccuracy: languageData.languageAccuracy,
       realLangValues: realLangValue._id,
+      date : languageData.date
     });
     await language.save();
 
