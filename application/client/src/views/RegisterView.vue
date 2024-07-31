@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import axios from 'axios';
-import { ref } from 'vue';
+import { ref , watch} from 'vue';
 
 import { useRouter } from 'vue-router';
 const email = ref<string>('');
@@ -16,6 +16,18 @@ import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 
 const passwordFieldType = ref('password');
 const passwordFieldType2 = ref('password');
+
+const emptyInput = ref<boolean>(true);
+
+watch([email, password], () => {
+  if (email.value && password.value) {
+    console.log('email and password found');
+    emptyInput.value = false;
+  } else {
+    console.log('email or password not found');
+    emptyInput.value = true;
+  }
+});
 
 const togglePasswordVisibility = () => {
   passwordFieldType.value = passwordFieldType.value === 'password' ? 'text' : 'password';
@@ -104,7 +116,7 @@ const register = async () => {
               v-model="password"
               placeholder=""
               :type="passwordFieldType"
-              class="inputt bg-#F2F2F2 w-full rounded-lg  py-4 px-3"
+              class="inputt bg-#F2F2F2 w-full rounded-lg px-3 py-4"
             />
             <label>Password</label>
             <FontAwesomeIcon
@@ -120,7 +132,7 @@ const register = async () => {
               v-model="password2"
               :type="passwordFieldType2"
               placeholder=""
-              class="inputt bg-#F2F2F2 w-full rounded-lg  p-4"
+              class="inputt bg-#F2F2F2 w-full rounded-lg p-4"
             />
             <label>Password</label>
 
@@ -144,6 +156,8 @@ const register = async () => {
             <button
               @click="register"
               class="font-500 cursor-pointer rounded-md border-none bg-[#FFFFFF] p-4 text-[#2C39A6] transition-colors duration-300 ease-in-out hover:bg-[#E7E8EE]"
+              :disabled="emptyInput"
+              :class="emptyInput ? 'tooltip cursor-not-allowed' : 'cursor-pointer'"
             >
               Kayıt ol
             </button>
@@ -159,6 +173,26 @@ const register = async () => {
 </template>
 
 <style scoped>
+.tooltip {
+  position: relative;
+  display: inline-block;
+}
+
+.tooltip:hover::after {
+  content: 'Email ve şifrenizi giriniz';
+  position: absolute;
+  background-color: #888ad3;
+  color: white;
+  padding: 5px;
+  border-radius: 4px;
+  font-size: 14px;
+  top: 100%;
+  left: 50%;
+  margin-top: 5px;
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+
 .material-textfield {
   position: relative;
 }

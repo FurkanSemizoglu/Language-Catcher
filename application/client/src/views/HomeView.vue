@@ -11,7 +11,7 @@ const token = ref<string | null>('');
 const user = ref<string>('');
 const url = ref<string>('');
 let loadingButton = ref<boolean>(false);
-let extensionExist = ref<boolean | null>(true);
+let extensionExist = ref<boolean>(true);
 let appReady = ref<boolean>(false);
 
 const toast = useToast();
@@ -142,22 +142,28 @@ const logout = async () => {
     </div>
     <div class="m-a mt-5 w-4/5">
       <div class="m-a relative mt-8 inline-block flex w-[600px] items-center justify-center">
-        <input
-          type="text"
-          v-model="url"
-          :placeholder="extensionExist === false ? 'Eklentiniz aktif değil' : 'URL giriniz'"
-          :disabled="extensionExist === false ? true : false"
-          class="bg-#F2F2F2 border-b-coolGray w-full rounded-3xl p-4 focus:border-none focus:outline-[#DCE2EE]"
-        />
-        <button
-          class="absolute right-0 rounded-r-3xl bg-[#0059F7] p-4 text-white transition duration-300 ease-in-out hover:bg-[#3E83F7]"
-          @click="sendUrlToExtension()"
-        >
-          Search
-        </button>
+        <div v-if="extensionExist === true" class="w-full">
+          <input
+            type="text"
+            v-model="url"
+            :placeholder="extensionExist ? 'URL giriniz' : 'Eklentiniz aktif değil'"
+            :disabled="extensionExist ? false : true"
+            class="bg-#F2F2F2 border-b-coolGray w-full rounded-3xl p-4 focus:border-none  focus:outline-[#DCE2EE]"
+          />
+          <button
+            class="absolute right-0 rounded-r-3xl bg-[#0059F7] p-4 text-white transition duration-300 ease-in-out hover:bg-[#3E83F7] p-2 "
+            @click="sendUrlToExtension()"
+          >
+            Search
+          </button>
+        </div>
+        <div v-else>
+          <div class="notExistAlert text-red   p-5  rounded-md text-xl">Eklenti aktif değil !!!</div>
+
+        </div>
       </div>
 
-      <div class="mt-10 mb-5">
+      <div class="mb-5 mt-10">
         <div class="cols-4 font-600 grid rounded-md border border-gray-300">
           <div class="h-full w-full rounded-md border border-gray-300 p-4 text-[#273464]">URL</div>
           <div class="h-full w-full rounded-md border border-gray-300 p-4 text-[#273464]">
@@ -170,8 +176,8 @@ const logout = async () => {
             <div>ACCURACY</div>
           </div>
         </div>
-        <div class="max-h-500px overflow-y-auto w-full " > 
-          <div v-for="(value, index) in returnedValues" :key="index" >
+        <div class="max-h-500px w-full overflow-y-auto">
+          <div v-for="(value, index) in returnedValues" :key="index">
             <UrlCard
               :email="user"
               :url="value.domain"
@@ -205,6 +211,10 @@ th {
 
 th {
   color: #373ba6;
+}
+
+.notExistAlert {
+  border-color: red !important;
 }
 
 .detailTransition-enter-active,
