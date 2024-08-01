@@ -43,6 +43,7 @@ interface urlCardResultProps {
   id : string;
   realLangValues: realLangValues;
   date : Date;
+  index : number;
 }
 
 interface RealValues {

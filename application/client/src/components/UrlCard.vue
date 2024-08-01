@@ -73,9 +73,10 @@ realValueTextFunc();
 </script>
 
 <template>
-  <div class="cols-5 mt-3 grid rounded-md border border-gray-300">
-    <div class="flex h-full w-full items-center justify-between overflow-auto p-4">
-      {{ props.url }}
+  <div class="cols-6 mt-3 grid rounded-md border border-gray-300 h-auto  min-h-100px">
+    <div class="flex h-full w-full items-center justify-between overflow-auto p-4">{{ props.index +1 }}</div>
+    <div class="flex h-auto w-full items-center justify-between  p-4">
+      <div class="break-words max-w-full ">{{ props.url }}</div>
     </div>
     <div class="flex h-full w-full items-center justify-between p-4">
       {{ detectedLanguagesText }}
@@ -95,7 +96,7 @@ realValueTextFunc();
       </div> -->
     </div>
     <div class="flex h-full w-full items-center justify-between p-4">
-      <div>{{ localeDate  }}</div>
+      <div>{{ localeDate }}</div>
       <div>
         <FontAwesomeIcon
           :icon="faTrashCan"
@@ -142,4 +143,8 @@ realValueTextFunc();
 .detailTransition-leave-to {
   opacity: 0;
 }
+
+/* .break-words {
+  word-break: break-word;
+} */
 </style>

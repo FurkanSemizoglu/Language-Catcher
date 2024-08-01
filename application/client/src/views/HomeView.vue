@@ -2,7 +2,8 @@
 import axios from 'axios';
 import { onMounted, ref } from 'vue';
 import { extensionResult, extensionResponse } from '../types';
-
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { faAngleDown } from '@fortawesome/free-solid-svg-icons';
 import { useToast } from 'vue-toastification';
 import UrlCard from '../components/UrlCard.vue';
 import LoadingBarCard from '../components/LoadingBarCard.vue';
@@ -13,7 +14,7 @@ const url = ref<string>('');
 let loadingButton = ref<boolean>(false);
 let extensionExist = ref<boolean>(true);
 let appReady = ref<boolean>(false);
-const  dateClicked = ref<boolean>(false);
+const dateClicked = ref<boolean>(true);
 const urlClicked = ref<boolean>(false);
 const toast = useToast();
 token.value = localStorage.getItem('token');
@@ -153,13 +154,13 @@ const sortDate = () => {
 };
 
 const sortUrls = () => {
-  if(urlClicked.value === false) {
+  if (urlClicked.value === false) {
     returnedValues.value.sort((a: extensionResult, b: extensionResult) => {
-      console.log("splittedd " , a.domain.split('/'));
+      console.log('splittedd ', a.domain.split('/'));
       const aValue = a.domain.split('/')[2];
       const bValue = b.domain.split('/')[2];
-      
-      console.log("valuesssss", aValue, bValue);
+
+      console.log('valuesssss', aValue, bValue);
       if (aValue < bValue) {
         return -1;
       }
@@ -173,8 +174,8 @@ const sortUrls = () => {
     returnedValues.value.sort((a: extensionResult, b: extensionResult) => {
       const aValue = a.domain.split('/')[2];
       const bValue = b.domain.split('/')[2];
-      
-      console.log("valuesssss", aValue, bValue);
+
+      console.log('valuesssss', aValue, bValue);
       if (aValue < bValue) {
         return 1;
       }
@@ -186,12 +187,17 @@ const sortUrls = () => {
     urlClicked.value = false;
   }
 
-  console.log("sorted names " , returnedValues.value);
+  console.log('sorted names ', returnedValues.value);
 };
+
+/* 
+const toogleDate = () => {
+  dateClicked.value = !dateClicked.value;
+}; */
 </script>
 
 <template>
-  <div v-if="appReady">
+  <div>
     <div class="topBar m-a flex w-full items-center justify-between px-8 py-6">
       <div class="cursor-pointer text-[#888AD3] hover:text-[#C0C5E5]">{{ user }}</div>
 
@@ -221,53 +227,68 @@ const sortUrls = () => {
         </div>
       </div>
 
-      <div class="mb-5 mt-10">
-        <div class="cols-5 font-600 grid rounded-md border border-gray-300">
+      <div class="mb-5 mt-10 max-w-[80%] mx-a">
+        <div class="cols-6 font-600 grid rounded-md border border-gray-300">
+          <div class="col-span-0 h-full  cursor-pointer rounded-md border border-gray-300 p-4 flex items-center justify-between">
+            <div>x</div>
+            <div>#</div>
+          </div>
           <div
-            class="h-full w-full rounded-md border border-gray-300 p-4 text-[#273464] cursor-pointer hover:font-bold"
+            class=" h-full w-full cursor-pointer rounded-md border border-gray-300 p-4 text-[#273464] flex items-center  hover:font-bold"
             @click="sortUrls()"
           >
             URL
           </div>
-          <div class="h-full w-full rounded-md border border-gray-300 p-4 text-[#273464]">
+          <div class="h-full w-full rounded-md border border-gray-300 p-4 flex items-center  text-[#273464]">
             LANGUAGE
           </div>
-          <div class="h-full w-full rounded-md border border-gray-300 p-4 text-[#273464]">
+          <div class="h-full w-full rounded-md border border-gray-300 p-4 flex items-center  text-[#273464]">
             <div>DETECTED PLACES</div>
           </div>
-          <div class="h-full w-full rounded-md border border-gray-300 p-4 text-[#273464]">
+          <div class="h-full w-full rounded-md border border-gray-300 p-4 flex items-center  text-[#273464]">
             <div>ACCURACY</div>
           </div>
           <div
-            class="h-full w-full cursor-pointer rounded-md border border-gray-300 p-4 text-[#273464] hover:font-bold"
+            class="h-full w-full cursor-pointer rounded-md border border-gray-300 p-4 text-[#273464] flex items-center justify-between hover:font-bold"
             @click="sortDate()"
           >
             <div>DATE</div>
+            <div>
+              <FontAwesomeIcon
+                :icon="faAngleDown"
+                class="mr-2 transform cursor-pointer transition-transform duration-300"
+                :class="{ 'rotate-0': dateClicked, 'rotate-180': !dateClicked }"
+              />
+            </div>
           </div>
         </div>
-        <div class="max-h-500px w-full overflow-y-auto">
-          <div v-for="(value, index) in returnedValues" :key="value._id">
-            <UrlCard
-              :email="user"
-              :url="value.domain"
-              :detected-language="value.language"
-              :detected-places="value.languageFetchedFrom"
-              :language-location="value.languageLocation"
-              :lang-name="value.langName"
-              :lang-native-name="value.langNativeName"
-              :accuracy="value.languageAccuracy"
-              :id="value._id"
-              :real-lang-values="value.realLangValues"
-              :date="new Date(value.date)"
-            />
+        <div class="relative">
+          <div v-if="appReady" class="max-h-500px w-full overflow-y-auto">
+            <div v-for="(value, index) in returnedValues" :key="value._id">
+              <UrlCard
+                :email="user"
+                :url="value.domain"
+                :detected-language="value.language"
+                :detected-places="value.languageFetchedFrom"
+                :language-location="value.languageLocation"
+                :lang-name="value.langName"
+                :lang-native-name="value.langNativeName"
+                :accuracy="value.languageAccuracy"
+                :id="value._id"
+                :real-lang-values="value.realLangValues"
+                :date="new Date(value.date)"
+                :index="index"
+              />
+            </div>
+          </div>
+          <div v-else class="ma top-70 absolute flex h-full w-full items-center justify-center">
+            <v-progress-circular :size="150" color="primary" indeterminate></v-progress-circular>
           </div>
         </div>
       </div>
     </div>
   </div>
-  <div v-else class="fixed left-0 top-0 flex h-full w-full items-center justify-center">
-    <v-progress-circular :size="150" color="primary" indeterminate></v-progress-circular>
-  </div>
+
   <LoadingBarCard :loadingButton="loadingButton" />
 </template>
 
