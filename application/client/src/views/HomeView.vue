@@ -13,7 +13,7 @@ const user = ref<string>('');
 const url = ref<string>('');
 let loadingButton = ref<boolean>(false);
 let extensionExist = ref<boolean>(true);
-let appReady = ref<boolean>(false);
+const appReady = ref<boolean>(false);
 const dateClicked = ref<boolean>(true);
 const urlClicked = ref<boolean>(false);
 const toast = useToast();
@@ -227,29 +227,39 @@ const toogleDate = () => {
         </div>
       </div>
 
-      <div class="mb-5 mt-10 max-w-[80%] mx-a">
-        <div class="cols-6 font-600 grid rounded-md border border-gray-300">
-          <div class="col-span-0 h-full  cursor-pointer rounded-md border border-gray-300 p-4 flex items-center justify-between">
-            <div>x</div>
+      <div class="mx-a min-w-700px mb-5 mt-10 max-w-[80%] ">
+        <div
+          class="cols-6 font-600 min-h-65px grid rounded-md border border-gray-300"
+          style="grid-template-columns: 0.75fr 2fr 2fr 2fr 2fr 2fr"
+        >
+          <div
+            class="col-span-0 flex h-full cursor-pointer items-center justify-center rounded-md border border-gray-300 p-4"
+          >
             <div>#</div>
           </div>
           <div
-            class=" h-full w-full cursor-pointer rounded-md border border-gray-300 p-4 text-[#273464] flex items-center  hover:font-bold"
+            class="flex h-full w-full cursor-pointer items-center rounded-md border border-gray-300 p-4 text-[#273464] hover:font-bold"
             @click="sortUrls()"
           >
             URL
           </div>
-          <div class="h-full w-full rounded-md border border-gray-300 p-4 flex items-center  text-[#273464]">
+          <div
+            class="flex h-full w-full items-center rounded-md border border-gray-300 p-4 text-[#273464]"
+          >
             LANGUAGE
           </div>
-          <div class="h-full w-full rounded-md border border-gray-300 p-4 flex items-center  text-[#273464]">
+          <div
+            class="flex h-full w-full items-center rounded-md border border-gray-300 p-4 text-[#273464]"
+          >
             <div>DETECTED PLACES</div>
           </div>
-          <div class="h-full w-full rounded-md border border-gray-300 p-4 flex items-center  text-[#273464]">
+          <div
+            class="flex h-full w-full items-center rounded-md border border-gray-300 p-4 text-[#273464]"
+          >
             <div>ACCURACY</div>
           </div>
           <div
-            class="h-full w-full cursor-pointer rounded-md border border-gray-300 p-4 text-[#273464] flex items-center justify-between hover:font-bold"
+            class="flex h-full w-full cursor-pointer items-center justify-between rounded-md border border-gray-300 p-4 text-[#273464] hover:font-bold"
             @click="sortDate()"
           >
             <div>DATE</div>
@@ -281,7 +291,7 @@ const toogleDate = () => {
               />
             </div>
           </div>
-          <div v-else class="ma top-70 absolute flex h-full w-full items-center justify-center">
+          <div v-else class="ma top-50 absolute flex h-full w-full items-center justify-center">
             <v-progress-circular :size="150" color="primary" indeterminate></v-progress-circular>
           </div>
         </div>

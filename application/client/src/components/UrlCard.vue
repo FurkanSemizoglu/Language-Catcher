@@ -3,6 +3,10 @@ import { ref } from 'vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { faAngleDown } from '@fortawesome/free-solid-svg-icons';
 import { faTrashCan } from '@fortawesome/free-solid-svg-icons';
+/* import { faSquare } from '@fortawesome/free-solid-svg-icons'; */
+/* import { faSquareCheck } from '@fortawesome/free-solid-svg-icons'; */
+import { faSquareCheck } from '@fortawesome/free-regular-svg-icons';
+import { faSquare } from '@fortawesome/free-regular-svg-icons';
 import { urlCardResultProps } from '../types';
 import AccuracyCircle from '../components/AccuracyCircle.vue';
 import axios from 'axios';
@@ -10,6 +14,9 @@ import axios from 'axios';
 const props = defineProps<urlCardResultProps>();
 const localeDate = new Date(props.date).toLocaleString('tr-TR');
 const detectedLanguagesText = ref<string>('');
+
+const model = ref<string>('');
+const checkbox = ref<boolean>(false);
 if (props.detectedLanguage === 'not detected') {
   detectedLanguagesText.value = 'Dil tespit edilemedi';
 } else {
@@ -73,10 +80,20 @@ realValueTextFunc();
 </script>
 
 <template>
-  <div class="cols-6 mt-3 grid rounded-md border border-gray-300 h-auto  min-h-100px">
-    <div class="flex h-full w-full items-center justify-between overflow-auto p-4">{{ props.index +1 }}</div>
-    <div class="flex h-auto w-full items-center justify-between  p-4">
-      <div class="break-words max-w-full ">{{ props.url }}</div>
+  <div
+    class="cols-6 min-h-100px mt-3 grid h-auto rounded-md border border-gray-300"
+    style="grid-template-columns: 0.75fr 2fr 2fr 2fr 2fr 2fr"
+  >
+    <div class="flex h-full w-full items-center justify-between  p-4">
+      <FontAwesomeIcon
+          :icon="checkbox ?  faSquareCheck : faSquare"
+          @click="checkbox = !checkbox"
+          class="cursor-pointer"
+        />
+      {{ props.index + 1 }}
+    </div>
+    <div class="flex h-auto w-full items-center justify-between p-4">
+      <div class="max-w-full break-words">{{ props.url }}</div>
     </div>
     <div class="flex h-full w-full items-center justify-between p-4">
       {{ detectedLanguagesText }}
@@ -96,7 +113,7 @@ realValueTextFunc();
       </div> -->
     </div>
     <div class="flex h-full w-full items-center justify-between p-4">
-      <div>{{ localeDate }}</div>
+      <div class="ml-2 max-w-min">{{ localeDate }}</div>
       <div>
         <FontAwesomeIcon
           :icon="faTrashCan"
@@ -144,7 +161,7 @@ realValueTextFunc();
   opacity: 0;
 }
 
-/* .break-words {
+.break-words {
   word-break: break-word;
-} */
+}
 </style>
