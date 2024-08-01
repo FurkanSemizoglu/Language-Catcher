@@ -27,9 +27,6 @@ if (props.detectedLanguage === 'not detected') {
 /* import AccuracyCircle from './AccuracyCircle.vue' */
 const showDetails = ref<boolean>(false);
 
-const toggleDetails = () => {
-  showDetails.value = !showDetails.value;
-};
 
 const deleteCard = async () => {
   console.log('id', props.id);
@@ -127,7 +124,7 @@ realValueTextFunc();
           :icon="faAngleDown"
           class="mr-2 transform cursor-pointer transition-transform duration-300"
           :class="{ 'rotate-0': showDetails, 'rotate-90': !showDetails }"
-          @click="toggleDetails()"
+          @click="showDetails = !showDetails"
         />
       </div>
     </div>

@@ -102,6 +102,18 @@ window.addEventListener('language-catcher-start', (e) => {
     }) */
 })
 
+const sendProgressEvent = (index: number , arrayLength : number) => {
+
+
+
+  const updateProgress = new CustomEvent('updateProgress', {
+    detail: {
+      progress: index/arrayLength
+    }
+  })
+  window.dispatchEvent(updateProgress)
+}
+
 const recurciveProcess = (
   URL: string,
   languageCatcherResultArray: ExtensionResponse[],
@@ -138,7 +150,9 @@ const recurciveProcess = (
 
     languageCatcherResultArray.push(languageCatcherResult.detail)
 
-    const progressLength = urlList.length % 2 === 0 ? urlList.length : urlList.length + 1
+
+    sendProgressEvent(index + 1 , urlList.length)
+   /*  const progressLength = urlList.length % 2 === 0 ? urlList.length : urlList.length + 1
     const progress = (index / progressLength) * 100
     console.log('progress content: ', progress)
     // burda sadece yüzde elli yeterli mi yoksa 25 75 civarı değerlerde de gönderilmeli mi
@@ -149,7 +163,7 @@ const recurciveProcess = (
         }
       })
       window.dispatchEvent(updateProgress)
-    }
+    } */
 
     if (index < urlList.length - 1) {
       recurciveProcess(URL, languageCatcherResultArray, urlList, index + 1)

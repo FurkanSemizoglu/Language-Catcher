@@ -11,7 +11,7 @@ import LoadingBarCard from '../components/LoadingBarCard.vue';
 const token = ref<string | null>('');
 const user = ref<string>('');
 const url = ref<string>('');
-let loadingButton = ref<boolean>(false);
+const loadingButton = ref<boolean>(false);
 let extensionExist = ref<boolean>(true);
 const appReady = ref<boolean>(false);
 const dateClicked = ref<boolean>(true);
@@ -40,7 +40,7 @@ window.addEventListener('language-catcher-exist', (e) => {
 });
 
 window.addEventListener('languageCatcherResult', async (e) => {
-  loadingButton.value = false;
+  /* loadingButton.value = false; */
   console.log('Result from extension', e);
   const event = e as CustomEvent;
   const language = event.detail.language;
@@ -61,6 +61,7 @@ window.addEventListener('languageCatcherResult', async (e) => {
         console.log('language response', languagesResponse.data);
 
         returnedValues.value = languagesResponse.data;
+        loadingButton.value = false;
         /* languagesResponse.data.sort((a: extensionResult, b: extensionResult) => {
           return new Date(b.date).getTime() - new Date(a.date).getTime();
         }); */

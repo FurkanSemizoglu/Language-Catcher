@@ -1,15 +1,21 @@
 <script setup lang="ts">
-import { defineProps, ref } from 'vue';
+import { defineProps, onMounted, ref } from 'vue';
 
 const props = defineProps<{ loadingButton: boolean }>();
 const progressDegree = ref<number>(0);
+  progressDegree.value === 0
 
-const startDegree = ref<number>(0);
 window.addEventListener('updateProgress', (e) => {
   const event = e as CustomEvent;
   console.log('update progress :', event.detail.progress);
-  if (progressDegree.value !== event.detail.progress) {
-    progressDegree.value = event.detail.progress;
+
+  progressDegree.value = event.detail.progress * 100;
+
+  // burada progress degree 0 olmalı
+  if(progressDegree.value === 100) {
+    setTimeout(() => {
+      progressDegree.value = 0;
+    }, 2000);
   }
 });
 </script>
@@ -23,15 +29,10 @@ window.addEventListener('updateProgress', (e) => {
       <div class="rounded-lg bg-white p-5">
         <div class="flex flex-col items-center justify-center gap-4 p-4">
           <div class="mb-5 text-3xl">Yükleniyor ...</div>
+          <div>% {{ progressDegree }}</div>
           <div class="text-align-center w-500px">
             <div class="progress progress-striped">
-              <div
-                class="progress-bar"
-                :style="{
-                  '--progress-start': progressDegree + '%'
-                }"
-              ></div>
-              <!-- <div class="progress-bar" :style="{ width: progressDegree + '%' }"></div> -->
+              <div class="progress-bar" :style="{ width: progressDegree + '%' }"></div>
             </div>
           </div>
         </div>
@@ -51,34 +52,13 @@ window.addEventListener('updateProgress', (e) => {
 
 .progress-bar {
   height: 18px;
-  /*  background-color: #ee303c; */
   border-radius: 4px;
-  transition: 0.4s linear;
-  transition-property: width, background-color;
+  transition:
+    width 0.4s linear,
+    background-color 0.4s linear;
 }
 
 .progress-striped .progress-bar {
-  /* background-color: #fcbc51; */
-  width: 100%;
   background-image: linear-gradient(90deg, rgba(47, 51, 176, 1) 0%, rgba(136, 138, 211, 1) 100%);
-  animation: progressAnimationStrike 6s forwards;
-}
-
-/* @keyframes progressAnimationStrike {
-  from {
-    width: 0;
-  }
-  to {
-    width: 100%;
-  }
-} */
-
-@keyframes progressAnimationStrike {
-  from {
-    width: var(--progress-start);
-  }
-  to {
-    width: 100%;
-  }
 }
 </style>
