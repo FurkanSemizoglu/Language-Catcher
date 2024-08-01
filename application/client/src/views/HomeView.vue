@@ -13,7 +13,8 @@ const url = ref<string>('');
 let loadingButton = ref<boolean>(false);
 let extensionExist = ref<boolean>(true);
 let appReady = ref<boolean>(false);
-
+const  dateClicked = ref<boolean>(false);
+const urlClicked = ref<boolean>(false);
 const toast = useToast();
 token.value = localStorage.getItem('token');
 
@@ -56,14 +57,18 @@ window.addEventListener('languageCatcherResult', async (e) => {
         const languagesResponse = await axios.get('http://localhost:5000/api/getUserLanguages', {
           params: { email: response.data.user.email }
         });
-        console.log("language response", languagesResponse.data);
+        console.log('language response', languagesResponse.data);
 
         returnedValues.value = languagesResponse.data;
+        /* languagesResponse.data.sort((a: extensionResult, b: extensionResult) => {
+          return new Date(b.date).getTime() - new Date(a.date).getTime();
+        }); */
+        console.log('sorted languages', languagesResponse.data);
         console.log('abi gitti artık ', response.data);
       }
     }
 
-   /*  const languagesResponse = await axios.get('http://localhost:5000/api/getUserLanguages', {
+    /*  const languagesResponse = await axios.get('http://localhost:5000/api/getUserLanguages', {
       params: { email: user.value }
     });
     console.log('languagesResponse', languagesResponse.data);
@@ -73,7 +78,7 @@ window.addEventListener('languageCatcherResult', async (e) => {
   }
 
   /*   returnedValues.value.push(event.detail); */
- /*  console.log(language);
+  /*  console.log(language);
   console.log('array : ', returnedValues.value); */
   url.value = '';
 });
@@ -130,6 +135,59 @@ const logout = async () => {
   localStorage.removeItem('token');
   window.location.href = '/';
 };
+
+const sortDate = () => {
+  if (dateClicked.value === false) {
+    returnedValues.value.sort((a: extensionResult, b: extensionResult) => {
+      return new Date(a.date).getTime() - new Date(b.date).getTime();
+    });
+    dateClicked.value = true;
+  } else {
+    returnedValues.value.sort((a: extensionResult, b: extensionResult) => {
+      return new Date(b.date).getTime() - new Date(a.date).getTime();
+    });
+    dateClicked.value = false;
+  }
+  returnedValues.value = [...returnedValues.value];
+  console.log('sorted values', returnedValues.value);
+};
+
+const sortUrls = () => {
+  if(urlClicked.value === false) {
+    returnedValues.value.sort((a: extensionResult, b: extensionResult) => {
+      console.log("splittedd " , a.domain.split('/'));
+      const aValue = a.domain.split('/')[2];
+      const bValue = b.domain.split('/')[2];
+      
+      console.log("valuesssss", aValue, bValue);
+      if (aValue < bValue) {
+        return -1;
+      }
+      if (aValue > bValue) {
+        return 1;
+      }
+      return 0;
+    });
+    urlClicked.value = true;
+  } else {
+    returnedValues.value.sort((a: extensionResult, b: extensionResult) => {
+      const aValue = a.domain.split('/')[2];
+      const bValue = b.domain.split('/')[2];
+      
+      console.log("valuesssss", aValue, bValue);
+      if (aValue < bValue) {
+        return 1;
+      }
+      if (aValue > bValue) {
+        return -1;
+      }
+      return 0;
+    });
+    urlClicked.value = false;
+  }
+
+  console.log("sorted names " , returnedValues.value);
+};
 </script>
 
 <template>
@@ -143,30 +201,34 @@ const logout = async () => {
     </div>
     <div class="m-a mt-5 w-4/5">
       <div class="m-a relative mt-8 inline-block flex w-[600px] items-center justify-center">
-        <div v-if="extensionExist === true" class="w-full">
+        <div v-if="extensionExist" class="w-full">
           <input
             type="text"
             v-model="url"
             :placeholder="extensionExist ? 'URL giriniz' : 'Eklentiniz aktif değil'"
             :disabled="extensionExist ? false : true"
-            class="bg-#F2F2F2 border-b-coolGray w-full rounded-3xl p-4 focus:border-none  focus:outline-[#DCE2EE]"
+            class="bg-#F2F2F2 border-b-coolGray w-full rounded-3xl p-4 focus:border-none focus:outline-[#DCE2EE]"
           />
           <button
-            class="absolute right-0 rounded-r-3xl bg-[#0059F7] p-4 text-white transition duration-300 ease-in-out hover:bg-[#3E83F7] p-2 "
+            class="absolute right-0 rounded-r-3xl bg-[#0059F7] p-2 p-4 text-white transition duration-300 ease-in-out hover:bg-[#3E83F7]"
             @click="sendUrlToExtension()"
           >
             Search
           </button>
         </div>
         <div v-else>
-          <div class="notExistAlert text-red   p-5  rounded-md text-xl">Eklenti aktif değil !!!</div>
-
+          <div class="notExistAlert text-red rounded-md p-5 text-xl">Eklenti aktif değil !!!</div>
         </div>
       </div>
 
       <div class="mb-5 mt-10">
         <div class="cols-5 font-600 grid rounded-md border border-gray-300">
-          <div class="h-full w-full rounded-md border border-gray-300 p-4 text-[#273464]">URL</div>
+          <div
+            class="h-full w-full rounded-md border border-gray-300 p-4 text-[#273464] cursor-pointer hover:font-bold"
+            @click="sortUrls()"
+          >
+            URL
+          </div>
           <div class="h-full w-full rounded-md border border-gray-300 p-4 text-[#273464]">
             LANGUAGE
           </div>
@@ -176,12 +238,15 @@ const logout = async () => {
           <div class="h-full w-full rounded-md border border-gray-300 p-4 text-[#273464]">
             <div>ACCURACY</div>
           </div>
-          <div class="h-full w-full rounded-md border border-gray-300 p-4 text-[#273464]">
+          <div
+            class="h-full w-full cursor-pointer rounded-md border border-gray-300 p-4 text-[#273464] hover:font-bold"
+            @click="sortDate()"
+          >
             <div>DATE</div>
           </div>
         </div>
         <div class="max-h-500px w-full overflow-y-auto">
-          <div v-for="(value, index) in returnedValues" :key="index">
+          <div v-for="(value, index) in returnedValues" :key="value._id">
             <UrlCard
               :email="user"
               :url="value.domain"
@@ -193,7 +258,7 @@ const logout = async () => {
               :accuracy="value.languageAccuracy"
               :id="value._id"
               :real-lang-values="value.realLangValues"
-              :date="value.date"
+              :date="new Date(value.date)"
             />
           </div>
         </div>
@@ -203,7 +268,7 @@ const logout = async () => {
   <div v-else class="fixed left-0 top-0 flex h-full w-full items-center justify-center">
     <v-progress-circular :size="150" color="primary" indeterminate></v-progress-circular>
   </div>
-  <LoadingBarCard  :loadingButton="loadingButton" />
+  <LoadingBarCard :loadingButton="loadingButton" />
 </template>
 
 <style scoped>

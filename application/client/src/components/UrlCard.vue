@@ -115,7 +115,7 @@ realValueTextFunc();
     </div>
     <!-- <div class="w-4/5">-</div> -->
     <transition name="detailTransition">
-      <div v-if="showDetails" class="col-span-4 p-4">
+      <div v-if="showDetails" class="col-span-5 p-4">
         <!-- <div class="bg-#F2F2F2 mb-5 h-[1px] w-full border-t"></div> -->
         <div class="cols-2 grid">
           <div>

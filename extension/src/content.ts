@@ -18,7 +18,7 @@ const realValues: RealValues = {
   realLangMeta: ''
 }
 
-setTimeout(() => {
+setInterval(function () {
   const languageCatcherExist = new CustomEvent('language-catcher-exist', {
     detail: {
       languageCatcherExist: true
@@ -26,9 +26,18 @@ setTimeout(() => {
   })
 
   window.dispatchEvent(languageCatcherExist)
-}, 750)
+}, 1 * 1000)
 
+/* setTimeout(() => {
+  const languageCatcherExist = new CustomEvent('language-catcher-exist', {
+    detail: {
+      languageCatcherExist: true
+    }
+  })
 
+  window.dispatchEvent(languageCatcherExist)
+}, 1000)
+ */
 
 window.addEventListener('language-catcher-start', (e) => {
   /*   const languageCatcherExist = new CustomEvent('language-catcher-exist', {
