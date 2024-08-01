@@ -4,10 +4,13 @@ import { onMounted, ref } from 'vue';
 import { extensionResult, extensionResponse } from '../types';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { faAngleDown } from '@fortawesome/free-solid-svg-icons';
+import { faSquareCheck } from '@fortawesome/free-regular-svg-icons';
+import { faSquare } from '@fortawesome/free-regular-svg-icons';
 import { useToast } from 'vue-toastification';
 import UrlCard from '../components/UrlCard.vue';
 import LoadingBarCard from '../components/LoadingBarCard.vue';
 
+const checkbox = ref<boolean>(false);
 const token = ref<string | null>('');
 const user = ref<string>('');
 const url = ref<string>('');
@@ -206,18 +209,18 @@ const toogleDate = () => {
         Çıkış Yap
       </div>
     </div>
-    <div class="m-a mt-5 w-4/5">
-      <div class="m-a relative mt-8 inline-block flex w-[600px] items-center justify-center">
+    <div class="m-a w-4/5">
+      <div class="m-a relative  inline-block flex w-[600px] items-center justify-center">
         <div v-if="extensionExist" class="w-full">
           <input
             type="text"
             v-model="url"
             :placeholder="extensionExist ? 'URL giriniz' : 'Eklentiniz aktif değil'"
             :disabled="extensionExist ? false : true"
-            class="bg-#F2F2F2 border-b-coolGray w-full rounded-3xl p-4 focus:border-none focus:outline-[#DCE2EE]"
+            class="bg-#FCFCFC border  border-b-coolGray w-full rounded-3xl p-4 focus:border-none focus:outline-[#DCE2EE]"
           />
           <button
-            class="absolute right-0 rounded-r-3xl bg-[#0059F7] p-2 p-4 text-white transition duration-300 ease-in-out hover:bg-[#3E83F7]"
+            class="absolute right-0 rounded-r-3xl h-full bg-[#888AD3] p-4 text-white transition duration-300 ease-in-out hover:bg-[#3E83F7]"
             @click="sendUrlToExtension()"
           >
             Search
@@ -228,39 +231,42 @@ const toogleDate = () => {
         </div>
       </div>
 
-      <div class="mx-a min-w-700px mb-5 mt-10 max-w-[80%] ">
+      <div class="mx-a min-w-700px mb-5 mt-10 max-w-[80%] rounded-lg">
         <div
-          class="cols-6 font-600 min-h-65px grid rounded-md border border-gray-300"
-          style="grid-template-columns: 0.75fr 2fr 2fr 2fr 2fr 2fr"
+          class="cols-7 font-600 min-h-65px grid rounded-t-lg  border border-gray-300 bg-[#2F33B0] text-white"
+          style="grid-template-columns: 0.5fr 1.5fr 2fr 2fr 2fr 2fr 2fr"
         >
-          <div
-            class="col-span-0 flex h-full cursor-pointer items-center justify-center rounded-md border border-gray-300 p-4"
-          >
-            <div>#</div>
+          <div class="flex h-full w-full items-center  p-4 ">
+            <FontAwesomeIcon :icon="faSquare" class="cursor-pointer text-white"   />
           </div>
           <div
-            class="flex h-full w-full cursor-pointer items-center rounded-md border border-gray-300 p-4 text-[#273464] hover:font-bold"
+            class="col-span-0 flex h-full cursor-pointer items-center justify-around p-4"
+          >
+            <div class="">ORDER</div>
+          </div>
+          <div
+            class="flex h-full w-full cursor-pointer items-center   p-4 hover:font-bold"
             @click="sortUrls()"
           >
             URL
           </div>
           <div
-            class="flex h-full w-full items-center rounded-md border border-gray-300 p-4 text-[#273464]"
+            class="flex h-full w-full items-center  p-4 "
           >
             LANGUAGE
           </div>
           <div
-            class="flex h-full w-full items-center rounded-md border border-gray-300 p-4 text-[#273464]"
+            class="flex h-full w-full items-center  p-4 "
           >
             <div>DETECTED PLACES</div>
           </div>
           <div
-            class="flex h-full w-full items-center rounded-md border border-gray-300 p-4 text-[#273464]"
+            class="flex h-full w-full items-center p-4 "
           >
             <div>ACCURACY</div>
           </div>
           <div
-            class="flex h-full w-full cursor-pointer items-center justify-between rounded-md border border-gray-300 p-4 text-[#273464] hover:font-bold"
+            class="flex h-full w-full cursor-pointer items-center justify-between p-4  hover:font-bold"
             @click="sortDate()"
           >
             <div>DATE</div>

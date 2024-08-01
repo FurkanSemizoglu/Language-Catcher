@@ -27,7 +27,6 @@ if (props.detectedLanguage === 'not detected') {
 /* import AccuracyCircle from './AccuracyCircle.vue' */
 const showDetails = ref<boolean>(false);
 
-
 const deleteCard = async () => {
   console.log('id', props.id);
   try {
@@ -78,15 +77,19 @@ realValueTextFunc();
 
 <template>
   <div
-    class="cols-6 min-h-100px mt-3 grid h-auto rounded-md border border-gray-300"
-    style="grid-template-columns: 0.75fr 2fr 2fr 2fr 2fr 2fr"
+    class="cols-7 min-h-100px grid h-auto border border-gray-300 "
+    style="grid-template-columns: 0.5fr 1.5fr 2fr 2fr 2fr 2fr 2fr"
+    :class=" checkbox ? 'bg-[#EBEAEA]' :  index % 2 === 0 ? 'bg-white' : 'bg-[#FCFCFC]' "
+    
   >
-    <div class="flex h-full w-full items-center justify-between  p-4">
+    <div class="flex h-full w-full items-center  p-4">
       <FontAwesomeIcon
-          :icon="checkbox ?  faSquareCheck : faSquare"
-          @click="checkbox = !checkbox"
-          class="cursor-pointer"
-        />
+        :icon="checkbox ? faSquareCheck : faSquare"
+        @click="checkbox = !checkbox"
+        class="cursor-pointer"
+      />
+    </div>
+    <div class="flex h-full w-full items-center justify-center p-4 text-[#A2A0A1]">
       {{ props.index + 1 }}
     </div>
     <div class="flex h-auto w-full items-center justify-between p-4">
@@ -103,7 +106,7 @@ realValueTextFunc();
         </span>
       </div>
     </div>
-    <div class="flex h-full w-full items-center justify-between p-4">
+    <div class="flex h-full w-full items-center ml-5 p-4">
       <AccuracyCircle :accuracy="props.accuracy" />
       <!--    <div v-if="props.accuracy === 'high'" class="ml-2">
         <div class="rounded-full w-5 h-5 bg-green"></div>
@@ -130,7 +133,7 @@ realValueTextFunc();
     </div>
     <!-- <div class="w-4/5">-</div> -->
     <transition name="detailTransition">
-      <div v-if="showDetails" class="col-span-5 p-4">
+      <div v-if="showDetails" class="col-span-7 p-4">
         <!-- <div class="bg-#F2F2F2 mb-5 h-[1px] w-full border-t"></div> -->
         <div class="cols-2 grid">
           <div>
