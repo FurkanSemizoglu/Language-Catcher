@@ -8,10 +8,9 @@ const addLanguageToUser = async (req: Request, res: Response) => {
   try {
     const { email, languageData } = req.body;
     console.log(email);
-  
+
     const user = await User.findOne({ email });
 
-   
     const languageLocation = new LanguageLocation({
       localStorage: languageData.languageLocation.localStorage,
       sessionStorage: languageData.languageLocation.sessionStorage,
@@ -41,7 +40,7 @@ const addLanguageToUser = async (req: Request, res: Response) => {
       languageLocation: languageLocation._id,
       languageAccuracy: languageData.languageAccuracy,
       realLangValues: realLangValue._id,
-      date : languageData.date
+      date: languageData.date,
     });
     await language.save();
 
@@ -91,7 +90,9 @@ const deleteLanguage = async (req: Request, res: Response) => {
   try {
     const { email, languageId } = req.query;
     const user = await User.findOne({ email });
-    const language = await Language.findById(languageId).populate("languageLocation").populate("realLangValues");
+    const language = await Language.findById(languageId)
+      .populate("languageLocation")
+      .populate("realLangValues");
 
     await LanguageLocation.findByIdAndDelete(language.languageLocation._id);
     await RealLangValues.findByIdAndDelete(language.realLangValues._id);
@@ -106,4 +107,42 @@ const deleteLanguage = async (req: Request, res: Response) => {
   }
 };
 
-module.exports = { addLanguageToUser, getUserLanguages, deleteLanguage };
+const deletesLanguages = async (req: Request, res: Response) => {
+  try {
+    const { email, languageIdList } = req.query;
+
+    if (!email || !languageIdList) {
+      return res.status(400).json({ error: "Missing email or languageIdList" });
+    }
+
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    if (!Array.isArray(languageIdList)) {
+      return res.status(400).json({ error: "languageIdList should be an array" });
+    }
+
+    for (const element of languageIdList) {
+      const language = await Language.findById(element).populate("languageLocation").populate("realLangValues");
+
+      if (language && language.languageLocation && language.realLangValues) {
+        await LanguageLocation.findByIdAndDelete(language.languageLocation._id);
+        await RealLangValues.findByIdAndDelete(language.realLangValues._id);
+        await Language.findByIdAndDelete(element);
+      }
+    }
+
+    user.languageUrls = user.languageUrls.filter(
+      (lang: any) => !languageIdList.includes(lang._id.toString())
+    );
+    await user.save();
+    res.status(200).json(user.languageUrls);
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+module.exports = { addLanguageToUser, getUserLanguages, deleteLanguage , deletesLanguages };

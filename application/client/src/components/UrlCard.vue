@@ -14,7 +14,7 @@ import axios from 'axios';
 const props = defineProps<urlCardResultProps>();
 const localeDate = new Date(props.date).toLocaleString('tr-TR');
 const detectedLanguagesText = ref<string>('');
-
+const cardId = ref<string[]>([]);
 const model = ref<string>('');
 const checkbox = ref<boolean>(false);
 if (props.detectedLanguage === 'not detected') {
@@ -73,6 +73,24 @@ const realValueTextFunc = () => {
   }
 };
 realValueTextFunc();
+
+
+
+const checkboxFunc = () => {
+
+
+  if (checkbox.value === true) {
+
+    cardId.value.push(props.id);
+    console.log('cardId', cardId);
+  } else {
+    cardId.value = cardId.value.filter((item) => item !== props.id);
+    console.log('cardId', cardId);
+  }
+
+  checkbox.value = !checkbox.value;
+};
+
 </script>
 
 <template>
@@ -85,7 +103,7 @@ realValueTextFunc();
     <div class="flex h-full w-full items-center  p-4">
       <FontAwesomeIcon
         :icon="checkbox ? faSquareCheck : faSquare"
-        @click="checkbox = !checkbox"
+        @click="checkboxFunc(); $emit('cardId', props.id)"
         class="cursor-pointer"
       />
     </div>

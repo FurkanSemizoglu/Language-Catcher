@@ -6,6 +6,7 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { faAngleDown } from '@fortawesome/free-solid-svg-icons';
 import { faSquareCheck } from '@fortawesome/free-regular-svg-icons';
 import { faSquare } from '@fortawesome/free-regular-svg-icons';
+import { faTrashCan } from '@fortawesome/free-solid-svg-icons';
 import { useToast } from 'vue-toastification';
 import UrlCard from '../components/UrlCard.vue';
 import LoadingBarCard from '../components/LoadingBarCard.vue';
@@ -24,6 +25,7 @@ token.value = localStorage.getItem('token');
 
 const returnedValues = ref<extensionResult[]>([]);
 
+const deleteItemsList = ref<string[]>([])
 /* window.addEventListener('updateProgress', (e) => {
   const event = e as CustomEvent;
   console.log('update progress :', event.detail.progress);
@@ -198,7 +200,40 @@ const sortUrls = () => {
 const toogleDate = () => {
   dateClicked.value = !dateClicked.value;
 }; */
+
+const deleteItemsFunc = (id : string) => {
+  console.log("received id " , id);
+  if(deleteItemsList.value.includes(id)){    
+    deleteItemsList.value = deleteItemsList.value.filter((item) => item !== id); 
+    console.log(deleteItemsList.value);
+    return
+  }
+  deleteItemsList.value.push(id)
+  console.log('delete items' , deleteItemsList.value);
+};
+
+
+
+const deleteItems = async() => {
+  console.log("delete items clicked  " , deleteItemsList.value);
+console.log("user " , user.value);
+  try {
+    const response = await axios.delete('http://localhost:5000/api/deletesLanguages', {
+      params: { email: user.value, languageIdList: deleteItemsList.value }
+    });
+
+    console.log('abi gitti artık ', response.data);
+    location.reload();
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 </script>
+
+
+
+
 
 <template>
   <div>
@@ -210,17 +245,17 @@ const toogleDate = () => {
       </div>
     </div>
     <div class="m-a w-4/5">
-      <div class="m-a relative  inline-block flex w-[600px] items-center justify-center">
+      <div class="m-a relative inline-block flex w-[600px] items-center justify-center">
         <div v-if="extensionExist" class="w-full">
           <input
             type="text"
             v-model="url"
             :placeholder="extensionExist ? 'URL giriniz' : 'Eklentiniz aktif değil'"
             :disabled="extensionExist ? false : true"
-            class="bg-#FCFCFC border  border-b-coolGray w-full rounded-3xl p-4 focus:border-none focus:outline-[#DCE2EE]"
+            class="bg-#FCFCFC border-b-coolGray w-full rounded-3xl border p-4 focus:border-none focus:outline-[#DCE2EE]"
           />
           <button
-            class="absolute right-0 rounded-r-3xl h-full bg-[#888AD3] p-4 text-white transition duration-300 ease-in-out hover:bg-[#3E83F7]"
+            class="absolute right-0 h-full rounded-r-3xl bg-[#888AD3] p-4 text-white transition duration-300 ease-in-out hover:bg-[#3E83F7]"
             @click="sendUrlToExtension()"
           >
             Search
@@ -231,42 +266,39 @@ const toogleDate = () => {
         </div>
       </div>
 
+      <FontAwesomeIcon
+        :icon="faTrashCan"
+        class="mr-4 transform cursor-pointer transition-transform duration-300"        
+        color="red"
+        @click="deleteItems()"
+      />
+
       <div class="mx-a min-w-700px mb-5 mt-10 max-w-[80%] rounded-lg">
         <div
-          class="cols-7 font-600 min-h-65px grid rounded-t-lg  border border-gray-300 bg-[#2F33B0] text-white"
+          class="cols-7 font-600 min-h-65px grid rounded-t-lg border border-gray-300 bg-[#2F33B0] text-white"
           style="grid-template-columns: 0.5fr 1.5fr 2fr 2fr 2fr 2fr 2fr"
         >
-          <div class="flex h-full w-full items-center  p-4 ">
-            <FontAwesomeIcon :icon="faSquare" class="cursor-pointer text-white"   />
+          <div class="flex h-full w-full items-center p-4">
+            <FontAwesomeIcon :icon="faSquare" class="cursor-pointer text-white" />
           </div>
-          <div
-            class="col-span-0 flex h-full cursor-pointer items-center justify-around p-4"
-          >
+          <div class="col-span-0 flex h-full cursor-pointer items-center justify-around p-4">
             <div class="">ORDER</div>
           </div>
           <div
-            class="flex h-full w-full cursor-pointer items-center   p-4 hover:font-bold"
+            class="flex h-full w-full cursor-pointer items-center p-4 hover:font-bold"
             @click="sortUrls()"
           >
             URL
           </div>
-          <div
-            class="flex h-full w-full items-center  p-4 "
-          >
-            LANGUAGE
-          </div>
-          <div
-            class="flex h-full w-full items-center  p-4 "
-          >
+          <div class="flex h-full w-full items-center p-4">LANGUAGE</div>
+          <div class="flex h-full w-full items-center p-4">
             <div>DETECTED PLACES</div>
           </div>
-          <div
-            class="flex h-full w-full items-center p-4 "
-          >
+          <div class="flex h-full w-full items-center p-4">
             <div>ACCURACY</div>
           </div>
           <div
-            class="flex h-full w-full cursor-pointer items-center justify-between p-4  hover:font-bold"
+            class="flex h-full w-full cursor-pointer items-center justify-between p-4 hover:font-bold"
             @click="sortDate()"
           >
             <div>DATE</div>
@@ -295,6 +327,7 @@ const toogleDate = () => {
                 :real-lang-values="value.realLangValues"
                 :date="new Date(value.date)"
                 :index="index"
+                @cardId="deleteItemsFunc"
               />
             </div>
           </div>
