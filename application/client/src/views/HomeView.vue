@@ -220,7 +220,7 @@ const deleteItems = async () => {
   appReady.value = false;
   console.log('ReturnedValues.value', returnedValues.value);
   console.log('tempReturnedValues.value', tempReturnedValues.value);
-  if (allItemsSelected) {
+  if (allItemsSelected.value === true) {
     console.log('all items selected');
 
     const idList = returnedValues.value.map((item) => item._id);
@@ -248,6 +248,10 @@ const deleteItems = async () => {
       });
 
       console.log('abi gitti artık ', response.data);
+
+      returnedValues.value = response.data
+      tempReturnedValues.value = response.data;
+      console.log("returned values", returnedValues.value);   
       appReady.value = true;
     } catch (error) {
       console.log(error);

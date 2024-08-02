@@ -41,7 +41,7 @@ const realValues: RealValues = {
   }
 })
  */
-/* setInterval(function () {
+setInterval(function () {
   const languageCatcherExist = new CustomEvent('language-catcher-exist', {
     detail: {
       languageCatcherExist: true
@@ -49,9 +49,9 @@ const realValues: RealValues = {
   })
 
   window.dispatchEvent(languageCatcherExist)
-}, 1 * 1000) */
+}, 0.2 * 1000)
 
-setTimeout(() => {
+/* setTimeout(() => {
   const languageCatcherExist = new CustomEvent('language-catcher-exist', {
     detail: {
       languageCatcherExist: true
@@ -59,7 +59,7 @@ setTimeout(() => {
   })
 
   window.dispatchEvent(languageCatcherExist)
-}, 750)
+}, 750) */
 
 window.addEventListener('language-catcher-start', (e) => {
   /*   const languageCatcherExist = new CustomEvent('language-catcher-exist', {

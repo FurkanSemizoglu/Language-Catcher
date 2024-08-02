@@ -115,7 +115,19 @@ const deletesLanguages = async (req: Request, res: Response) => {
       return res.status(400).json({ error: "Missing email or languageIdList" });
     }
 
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email }).populate({
+      path: "languageUrls",
+      populate: [
+        {
+          path: "languageLocation",
+          model: "LanguageLocation",
+        },
+        {
+          path: "realLangValues",
+          model: "RealLangValues",
+        },
+      ],
+    });
 
     if (!user) {
       return res.status(404).json({ error: "User not found" });
@@ -138,6 +150,7 @@ const deletesLanguages = async (req: Request, res: Response) => {
     user.languageUrls = user.languageUrls.filter(
       (lang: any) => !languageIdList.includes(lang._id.toString())
     );
+   
     await user.save();
     res.status(200).json(user.languageUrls);
   } catch (error: any) {
