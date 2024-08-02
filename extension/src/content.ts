@@ -18,6 +18,18 @@ const realValues: RealValues = {
   realLangMeta: ''
 }
 
+/* chrome.runtime.onInstalled.addListener(
+  function () {
+   const languageCatcherExist = new CustomEvent('language-catcher-exist', {
+    detail: {
+      languageCatcherExist: true
+    }
+  })
+
+  window.dispatchEvent(languageCatcherExist)
+}
+) */
+
 setInterval(function () {
   const languageCatcherExist = new CustomEvent('language-catcher-exist', {
     detail: {

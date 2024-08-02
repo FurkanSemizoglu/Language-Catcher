@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import axios from 'axios';
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import { extensionResult, extensionResponse } from '../types';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { faAngleDown } from '@fortawesome/free-solid-svg-icons';
 import { faSquareCheck } from '@fortawesome/free-regular-svg-icons';
 import { faSquare } from '@fortawesome/free-regular-svg-icons';
 import { faTrashCan } from '@fortawesome/free-solid-svg-icons';
+import { faSliders } from '@fortawesome/free-solid-svg-icons/faSliders';
+import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons/faMagnifyingGlass';
 import { useToast } from 'vue-toastification';
 import UrlCard from '../components/UrlCard.vue';
 import LoadingBarCard from '../components/LoadingBarCard.vue';
@@ -25,7 +27,7 @@ token.value = localStorage.getItem('token');
 
 const returnedValues = ref<extensionResult[]>([]);
 
-const deleteItemsList = ref<string[]>([])
+const deleteItemsList = ref<string[]>([]);
 /* window.addEventListener('updateProgress', (e) => {
   const event = e as CustomEvent;
   console.log('update progress :', event.detail.progress);
@@ -201,22 +203,20 @@ const toogleDate = () => {
   dateClicked.value = !dateClicked.value;
 }; */
 
-const deleteItemsFunc = (id : string) => {
-  console.log("received id " , id);
-  if(deleteItemsList.value.includes(id)){    
-    deleteItemsList.value = deleteItemsList.value.filter((item) => item !== id); 
+const deleteItemsFunc = (id: string) => {
+  console.log('received id ', id);
+  if (deleteItemsList.value.includes(id)) {
+    deleteItemsList.value = deleteItemsList.value.filter((item) => item !== id);
     console.log(deleteItemsList.value);
-    return
+    return;
   }
-  deleteItemsList.value.push(id)
-  console.log('delete items' , deleteItemsList.value);
+  deleteItemsList.value.push(id);
+  console.log('delete items', deleteItemsList.value);
 };
 
-
-
-const deleteItems = async() => {
-  console.log("delete items clicked  " , deleteItemsList.value);
-console.log("user " , user.value);
+const deleteItems = async () => {
+  console.log('delete items clicked  ', deleteItemsList.value);
+  console.log('user ', user.value);
   try {
     const response = await axios.delete('http://localhost:5000/api/deletesLanguages', {
       params: { email: user.value, languageIdList: deleteItemsList.value }
@@ -227,35 +227,75 @@ console.log("user " , user.value);
   } catch (error) {
     console.log(error);
   }
+};
+
+const openFilter = ref<boolean>(false);
+const searchedUrl = ref<string>('');
+let oldReturnedValues = ref<extensionResult[]>([]);
+const searchUrl = () => {
+  oldReturnedValues.value = returnedValues.value;
+  console.log('searched url', searchedUrl.value);
+  const searchedValues = returnedValues.value.filter((value) => {
+    return value.domain.includes(searchedUrl.value);
+  });
+
+  returnedValues.value = searchedValues;
+  console.log('searched values', searchedValues);
+};
+
+if(searchedUrl.value === '') {
+  returnedValues.value = oldReturnedValues.value;
 }
 
+
+const highAccuracy = ref<boolean>(false);
+const mediumAccuracy = ref<boolean>(false);
+const lowAccuracy = ref<boolean>(false);
+
+const filterAccuracy = () => {
+  if (!highAccuracy.value && !mediumAccuracy.value && !lowAccuracy.value) {
+    returnedValues.value = oldReturnedValues.value;
+    return;
+  }
+  console.log("hifh " , highAccuracy.value);
+
+ /*  let flag : boolean = false */
+  returnedValues.value = returnedValues.value.filter((value) => {
+    if (highAccuracy.value && value.languageAccuracy === 'high') return true;
+    if (mediumAccuracy.value && value.languageAccuracy === 'medium') return  true;
+    if (lowAccuracy.value && value.languageAccuracy === 'low') return  true;
+/* 
+    if(flag) return true; */
+    return false;
+  });
+
+  console.log("returned values", returnedValues.value);
+};
+
+watch([highAccuracy, mediumAccuracy, lowAccuracy], filterAccuracy);
 </script>
-
-
-
-
 
 <template>
   <div>
     <div class="topBar m-a flex w-full items-center justify-between px-8 py-6">
-      <div class="cursor-pointer text-[#888AD3] hover:text-[#C0C5E5]">{{ user }}</div>
+      <div class="cursor-pointer text-[#2F33B0] hover:text-[#C0C5E5]">{{ user }}</div>
 
-      <div class="mr-3 cursor-pointer text-[#888AD3] hover:text-[#C0C5E5]" @click="logout">
+      <div class="mr-3 cursor-pointer text-[#2F33B0] hover:text-[#C0C5E5]" @click="logout">
         Çıkış Yap
       </div>
     </div>
     <div class="m-a w-4/5">
-      <div class="m-a relative inline-block flex w-[600px] items-center justify-center">
+      <div class="m-a relative inline-block flex max-w-[600px] items-center justify-center">
         <div v-if="extensionExist" class="w-full">
           <input
             type="text"
             v-model="url"
             :placeholder="extensionExist ? 'URL giriniz' : 'Eklentiniz aktif değil'"
             :disabled="extensionExist ? false : true"
-            class="bg-#FCFCFC border-b-coolGray w-full rounded-3xl border p-4 focus:border-none focus:outline-[#DCE2EE]"
+            class="bg-#FCFCFC border-b-coolGray w-full rounded-3xl border p-4 focus:border-none focus:outline-[#DCE2EE] sm:w"
           />
           <button
-            class="absolute right-0 h-full rounded-r-3xl bg-[#888AD3] p-4 text-white transition duration-300 ease-in-out hover:bg-[#3E83F7]"
+            class="absolute right-0 h-full rounded-r-3xl bg-[#2F33B0] p-4 text-white transition duration-300 ease-in-out hover:bg-[#3E83F7]"
             @click="sendUrlToExtension()"
           >
             Search
@@ -266,14 +306,50 @@ console.log("user " , user.value);
         </div>
       </div>
 
-      <FontAwesomeIcon
-        :icon="faTrashCan"
-        class="mr-4 transform cursor-pointer transition-transform duration-300"        
-        color="red"
-        @click="deleteItems()"
-      />
-
       <div class="mx-a min-w-700px mb-5 mt-10 max-w-[80%] rounded-lg">
+        <div class="mb-2 flex w-full items-center justify-end">
+          <div class="flex items-center">
+            <div class="mr-2 rounded-lg border">
+              <input type="text" class="w-full rounded-lg px-1 py-0.5" v-model="searchedUrl" />
+            </div>
+            <FontAwesomeIcon
+              :icon="faMagnifyingGlass"
+              class="mr-4 transform cursor-pointer transition-transform duration-300"
+              @click="searchUrl()"
+            />
+          </div>
+          <div class="relative">
+            <FontAwesomeIcon
+              :icon="faSliders"
+              class="tooltipSearch mr-4 transform cursor-pointer transition-transform duration-300"
+              @click="openFilter = !openFilter"
+            />
+
+            <div
+              v-if="openFilter"
+              class="-top-22 -left-30 absolute rounded-lg bg-[#C0C5E5] p-4 shadow"
+            >
+              <div class="mb-2 flex items-center justify-center">Accuracy Filter</div>
+              <div class="flex items-center gap-2">
+                <input type="checkbox" v-model="highAccuracy" class="mr-1" />
+                <label>High</label>
+
+                <input type="checkbox"  v-model="mediumAccuracy"class="mr-1" />
+                <label>Medium</label>
+
+                <input type="checkbox" v-model="lowAccuracy" class="mr-1" />
+                <label>Low</label>
+              </div>
+            </div>
+          </div>
+          <div>
+            <FontAwesomeIcon
+              :icon="faTrashCan"
+              class="mr-4 transform cursor-pointer transition-transform duration-300"
+              @click="deleteItems()"
+            />
+          </div>
+        </div>
         <div
           class="cols-7 font-600 min-h-65px grid rounded-t-lg border border-gray-300 bg-[#2F33B0] text-white"
           style="grid-template-columns: 0.5fr 1.5fr 2fr 2fr 2fr 2fr 2fr"
@@ -343,6 +419,26 @@ console.log("user " , user.value);
 </template>
 
 <style scoped>
+.tooltipSearch {
+  position: relative;
+  display: inline-block;
+}
+
+.tooltipSearch:hover::after {
+  content: 'Email ve şifrenizi giriniz';
+  position: absolute;
+  background-color: #888ad3;
+  color: white;
+  padding: 5px;
+  border-radius: 4px;
+  font-size: 14px;
+  top: 0;
+  z-index: 100;
+  margin-bottom: 5px;
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+
 td,
 th {
   border: 1px solid #dddddd;

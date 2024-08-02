@@ -29,7 +29,7 @@ window.addEventListener('updateProgress', (e) => {
       <div class="rounded-lg bg-white p-5">
         <div class="flex flex-col items-center justify-center gap-4 p-4">
           <div class="mb-5 text-3xl">Yükleniyor ...</div>
-          <div>% {{ progressDegree }}</div>
+          <div>% {{ progressDegree.toFixed(2) }}</div>
           <div class="text-align-center w-500px">
             <div class="progress progress-striped">
               <div class="progress-bar" :style="{ width: progressDegree + '%' }"></div>
