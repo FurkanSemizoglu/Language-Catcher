@@ -26,6 +26,7 @@ const toast = useToast();
 token.value = localStorage.getItem('token');
 
 const returnedValues = ref<extensionResult[]>([]);
+const tempReturnedValues = ref<extensionResult[]>([]);
 
 const deleteItemsList = ref<string[]>([]);
 /* window.addEventListener('updateProgress', (e) => {
@@ -68,6 +69,7 @@ window.addEventListener('languageCatcherResult', async (e) => {
         console.log('language response', languagesResponse.data);
 
         returnedValues.value = languagesResponse.data;
+        tempReturnedValues.value = languagesResponse.data;
         loadingButton.value = false;
         /* languagesResponse.data.sort((a: extensionResult, b: extensionResult) => {
           return new Date(b.date).getTime() - new Date(a.date).getTime();
@@ -108,7 +110,7 @@ onMounted(async () => {
     });
 
     returnedValues.value = languagesResponse.data;
-
+    tempReturnedValues.value = languagesResponse.data;
     console.log('languagesss', languagesResponse.data);
     console.log('email ', response.data.user.email);
     user.value = response.data.user.email;
@@ -232,10 +234,12 @@ const deleteItems = async () => {
 const openFilter = ref<boolean>(false);
 const searchedUrl = ref<string>('');
 let oldReturnedValues = ref<extensionResult[]>([]);
+  oldReturnedValues.value = JSON.parse(JSON.stringify(returnedValues.value)); 
+
 const searchUrl = () => {
-  oldReturnedValues.value = returnedValues.value;
+  console.log('old values', oldReturnedValues.value);
   console.log('searched url', searchedUrl.value);
-  const searchedValues = returnedValues.value.filter((value) => {
+  const searchedValues = tempReturnedValues.value.filter((value) => {
     return value.domain.includes(searchedUrl.value);
   });
 
@@ -243,10 +247,9 @@ const searchUrl = () => {
   console.log('searched values', searchedValues);
 };
 
-if(searchedUrl.value === '') {
+if (searchedUrl.value === '') {
   returnedValues.value = oldReturnedValues.value;
 }
-
 
 const highAccuracy = ref<boolean>(false);
 const mediumAccuracy = ref<boolean>(false);
@@ -254,25 +257,26 @@ const lowAccuracy = ref<boolean>(false);
 
 const filterAccuracy = () => {
   if (!highAccuracy.value && !mediumAccuracy.value && !lowAccuracy.value) {
-    returnedValues.value = oldReturnedValues.value;
+    returnedValues.value = tempReturnedValues.value;
     return;
   }
-  console.log("hifh " , highAccuracy.value);
+  console.log('hifh ', highAccuracy.value);
 
- /*  let flag : boolean = false */
-  returnedValues.value = returnedValues.value.filter((value) => {
+  /*  let flag : boolean = false */
+  returnedValues.value = tempReturnedValues.value.filter((value) => {
     if (highAccuracy.value && value.languageAccuracy === 'high') return true;
-    if (mediumAccuracy.value && value.languageAccuracy === 'medium') return  true;
-    if (lowAccuracy.value && value.languageAccuracy === 'low') return  true;
-/* 
+    if (mediumAccuracy.value && value.languageAccuracy === 'medium') return true;
+    if (lowAccuracy.value && value.languageAccuracy === 'low') return true;
+    /* 
     if(flag) return true; */
     return false;
   });
 
-  console.log("returned values", returnedValues.value);
+  console.log('returned values', returnedValues.value);
 };
 
 watch([highAccuracy, mediumAccuracy, lowAccuracy], filterAccuracy);
+watch(searchedUrl, searchUrl);
 </script>
 
 <template>
@@ -292,7 +296,7 @@ watch([highAccuracy, mediumAccuracy, lowAccuracy], filterAccuracy);
             v-model="url"
             :placeholder="extensionExist ? 'URL giriniz' : 'Eklentiniz aktif değil'"
             :disabled="extensionExist ? false : true"
-            class="bg-#FCFCFC border-b-coolGray w-full rounded-3xl border p-4 focus:border-none focus:outline-[#DCE2EE] sm:w"
+            class="bg-#FCFCFC border-b-coolGray w-full rounded-3xl border p-4 focus:border-none focus:outline-[#DCE2EE]"
           />
           <button
             class="absolute right-0 h-full rounded-r-3xl bg-[#2F33B0] p-4 text-white transition duration-300 ease-in-out hover:bg-[#3E83F7]"
@@ -334,7 +338,7 @@ watch([highAccuracy, mediumAccuracy, lowAccuracy], filterAccuracy);
                 <input type="checkbox" v-model="highAccuracy" class="mr-1" />
                 <label>High</label>
 
-                <input type="checkbox"  v-model="mediumAccuracy"class="mr-1" />
+                <input type="checkbox" v-model="mediumAccuracy" class="mr-1" />
                 <label>Medium</label>
 
                 <input type="checkbox" v-model="lowAccuracy" class="mr-1" />
@@ -360,12 +364,7 @@ watch([highAccuracy, mediumAccuracy, lowAccuracy], filterAccuracy);
           <div class="col-span-0 flex h-full cursor-pointer items-center justify-around p-4">
             <div class="">ORDER</div>
           </div>
-          <div
-            class="flex h-full w-full cursor-pointer items-center p-4 hover:font-bold"
-            @click="sortUrls()"
-          >
-            URL
-          </div>
+          <div class="flex h-full w-full items-center p-4 hover:font-bold">URL</div>
           <div class="flex h-full w-full items-center p-4">LANGUAGE</div>
           <div class="flex h-full w-full items-center p-4">
             <div>DETECTED PLACES</div>
