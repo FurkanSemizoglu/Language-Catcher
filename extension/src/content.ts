@@ -18,19 +18,7 @@ const realValues: RealValues = {
   realLangMeta: ''
 }
 
-/* chrome.runtime.onInstalled.addListener(
-  function () {
-   const languageCatcherExist = new CustomEvent('language-catcher-exist', {
-    detail: {
-      languageCatcherExist: true
-    }
-  })
-
-  window.dispatchEvent(languageCatcherExist)
-}
-) */
-
-setInterval(function () {
+/* chrome.runtime.onInstalled.addListener(function (details) {
   const languageCatcherExist = new CustomEvent('language-catcher-exist', {
     detail: {
       languageCatcherExist: true
@@ -38,18 +26,40 @@ setInterval(function () {
   })
 
   window.dispatchEvent(languageCatcherExist)
-}, 1 * 1000)
+  if (details.reason == 'install') {
+    console.log('This is a first install!')
+    const languageCatcherExist = new CustomEvent('language-catcher-exist', {
+      detail: {
+        languageCatcherExist: true
+      }
+    })
 
-/* setTimeout(() => {
-  const languageCatcherExist = new CustomEvent('language-catcher-exist', {
-    detail: {
-      languageCatcherExist: true
-    }
-  })
-
-  window.dispatchEvent(languageCatcherExist)
-}, 1000)
+    window.dispatchEvent(languageCatcherExist)
+  } else if (details.reason == 'update') {
+    var thisVersion = chrome.runtime.getManifest().version
+    console.log('Updated from ' + details.previousVersion + ' to ' + thisVersion + '!')
+  }
+})
  */
+/* setInterval(function () {
+  const languageCatcherExist = new CustomEvent('language-catcher-exist', {
+    detail: {
+      languageCatcherExist: true
+    }
+  })
+
+  window.dispatchEvent(languageCatcherExist)
+}, 1 * 1000) */
+
+setTimeout(() => {
+  const languageCatcherExist = new CustomEvent('language-catcher-exist', {
+    detail: {
+      languageCatcherExist: true
+    }
+  })
+
+  window.dispatchEvent(languageCatcherExist)
+}, 750)
 
 window.addEventListener('language-catcher-start', (e) => {
   /*   const languageCatcherExist = new CustomEvent('language-catcher-exist', {
@@ -114,13 +124,10 @@ window.addEventListener('language-catcher-start', (e) => {
     }) */
 })
 
-const sendProgressEvent = (index: number , arrayLength : number) => {
-
-
-
+const sendProgressEvent = (index: number, arrayLength: number) => {
   const updateProgress = new CustomEvent('updateProgress', {
     detail: {
-      progress: index/arrayLength
+      progress: index / arrayLength
     }
   })
   window.dispatchEvent(updateProgress)
@@ -162,9 +169,8 @@ const recurciveProcess = (
 
     languageCatcherResultArray.push(languageCatcherResult.detail)
 
-
-    sendProgressEvent(index + 1 , urlList.length)
-   /*  const progressLength = urlList.length % 2 === 0 ? urlList.length : urlList.length + 1
+    sendProgressEvent(index + 1, urlList.length)
+    /*  const progressLength = urlList.length % 2 === 0 ? urlList.length : urlList.length + 1
     const progress = (index / progressLength) * 100
     console.log('progress content: ', progress)
     // burda sadece yüzde elli yeterli mi yoksa 25 75 civarı değerlerde de gönderilmeli mi

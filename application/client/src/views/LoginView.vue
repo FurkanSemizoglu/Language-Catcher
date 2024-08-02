@@ -23,8 +23,6 @@ const togglePasswordVisibility = () => {
 
 const emptyInput = ref<boolean>(true);
 
-
-
 watch([email, password], () => {
   if (email.value && password.value) {
     console.log('email and password found');
@@ -77,7 +75,7 @@ const login = async () => {
 </script>
 <template>
   <div class="m-0 flex h-screen w-full">
-    <div class="relative flex w-full items-center justify-center bg-gray-100">
+    <div class="hidden w-full items-center justify-center bg-gray-100 lg:flex">
       <img
         src="../../public/world.jpg"
         alt="World"
@@ -90,7 +88,7 @@ const login = async () => {
         Efilli Dil Algılama Uygulaması
       </div>
     </div>
-    <div class="flex w-2/5 flex-col items-center justify-center bg-[#FFFFFF] p-4">
+    <div class="flex flex-col  w-full items-center justify-center bg-[#FFFFFF] p-4 lg:w-[45%]">
       <div class="mx-a ml-4 flex w-[90%] flex-col items-center justify-center">
         <div class="font-900 mb-4 text-3xl text-[#2C39A6]">Giriş</div>
         <div class="mt-2 flex w-full flex-col items-center justify-center gap-4">
@@ -130,7 +128,7 @@ const login = async () => {
             </RouterLink>
 
             <button
-              class=" font-500 cursor-pointer rounded-md border-none bg-[#FFFFFF] p-4 text-[#2C39A6] transition-colors duration-300 ease-in-out hover:bg-[#E7E8EE]"
+              class="font-500 cursor-pointer rounded-md border-none bg-[#FFFFFF] p-4 text-[#2C39A6] transition-colors duration-300 ease-in-out hover:bg-[#E7E8EE]"
               @click="login"
               :disabled="emptyInput"
               :class="emptyInput ? 'tooltip cursor-not-allowed' : 'cursor-pointer'"
@@ -157,14 +155,14 @@ const login = async () => {
 .tooltip:hover::after {
   content: 'Email ve şifrenizi giriniz';
   position: absolute;
-  background-color: #888AD3;
+  background-color: #888ad3;
   color: white;
   padding: 5px;
   border-radius: 4px;
   font-size: 14px;
   top: 100%;
   left: 50%;
-  margin-top: 5px ;
+  margin-top: 5px;
   transform: translateX(-50%);
   white-space: nowrap;
 }

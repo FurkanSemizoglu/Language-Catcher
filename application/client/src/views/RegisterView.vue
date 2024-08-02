@@ -87,7 +87,7 @@ const register = async () => {
 
 <template>
   <div class="flex h-screen">
-    <div class="relative flex w-full items-center justify-center bg-gray-100">
+    <div class="hidden w-full items-center justify-center bg-gray-100 lg:flex">
       <img
         src="../../public/world.jpg"
         alt="World"
@@ -97,7 +97,7 @@ const register = async () => {
         Efilli Dil Algılama Uygulaması
       </div>
     </div>
-    <div class="flex w-2/5 flex-col items-center justify-center bg-[#FFFFFF] p-4">
+    <div class="flex flex-col  w-full items-center justify-center bg-[#FFFFFF] p-4 lg:w-[45%]">
       <div class="mx-a ml-4 flex w-[90%] flex-col items-center justify-center">
         <div class="font-900 mb-4 text-3xl text-[#2C39A6]">Kayıt Ol</div>
         <div class="mt-1 flex w-full flex-col items-center justify-center gap-4">

@@ -330,7 +330,7 @@ watch(searchedUrl, searchUrl);
           </button>
         </div>
         <div v-else>
-          <div class="notExistAlert text-red rounded-md p-5 text-xl">Eklenti aktif değil !!!</div>
+          <div class="notExistAlert text-red rounded-md p-5 text-xl ma" >Eklenti aktif değil !!!</div>
         </div>
       </div>
 
