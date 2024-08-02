@@ -240,6 +240,10 @@ const deleteItems = async () => {
 
     return;
   } else {
+    if(deleteItemsList.value.length === 0) {
+      appReady.value = true;
+      return;
+    }
     console.log('delete items clicked  ', deleteItemsList.value);
     console.log('user ', user.value);
     try {
@@ -258,6 +262,17 @@ const deleteItems = async () => {
     }
   }
 };
+
+const extensionId = "bkoahppiepfhhkofbhlagafcbklmdedi";
+const messageBody = "exist";
+if (chrome?.runtime?.sendMessage) {
+  chrome.runtime.sendMessage(extensionId, messageBody, function(response) {
+    console.log("The extension IS installed.", response);
+  });
+} else {
+  console.log("The extension is NOT installed.")
+}
+
 
 const openFilter = ref<boolean>(false);
 const searchedUrl = ref<string>('');

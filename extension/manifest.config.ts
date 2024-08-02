@@ -38,5 +38,8 @@ export default defineManifest(() => ({
       js: ['src/content.ts'],
       run_at: "document_start"
     }
-  ]
+  ]/* ,
+  externally_connectable: {
+    matches: ["https://*.example.com/*" , "http://*.localhost:5173.com/*"]
+  } */
 }))

@@ -18,6 +18,15 @@ const realValues: RealValues = {
   realLangMeta: ''
 }
 
+
+
+/* chrome.runtime.onMessageExternal.addListener((message: any, sender: any, sendResponse: any) => {
+  console.log("Received message:", message);
+  console.log("Sender:", sender);
+  
+  sendResponse({ exist: true });
+}); */
+
 /* chrome.runtime.onInstalled.addListener(function (details) {
   const languageCatcherExist = new CustomEvent('language-catcher-exist', {
     detail: {
