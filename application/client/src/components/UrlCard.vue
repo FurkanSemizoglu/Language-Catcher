@@ -89,6 +89,7 @@ const checkboxFunc = () => {
   }
 
   checkbox.value = !checkbox.value;
+  console.log('allItemSelected', props.allItemsSelected);
 };
 
 </script>
@@ -97,12 +98,12 @@ const checkboxFunc = () => {
   <div
     class="cols-7 min-h-100px grid h-auto border border-gray-300 "
     style="grid-template-columns: 0.5fr 1.5fr 2fr 2fr 2fr 2fr 2fr"
-    :class=" checkbox ? 'bg-[#EBEAEA]' :  index % 2 === 0 ? 'bg-white' : 'bg-[#FCFCFC]' "
+    :class="props.allItemsSelected ? 'bg-[#EBEAEA]'  : checkbox ? 'bg-[#EBEAEA]' :  index % 2 === 0 ? 'bg-white' : 'bg-[#FCFCFC]' "
     
   >
     <div class="flex h-full w-full items-center  p-4">
       <FontAwesomeIcon
-        :icon="checkbox ? faSquareCheck : faSquare"
+        :icon="props.allItemsSelected ?  faSquareCheck :  checkbox ? faSquareCheck : faSquare"
         @click="checkboxFunc(); $emit('cardId', props.id)"
         class="cursor-pointer"
       />

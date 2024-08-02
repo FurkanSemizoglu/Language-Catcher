@@ -27,7 +27,7 @@ token.value = localStorage.getItem('token');
 
 const returnedValues = ref<extensionResult[]>([]);
 const tempReturnedValues = ref<extensionResult[]>([]);
-
+const allItemsSelected = ref<boolean>(false);
 const deleteItemsList = ref<string[]>([]);
 /* window.addEventListener('updateProgress', (e) => {
   const event = e as CustomEvent;
@@ -217,24 +217,48 @@ const deleteItemsFunc = (id: string) => {
 };
 
 const deleteItems = async () => {
-  console.log('delete items clicked  ', deleteItemsList.value);
-  console.log('user ', user.value);
-  try {
-    const response = await axios.delete('http://localhost:5000/api/deletesLanguages', {
-      params: { email: user.value, languageIdList: deleteItemsList.value }
-    });
+  appReady.value = false;
+  console.log('ReturnedValues.value', returnedValues.value);
+  console.log('tempReturnedValues.value', tempReturnedValues.value);
+  if (allItemsSelected) {
+    console.log('all items selected');
 
-    console.log('abi gitti artık ', response.data);
-    location.reload();
-  } catch (error) {
-    console.log(error);
+    const idList = returnedValues.value.map((item) => item._id);
+    try {
+      const response = await axios.delete('http://localhost:5000/api/deletesLanguages', {
+        params: { email: user.value, languageIdList: idList }
+      });
+
+      console.log('abi gitti artık ', response.data);
+      returnedValues.value = [];
+      tempReturnedValues.value = [];
+      allItemsSelected.value = false;
+      appReady.value = true;
+    } catch (error) {
+      console.log(error);
+    }
+
+    return;
+  } else {
+    console.log('delete items clicked  ', deleteItemsList.value);
+    console.log('user ', user.value);
+    try {
+      const response = await axios.delete('http://localhost:5000/api/deletesLanguages', {
+        params: { email: user.value, languageIdList: deleteItemsList.value }
+      });
+
+      console.log('abi gitti artık ', response.data);
+      appReady.value = true;
+    } catch (error) {
+      console.log(error);
+    }
   }
 };
 
 const openFilter = ref<boolean>(false);
 const searchedUrl = ref<string>('');
 let oldReturnedValues = ref<extensionResult[]>([]);
-  oldReturnedValues.value = JSON.parse(JSON.stringify(returnedValues.value)); 
+oldReturnedValues.value = JSON.parse(JSON.stringify(returnedValues.value));
 
 const searchUrl = () => {
   console.log('old values', oldReturnedValues.value);
@@ -359,7 +383,11 @@ watch(searchedUrl, searchUrl);
           style="grid-template-columns: 0.5fr 1.5fr 2fr 2fr 2fr 2fr 2fr"
         >
           <div class="flex h-full w-full items-center p-4">
-            <FontAwesomeIcon :icon="faSquare" class="cursor-pointer text-white" />
+            <FontAwesomeIcon
+              :icon="allItemsSelected ? faSquareCheck : faSquare"
+              class="cursor-pointer text-white"
+              @click="allItemsSelected = !allItemsSelected"
+            />
           </div>
           <div class="col-span-0 flex h-full cursor-pointer items-center justify-around p-4">
             <div class="">ORDER</div>
@@ -402,6 +430,7 @@ watch(searchedUrl, searchUrl);
                 :real-lang-values="value.realLangValues"
                 :date="new Date(value.date)"
                 :index="index"
+                :allItemsSelected="allItemsSelected"
                 @cardId="deleteItemsFunc"
               />
             </div>

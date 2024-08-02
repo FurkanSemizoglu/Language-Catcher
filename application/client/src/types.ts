@@ -44,6 +44,7 @@ interface urlCardResultProps {
   realLangValues: realLangValues;
   date : Date;
   index : number;
+  allItemsSelected : boolean;
 }
 
 interface RealValues {
