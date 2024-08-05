@@ -153,13 +153,13 @@ watch(
     <div class="flex h-full w-full items-center justify-between p-4">
       <div class="ml-2 max-w-min">{{ localeDate }}</div>
       <div>
-        <FontAwesomeIcon
+      <!--   <FontAwesomeIcon
           :icon="faTrashCan"
           class="mr-4 transform cursor-pointer transition-transform duration-300"
           :class="{ hidden: !showDetails }"
           color="red"
           @click="deleteCard()"
-        />
+        /> -->
 
         <FontAwesomeIcon
           :icon="faAngleDown"

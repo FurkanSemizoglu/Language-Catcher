@@ -15,7 +15,7 @@ window.addEventListener('updateProgress', (e) => {
   if (progressDegree.value === 100) {
     setTimeout(() => {
       progressDegree.value = 0;
-    }, 2000);
+    }, 4000);
   }
 });
 </script>
