@@ -396,9 +396,9 @@ watch(searchedUrl, searchUrl);
 
             <div
               v-if="openFilter"
-              class="-top-22 -left-30 absolute rounded-lg bg-[#C0C5E5] p-4 shadow"
+              class="-top-25 -left-30 absolute rounded-lg border-[#2F33B0]  p-4 shadow-lg"
             >
-              <div class="mb-2 flex items-center justify-center">Accuracy Filter</div>
+              <div class="mb-5 flex items-center justify-center">Accuracy Filter</div>
               <div class="flex items-center gap-2">
                 <input type="checkbox" v-model="highAccuracy" class="mr-1" />
                 <label>High</label>
