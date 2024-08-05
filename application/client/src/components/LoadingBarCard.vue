@@ -3,7 +3,7 @@ import { defineProps, onMounted, ref } from 'vue';
 
 const props = defineProps<{ loadingButton: boolean }>();
 const progressDegree = ref<number>(0);
-  progressDegree.value === 0
+progressDegree.value === 0;
 
 window.addEventListener('updateProgress', (e) => {
   const event = e as CustomEvent;
@@ -12,7 +12,7 @@ window.addEventListener('updateProgress', (e) => {
   progressDegree.value = event.detail.progress * 100;
 
   // burada progress degree 0 olmalı
-  if(progressDegree.value === 100) {
+  if (progressDegree.value === 100) {
     setTimeout(() => {
       progressDegree.value = 0;
     }, 2000);
@@ -28,7 +28,21 @@ window.addEventListener('updateProgress', (e) => {
     >
       <div class="rounded-lg bg-white p-5">
         <div class="flex flex-col items-center justify-center gap-4 p-4">
-          <div class="mb-5 text-3xl">Yükleniyor ...</div>
+          <div class="mb-5 text-3xl">
+            Yükleniyor ...
+           <!--  <div class="loading loading03 text-3xl font-500">
+              <span>L</span>
+              <span>O</span>
+              <span>A</span>
+              <span>D</span>
+              <span>I</span>
+              <span>N</span>
+              <span>G</span>
+              <span>.</span>
+              <span>.</span>
+              <span>.</span>
+            </div> -->
+          </div>
           <div>% {{ progressDegree.toFixed(2) }}</div>
           <div class="text-align-center w-500px">
             <div class="progress progress-striped">
@@ -42,6 +56,52 @@ window.addEventListener('updateProgress', (e) => {
 </template>
 
 <style scoped>
+.loading {
+  font-size: 84px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 800;
+  text-align: center;
+}
+
+.loading span {
+  display: inline-block;
+  margin: 0 -0.05em;
+}
+
+.loading03 span {
+  margin: 0 -0.075em;
+  animation: loading03 0.7s infinite alternate;
+}
+
+.loading03 span:nth-child(2) {
+  animation-delay: 0.1s;
+}
+
+.loading03 span:nth-child(3) {
+  animation-delay: 0.2s;
+}
+
+.loading03 span:nth-child(4) {
+  animation-delay: 0.3s;
+}
+
+.loading03 span:nth-child(5) {
+  animation-delay: 0.4s;
+}
+
+.loading03 span:nth-child(6) {
+  animation-delay: 0.5s;
+}
+
+@keyframes loading03 {
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(0.8);
+  }
+}
+
 .progress {
   background: rgba(0, 0, 0, 0.25);
   border-radius: 6px;

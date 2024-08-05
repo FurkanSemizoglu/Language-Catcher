@@ -220,7 +220,28 @@ const deleteItems = async () => {
   appReady.value = false;
   console.log('ReturnedValues.value', returnedValues.value);
   console.log('tempReturnedValues.value', tempReturnedValues.value);
-  if (allItemsSelected.value === true) {
+  if (deleteItemsList.value.length === 0) {
+    appReady.value = true;
+    return;
+  }
+  console.log('delete items clicked  ', deleteItemsList.value);
+  console.log('user ', user.value);
+  try {
+    const response = await axios.delete('http://localhost:5000/api/deletesLanguages', {
+      params: { email: user.value, languageIdList: deleteItemsList.value }
+    });
+
+    console.log('abi gitti artık ', response.data);
+
+    returnedValues.value = response.data;
+    tempReturnedValues.value = response.data;
+    console.log('returned values', returnedValues.value);
+    appReady.value = true;
+    allItemsSelected.value = false;
+  } catch (error) {
+    console.log(error);
+  }
+  /*   if (allItemsSelected.value === true) {
     console.log('all items selected');
 
     const idList = returnedValues.value.map((item) => item._id);
@@ -260,19 +281,18 @@ const deleteItems = async () => {
     } catch (error) {
       console.log(error);
     }
-  }
+  } */
 };
 
-const extensionId = "bkoahppiepfhhkofbhlagafcbklmdedi";
-const messageBody = "exist";
+const extensionId = 'bkoahppiepfhhkofbhlagafcbklmdedi';
+const messageBody = 'exist';
 if (chrome?.runtime?.sendMessage) {
-  chrome.runtime.sendMessage(extensionId, messageBody, function(response) {
-    console.log("The extension IS installed.", response);
+  chrome.runtime.sendMessage(extensionId, messageBody, function (response) {
+    console.log('The extension IS installed.', response);
   });
 } else {
-  console.log("The extension is NOT installed.")
+  console.log('The extension is NOT installed.');
 }
-
 
 const openFilter = ref<boolean>(false);
 const searchedUrl = ref<string>('');
@@ -349,7 +369,9 @@ watch(searchedUrl, searchUrl);
           </button>
         </div>
         <div v-else>
-          <div class="notExistAlert text-red rounded-md p-5 text-xl ma" >Eklenti aktif değil !!!</div>
+          <div class="notExistAlert text-red ma rounded-md p-5 text-xl">
+            Eklenti aktif değil !!!
+          </div>
         </div>
       </div>
 

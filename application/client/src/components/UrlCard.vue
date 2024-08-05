@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, watch  , defineEmits } from 'vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { faAngleDown } from '@fortawesome/free-solid-svg-icons';
 import { faTrashCan } from '@fortawesome/free-solid-svg-icons';
@@ -17,6 +17,10 @@ const detectedLanguagesText = ref<string>('');
 const cardId = ref<string[]>([]);
 const model = ref<string>('');
 const checkbox = ref<boolean>(false);
+const emit = defineEmits<{
+  (e: 'cardId', id: string): void;
+}>();
+
 if (props.detectedLanguage === 'not detected') {
   detectedLanguagesText.value = 'Dil tespit edilemedi';
 } else {
@@ -74,13 +78,8 @@ const realValueTextFunc = () => {
 };
 realValueTextFunc();
 
-
-
 const checkboxFunc = () => {
-
-
   if (checkbox.value === true) {
-
     cardId.value.push(props.id);
     console.log('cardId', cardId);
   } else {
@@ -92,19 +91,39 @@ const checkboxFunc = () => {
   console.log('allItemSelected', props.allItemsSelected);
 };
 
+watch(
+  () => props.allItemsSelected,
+  (newValue) => {
+    if (newValue) {
+      checkbox.value = true;
+      cardId.value.push(props.id);
+    } else {
+      checkbox.value = false;
+      cardId.value = cardId.value.filter((item) => item !== props.id);
+    }
+    emit('cardId', cardId.value[0]);
+  }
+);
+
+/* if(props.allItemsSelected){
+  checkbox.value = true;
+}
+ */
 </script>
 
 <template>
   <div
-    class="cols-7 min-h-100px grid h-auto border border-gray-300 "
+    class="cols-7 min-h-100px grid h-auto border border-gray-300"
     style="grid-template-columns: 0.5fr 1.5fr 2fr 2fr 2fr 2fr 2fr"
-    :class="props.allItemsSelected ? 'bg-[#EBEAEA]'  : checkbox ? 'bg-[#EBEAEA]' :  index % 2 === 0 ? 'bg-white' : 'bg-[#FCFCFC]' "
-    
+    :class="checkbox ? 'bg-[#EBEAEA]' : index % 2 === 0 ? 'bg-white' : 'bg-[#FCFCFC]'"
   >
-    <div class="flex h-full w-full items-center  p-4">
+    <div class="flex h-full w-full items-center p-4">
       <FontAwesomeIcon
-        :icon="props.allItemsSelected ?  faSquareCheck :  checkbox ? faSquareCheck : faSquare"
-        @click="checkboxFunc(); $emit('cardId', props.id)"
+        :icon="checkbox ? faSquareCheck : faSquare"
+        @click="
+          checkboxFunc();
+          $emit('cardId', props.id);
+        "
         class="cursor-pointer"
       />
     </div>
@@ -125,7 +144,7 @@ const checkboxFunc = () => {
         </span>
       </div>
     </div>
-    <div class="flex h-full w-full items-center ml-5 p-4">
+    <div class="ml-5 flex h-full w-full items-center p-4">
       <AccuracyCircle :accuracy="props.accuracy" />
       <!--    <div v-if="props.accuracy === 'high'" class="ml-2">
         <div class="rounded-full w-5 h-5 bg-green"></div>
