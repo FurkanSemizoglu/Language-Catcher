@@ -34,10 +34,10 @@ const deleteItemsList = ref<string[]>([]);
   console.log('update progress :', event.detail.progress);
 }); */
 
-chrome.storage.local.get(['variable'], (result) => {
+/* chrome.storage.local.get(['variable'], (result) => {
   console.log('Variable currently is ' + result.variable);
 
-});
+}); */
 
 extensionExist.value = false;
 // Burada hep dinleyebiliriz ya da sadece bi kere de dinlenebilir
@@ -382,110 +382,123 @@ watch(searchedUrl, searchUrl);
         </div>
       </div>
       <!--  <div class="block overflow-x-auto">   -->
-      <div class="mx-a min-w-700px mb-5 mt-10 max-w-[80%] rounded-lg">
-        <div class="mb-2 flex w-full items-center justify-end">
-          <div class="flex items-center">
-            <div class="mr-2 rounded-lg border">
-              <input type="text" class="w-full rounded-lg px-1 py-0.5" v-model="searchedUrl" />
-            </div>
-            <FontAwesomeIcon
-              :icon="faMagnifyingGlass"
-              class="mr-4 transform cursor-pointer transition-transform duration-300"
-              @click="searchUrl()"
-            />
-          </div>
-          <div class="relative">
-            <FontAwesomeIcon
-              :icon="faSliders"
-              class="tooltipSearch mr-4 transform cursor-pointer transition-transform duration-300"
-              @click="openFilter = !openFilter"
-            />
-
-            <div
-              v-if="openFilter"
-              class="-top-25 -left-30 absolute rounded-lg border-[#2F33B0] p-4 shadow-lg"
-            >
-              <div class="mb-5 flex items-center justify-center">Accuracy Filter</div>
-              <div class="flex items-center gap-2">
-                <input type="checkbox" v-model="highAccuracy" class="mr-1" />
-                <label>High</label>
-
-                <input type="checkbox" v-model="mediumAccuracy" class="mr-1" />
-                <label>Medium</label>
-
-                <input type="checkbox" v-model="lowAccuracy" class="mr-1" />
-                <label>Low</label>
+      <div class="mx-a  mb-5 mt-10 w-[100%] rounded-lg lg:w-[80%]">
+        <div class="filters">
+          <div class="mb-2 flex w-full items-center justify-end">
+            <div class="flex items-center">
+              <div class="mr-2 rounded-lg border">
+                <input type="text" class="w-full rounded-lg px-1 py-0.5" v-model="searchedUrl" />
               </div>
-            </div>
-          </div>
-          <div>
-            <FontAwesomeIcon
-              :icon="faTrashCan"
-              class="mr-4 transform cursor-pointer transition-transform duration-300"
-              @click="deleteItems()"
-            />
-          </div>
-        </div>
-        <div class="w-[100%]">
-          <div
-            class="cols-7 font-600 min-h-65px grid rounded-t-lg border border-gray-300 bg-[#2F33B0] text-white"
-            style="grid-template-columns: 0.5fr 1.5fr 2fr 2fr 2fr 2fr 2fr"
-          >
-            <div class="flex h-full w-full items-center p-4">
               <FontAwesomeIcon
-                :icon="allItemsSelected ? faSquareCheck : faSquare"
-                class="cursor-pointer text-white"
-                @click="allItemsSelected = !allItemsSelected"
+                :icon="faMagnifyingGlass"
+                class="mr-4 transform cursor-pointer transition-transform duration-300"
+                @click="searchUrl()"
               />
             </div>
-            <div class="col-span-0 flex h-full cursor-pointer items-center justify-around p-4">
-              <div class="">ORDER</div>
-            </div>
-            <div class="flex h-full w-full items-center p-4 hover:font-bold">URL</div>
-            <div class="flex h-full w-full items-center p-4">LANGUAGE</div>
-            <div class="flex h-full w-full items-center p-4">
-              <div>DETECTED PLACES</div>
-            </div>
-            <div class="flex h-full w-full items-center p-4">
-              <div>ACCURACY</div>
-            </div>
-            <div
-              class="flex h-full w-full cursor-pointer items-center justify-between p-4 hover:font-bold"
-              @click="sortDate()"
-            >
-              <div>DATE</div>
-              <div>
-                <FontAwesomeIcon
-                  :icon="faAngleDown"
-                  class="mr-2 transform cursor-pointer transition-transform duration-300"
-                  :class="{ 'rotate-0': dateClicked, 'rotate-180': !dateClicked }"
-                />
+            <div class="relative">
+              <FontAwesomeIcon
+                :icon="faSliders"
+                class="tooltipSearch mr-4 transform cursor-pointer transition-transform duration-300"
+                @click="openFilter = !openFilter"
+              />
+
+              <div
+                v-if="openFilter"
+                class="-top-25 -left-30 absolute rounded-lg border-[#2F33B0] p-4 shadow-lg"
+              >
+                <div class="mb-5 flex items-center justify-center">Accuracy Filter</div>
+                <div class="flex items-center gap-2">
+                  <input type="checkbox" v-model="highAccuracy" class="mr-1" />
+                  <label>High</label>
+
+                  <input type="checkbox" v-model="mediumAccuracy" class="mr-1" />
+                  <label>Medium</label>
+
+                  <input type="checkbox" v-model="lowAccuracy" class="mr-1" />
+                  <label>Low</label>
+                </div>
               </div>
+            </div>
+            <div>
+              <FontAwesomeIcon
+                :icon="faTrashCan"
+                class="mr-4 transform cursor-pointer transition-transform duration-300"
+                @click="deleteItems()"
+              />
             </div>
           </div>
-          <div class="relative">
-            <div v-if="appReady" class="max-h-500px w-full overflow-y-auto">
-              <div v-for="(value, index) in returnedValues" :key="value._id">
-                <UrlCard
-                  :email="user"
-                  :url="value.domain"
-                  :detected-language="value.language"
-                  :detected-places="value.languageFetchedFrom"
-                  :language-location="value.languageLocation"
-                  :lang-name="value.langName"
-                  :lang-native-name="value.langNativeName"
-                  :accuracy="value.languageAccuracy"
-                  :id="value._id"
-                  :real-lang-values="value.realLangValues"
-                  :date="new Date(value.date)"
-                  :index="index"
-                  :allItemsSelected="allItemsSelected"
-                  @cardId="deleteItemsFunc"
-                />
+        </div>
+        <div class="block w-[100%]">
+          <div class="block w-[100%] overflow-x-auto">
+            <div class="min-w-800px block">
+              <div
+                class="cols-7 font-600 min-h-65px grid rounded-t-lg border border-gray-300 bg-[#2F33B0] text-white"
+                style="grid-template-columns: 0.5fr 1.5fr 2fr 2fr 2fr 2fr 2fr"
+              >
+                <div class="flex h-full w-full items-center p-4">
+                  <FontAwesomeIcon
+                    :icon="allItemsSelected ? faSquareCheck : faSquare"
+                    class="cursor-pointer text-white"
+                    @click="allItemsSelected = !allItemsSelected"
+                  />
+                </div>
+                <div class="col-span-0 flex h-full cursor-pointer items-center justify-around p-4">
+                  <div class="">ORDER</div>
+                </div>
+                <div class="flex h-full w-full items-center p-4 hover:font-bold">URL</div>
+                <div class="flex h-full w-full items-center p-4">LANGUAGE</div>
+                <div class="flex h-full w-full items-center p-4">
+                  <div>DETECTED PLACES</div>
+                </div>
+                <div class="flex h-full w-full items-center p-4">
+                  <div>ACCURACY</div>
+                </div>
+                <div
+                  class="flex h-full w-full cursor-pointer items-center justify-between p-4 hover:font-bold"
+                  @click="sortDate()"
+                >
+                  <div>DATE</div>
+                  <div>
+                    <FontAwesomeIcon
+                      :icon="faAngleDown"
+                      class="mr-2 transform cursor-pointer transition-transform duration-300"
+                      :class="{ 'rotate-0': dateClicked, 'rotate-180': !dateClicked }"
+                    />
+                  </div>
+                </div>
               </div>
-            </div>
-            <div v-else class="ma top-50 absolute flex h-full w-full items-center justify-center">
-              <v-progress-circular :size="150" color="primary" indeterminate></v-progress-circular>
+              <div class="relative">
+                <div v-if="appReady" class="max-h-500px w-full overflow-y-auto">
+                  <div v-for="(value, index) in returnedValues" :key="value._id">
+                    <UrlCard
+                      :email="user"
+                      :url="value.domain"
+                      :detected-language="value.language"
+                      :detected-places="value.languageFetchedFrom"
+                      :language-location="value.languageLocation"
+                      :lang-name="value.langName"
+                      :lang-native-name="value.langNativeName"
+                      :accuracy="value.languageAccuracy"
+                      :id="value._id"
+                      :real-lang-values="value.realLangValues"
+                      :date="new Date(value.date)"
+                      :index="index"
+                      :allItemsSelected="allItemsSelected"
+                      @cardId="deleteItemsFunc"
+                    />
+                  </div>
+                </div>
+                <div
+                  v-else
+                  class="ma top-50 absolute flex h-full w-full items-center justify-center"
+                >
+                  <v-progress-circular
+                    :size="150"
+                    color="primary"
+                    indeterminate
+                  ></v-progress-circular>
+                </div>
+              </div>
             </div>
           </div>
         </div>
