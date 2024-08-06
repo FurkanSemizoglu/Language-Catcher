@@ -18,6 +18,9 @@ const realValues: RealValues = {
   realLangMeta: ''
 }
 
+export const languageCatcher : boolean = true
+
+console.log("Extension is running :  " , languageCatcher);
 
 
 /* chrome.runtime.onMessageExternal.addListener((message: any, sender: any, sendResponse: any) => {
@@ -81,7 +84,7 @@ window.addEventListener('language-catcher-start', (e) => {
   console.log('Language catcher is starting')
   const event = e as CustomEvent
   const url = event.detail.url
-  const urlList: string[] = event.detail.url.split(',')
+  const urlList: string[] = event.detail.url.split(',').map((url: string) => url.trim());
   console.log('domaain ', urlList)
 
   let index = 0
@@ -179,18 +182,7 @@ const recurciveProcess = (
     languageCatcherResultArray.push(languageCatcherResult.detail)
 
     sendProgressEvent(index + 1, urlList.length)
-    /*  const progressLength = urlList.length % 2 === 0 ? urlList.length : urlList.length + 1
-    const progress = (index / progressLength) * 100
-    console.log('progress content: ', progress)
-    // burda sadece yüzde elli yeterli mi yoksa 25 75 civarı değerlerde de gönderilmeli mi
-    if (progress % 25 === 0 || progress % 20 === 0) {
-      const updateProgress = new CustomEvent('updateProgress', {
-        detail: {
-          progress: progress
-        }
-      })
-      window.dispatchEvent(updateProgress)
-    } */
+
 
     if (index < urlList.length - 1) {
       recurciveProcess(URL, languageCatcherResultArray, urlList, index + 1)
@@ -198,6 +190,8 @@ const recurciveProcess = (
       const languageCatcherResultArrayEvent = new CustomEvent('languageCatcherResult', {
         detail: languageCatcherResultArray
       })
+      console.log("senda dataa array : ", languageCatcherResultArray);
+      console.log("send data worksss " , index);
 
       window.dispatchEvent(languageCatcherResultArrayEvent)
     }

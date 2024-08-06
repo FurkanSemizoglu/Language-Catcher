@@ -75,7 +75,6 @@ window.addEventListener('languageCatcherResult', async (e) => {
           return new Date(b.date).getTime() - new Date(a.date).getTime();
         }); */
         console.log('sorted languages', languagesResponse.data);
-        console.log('abi gitti artık ', response.data);
       }
     }
 
@@ -217,13 +216,14 @@ const deleteItemsFunc = (id: string) => {
 };
 
 const deleteItems = async () => {
-  appReady.value = false;
-  console.log('ReturnedValues.value', returnedValues.value);
-  console.log('tempReturnedValues.value', tempReturnedValues.value);
   if (deleteItemsList.value.length === 0) {
     appReady.value = true;
     return;
   }
+  appReady.value = false;
+  console.log('ReturnedValues.value', returnedValues.value);
+  console.log('tempReturnedValues.value', tempReturnedValues.value);
+
   console.log('delete items clicked  ', deleteItemsList.value);
   console.log('user ', user.value);
   try {
@@ -236,8 +236,10 @@ const deleteItems = async () => {
     returnedValues.value = response.data;
     tempReturnedValues.value = response.data;
     console.log('returned values', returnedValues.value);
+    console.log('after delete items list ', deleteItemsList.value);
     appReady.value = true;
     allItemsSelected.value = false;
+    deleteItemsList.value = [];
   } catch (error) {
     console.log(error);
   }
@@ -374,7 +376,7 @@ watch(searchedUrl, searchUrl);
           </div>
         </div>
       </div>
-
+      <!--  <div class="block overflow-x-auto">   -->
       <div class="mx-a min-w-700px mb-5 mt-10 max-w-[80%] rounded-lg">
         <div class="mb-2 flex w-full items-center justify-end">
           <div class="flex items-center">
@@ -396,7 +398,7 @@ watch(searchedUrl, searchUrl);
 
             <div
               v-if="openFilter"
-              class="-top-25 -left-30 absolute rounded-lg border-[#2F33B0]  p-4 shadow-lg"
+              class="-top-25 -left-30 absolute rounded-lg border-[#2F33B0] p-4 shadow-lg"
             >
               <div class="mb-5 flex items-center justify-center">Accuracy Filter</div>
               <div class="flex items-center gap-2">
@@ -419,68 +421,71 @@ watch(searchedUrl, searchUrl);
             />
           </div>
         </div>
-        <div
-          class="cols-7 font-600 min-h-65px grid rounded-t-lg border border-gray-300 bg-[#2F33B0] text-white"
-          style="grid-template-columns: 0.5fr 1.5fr 2fr 2fr 2fr 2fr 2fr"
-        >
-          <div class="flex h-full w-full items-center p-4">
-            <FontAwesomeIcon
-              :icon="allItemsSelected ? faSquareCheck : faSquare"
-              class="cursor-pointer text-white"
-              @click="allItemsSelected = !allItemsSelected"
-            />
-          </div>
-          <div class="col-span-0 flex h-full cursor-pointer items-center justify-around p-4">
-            <div class="">ORDER</div>
-          </div>
-          <div class="flex h-full w-full items-center p-4 hover:font-bold">URL</div>
-          <div class="flex h-full w-full items-center p-4">LANGUAGE</div>
-          <div class="flex h-full w-full items-center p-4">
-            <div>DETECTED PLACES</div>
-          </div>
-          <div class="flex h-full w-full items-center p-4">
-            <div>ACCURACY</div>
-          </div>
+        <div class="w-[100%]">
           <div
-            class="flex h-full w-full cursor-pointer items-center justify-between p-4 hover:font-bold"
-            @click="sortDate()"
+            class="cols-7 font-600 min-h-65px grid rounded-t-lg border border-gray-300 bg-[#2F33B0] text-white"
+            style="grid-template-columns: 0.5fr 1.5fr 2fr 2fr 2fr 2fr 2fr"
           >
-            <div>DATE</div>
-            <div>
+            <div class="flex h-full w-full items-center p-4">
               <FontAwesomeIcon
-                :icon="faAngleDown"
-                class="mr-2 transform cursor-pointer transition-transform duration-300"
-                :class="{ 'rotate-0': dateClicked, 'rotate-180': !dateClicked }"
+                :icon="allItemsSelected ? faSquareCheck : faSquare"
+                class="cursor-pointer text-white"
+                @click="allItemsSelected = !allItemsSelected"
               />
             </div>
-          </div>
-        </div>
-        <div class="relative">
-          <div v-if="appReady" class="max-h-500px w-full overflow-y-auto">
-            <div v-for="(value, index) in returnedValues" :key="value._id">
-              <UrlCard
-                :email="user"
-                :url="value.domain"
-                :detected-language="value.language"
-                :detected-places="value.languageFetchedFrom"
-                :language-location="value.languageLocation"
-                :lang-name="value.langName"
-                :lang-native-name="value.langNativeName"
-                :accuracy="value.languageAccuracy"
-                :id="value._id"
-                :real-lang-values="value.realLangValues"
-                :date="new Date(value.date)"
-                :index="index"
-                :allItemsSelected="allItemsSelected"
-                @cardId="deleteItemsFunc"
-              />
+            <div class="col-span-0 flex h-full cursor-pointer items-center justify-around p-4">
+              <div class="">ORDER</div>
+            </div>
+            <div class="flex h-full w-full items-center p-4 hover:font-bold">URL</div>
+            <div class="flex h-full w-full items-center p-4">LANGUAGE</div>
+            <div class="flex h-full w-full items-center p-4">
+              <div>DETECTED PLACES</div>
+            </div>
+            <div class="flex h-full w-full items-center p-4">
+              <div>ACCURACY</div>
+            </div>
+            <div
+              class="flex h-full w-full cursor-pointer items-center justify-between p-4 hover:font-bold"
+              @click="sortDate()"
+            >
+              <div>DATE</div>
+              <div>
+                <FontAwesomeIcon
+                  :icon="faAngleDown"
+                  class="mr-2 transform cursor-pointer transition-transform duration-300"
+                  :class="{ 'rotate-0': dateClicked, 'rotate-180': !dateClicked }"
+                />
+              </div>
             </div>
           </div>
-          <div v-else class="ma top-50 absolute flex h-full w-full items-center justify-center">
-            <v-progress-circular :size="150" color="primary" indeterminate></v-progress-circular>
+          <div class="relative">
+            <div v-if="appReady" class="max-h-500px w-full overflow-y-auto">
+              <div v-for="(value, index) in returnedValues" :key="value._id">
+                <UrlCard
+                  :email="user"
+                  :url="value.domain"
+                  :detected-language="value.language"
+                  :detected-places="value.languageFetchedFrom"
+                  :language-location="value.languageLocation"
+                  :lang-name="value.langName"
+                  :lang-native-name="value.langNativeName"
+                  :accuracy="value.languageAccuracy"
+                  :id="value._id"
+                  :real-lang-values="value.realLangValues"
+                  :date="new Date(value.date)"
+                  :index="index"
+                  :allItemsSelected="allItemsSelected"
+                  @cardId="deleteItemsFunc"
+                />
+              </div>
+            </div>
+            <div v-else class="ma top-50 absolute flex h-full w-full items-center justify-center">
+              <v-progress-circular :size="150" color="primary" indeterminate></v-progress-circular>
+            </div>
           </div>
         </div>
       </div>
+      <!-- </div> -->
     </div>
   </div>
 
