@@ -2,7 +2,7 @@ console.log('background is running')
 
 import type { LanguageData } from './types'
 
-
+chrome.storage.local.set({ variable: "exist" });
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   console.log('background received message', request)

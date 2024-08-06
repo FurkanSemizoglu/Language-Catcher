@@ -18,6 +18,8 @@ const realValues: RealValues = {
   realLangMeta: ''
 }
 
+
+// chrome storage ile kayıt edebilirsin belki bu değeri
 export const languageCatcher : boolean = true
 
 console.log("Extension is running :  " , languageCatcher);

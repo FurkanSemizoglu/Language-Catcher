@@ -34,6 +34,11 @@ const deleteItemsList = ref<string[]>([]);
   console.log('update progress :', event.detail.progress);
 }); */
 
+chrome.storage.local.get(['variable'], (result) => {
+  console.log('Variable currently is ' + result.variable);
+
+});
+
 extensionExist.value = false;
 // Burada hep dinleyebiliriz ya da sadece bi kere de dinlenebilir
 window.addEventListener('language-catcher-exist', (e) => {
