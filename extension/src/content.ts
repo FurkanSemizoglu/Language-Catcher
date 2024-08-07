@@ -31,11 +31,21 @@ let isInjected = true
 
 function showTableContent() {
   console.log('çalıl1')
-
   const container = document.getElementById('showTable')
   if (container) {
+    const iframe = document.createElement('iframe')
+    iframe.src = chrome.runtime.getURL('popup.html')
+    iframe.id = 'popupIframe'
+    iframe.style.width = '100%'
+    iframe.style.height = '100%'
+    iframe.style.border = 'none'
+    container.appendChild(iframe)
+  } 
+
+/*   const container = document.getElementById('showTable')
+  if (container) {
     const div = document.createElement('div')
-   /*  div.innerHTML = chrome.runtime.getURL('popup.html') */
+ 
     div.style.width = '100%'
     div.style.height = '100%'
     div.style.border = 'none'
@@ -53,7 +63,7 @@ function showTableContent() {
         container.appendChild(div)
       })
       .catch((error) => console.error('Error fetching index.html:', error))
-  }
+  } */
   /* 
   const targetDiv = document.getElementById('showTable')
   if (targetDiv) {
@@ -106,15 +116,15 @@ if (container) {
 }
 
 function removeTableContent() {
-  const popupDiv = document.getElementById('extension-popup-content')
+  const popupDiv = document.getElementById('popupIframe')
   if (popupDiv) {
     popupDiv.remove()
     isInjected = false
   }
 }
 
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  /*   console.log("BUraa gelin mü" , message.showTable); */
+/* chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+
   if (message.action === 'toogleTable') {
     if (message.showTable) {
       console.log('BUraa gelin mü')
@@ -123,7 +133,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       removeTableContent()
     }
   }
-})
+}) */
 /* window.addEventListener('startTable', (e) => {
   console.log('startTable in content.ts')
   const container = document.getElementById('showTable')
@@ -147,15 +157,6 @@ setInterval(function () {
   window.dispatchEvent(languageCatcherExist)
 }, 0.2 * 1000)
 
-/* setTimeout(() => {
-  const languageCatcherExist = new CustomEvent('language-catcher-exist', {
-    detail: {
-      languageCatcherExist: true
-    }
-  })
-
-  window.dispatchEvent(languageCatcherExist)
-}, 750) */
 
 window.addEventListener('language-catcher-start', (e) => {
   console.log('Language catcher is starting')
@@ -252,7 +253,14 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
       sendResponse(data)
     })
-  } else if (request.action === 'showTable') {
+  }else if (request.action === 'toogleTable') {
+    if (request.showTable) {
+      console.log('BUraa gelin mü')
+      showTableContent()
+    } else {
+      removeTableContent()
+    }
+  }/* else if (request.action === 'showTable') {
     console.log('works showtablw')
     const container = document.getElementById('showTable')
     if (container) {
@@ -263,7 +271,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       iframe.style.border = 'none'
       container.appendChild(iframe)
     }
-  }
+  } */
   return true // şurası return true olunca çalıştı
 })
 

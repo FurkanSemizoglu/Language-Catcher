@@ -424,7 +424,7 @@ watch(searchedUrl, searchUrl)
 </script>
 
 <template>
-  <div class="h-full w-full">
+  <div id="popup"class="h-full w-full">
     <!--     <div class="topBar m-a flex w-full items-center justify-between px-8 py-6">
       <div class="cursor-pointer text-[#2F33B0] hover:text-[#C0C5E5]">{{ user }}</div>
 
