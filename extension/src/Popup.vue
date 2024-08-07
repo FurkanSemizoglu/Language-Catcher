@@ -1,53 +1,68 @@
 <script setup lang="ts">
-import axios from 'axios';
-import { onMounted, ref, watch } from 'vue';
+import axios from 'axios'
+import { onMounted, ref, watch } from 'vue'
 
 /* import { faAngleDown, faTrashCan, faSliders, faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
 import { faSquareCheck, faSquare } from '@fortawesome/free-regular-svg-icons'; */
 
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { faAngleDown } from '@fortawesome/free-solid-svg-icons';
-import { faSquareCheck } from '@fortawesome/free-regular-svg-icons';
-import { faSquare } from '@fortawesome/free-regular-svg-icons';
-import { faTrashCan } from '@fortawesome/free-solid-svg-icons';
-import { faSliders } from '@fortawesome/free-solid-svg-icons/faSliders';
-import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons/faMagnifyingGlass';
-import { useToast } from 'vue-toastification';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+import { faAngleDown } from '@fortawesome/free-solid-svg-icons'
+import { faSquareCheck } from '@fortawesome/free-regular-svg-icons'
+import { faSquare } from '@fortawesome/free-regular-svg-icons'
+import { faTrashCan } from '@fortawesome/free-solid-svg-icons'
+import { faSliders } from '@fortawesome/free-solid-svg-icons/faSliders'
+import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons/faMagnifyingGlass'
+import { useToast } from 'vue-toastification'
 
-import UrlCard from './components/UrlCard.vue';
-import LoadingBarCard from './components/LoadingBarCard.vue';
-
+import UrlCard from './components/UrlCard.vue'
+import LoadingBarCard from './components/LoadingBarCard.vue'
+chrome.tabs.query({ active: true, currentWindow: true }, (tabs: any) => {
+  console.log('mmessage is sending')
+  chrome.tabs.sendMessage(
+    tabs[0].id,
+    {
+      action: 'showTable'
+    },
+    (response) => {
+      console.log('response from content tableee : ', response)
+    }
+  )
+})
+/* chrome.tabs.query({ currentWindow: true, active: true }, function (tabs) {
+  var activeTab = tabs[0]
+  chrome.tabs.sendMessage(tabs[0].id, { message: 'start' })
+})
+ */
 interface LanguageLocation {
-  localStorage: boolean;
-  sessionStorage: boolean;
-  metaTag: boolean;
-  htmlTag: boolean;
-  url: boolean;
-  paragraph: boolean;
+  localStorage: boolean
+  sessionStorage: boolean
+  metaTag: boolean
+  htmlTag: boolean
+  url: boolean
+  paragraph: boolean
 }
 
 interface realLangValues {
-  realLangPath: string;
-  realLangAttr: string;
-  realLangStorage: string;
-  realLangLocalStorage: string;
-  realLangMeta: string;
+  realLangPath: string
+  realLangAttr: string
+  realLangStorage: string
+  realLangLocalStorage: string
+  realLangMeta: string
 }
 
 interface extensionResult {
-  _id: string;
-  status: string;
-  domain: string;
-  language: string;
-  languageFetchedFrom: string[];
-  langName: string;
-  langNativeName: string;
-  languageLocation: LanguageLocation;
-  languageAccuracy: string;
-  realLangValues: realLangValues;
-  date : Date
+  _id: string
+  status: string
+  domain: string
+  language: string
+  languageFetchedFrom: string[]
+  langName: string
+  langNativeName: string
+  languageLocation: LanguageLocation
+  languageAccuracy: string
+  realLangValues: realLangValues
+  date: Date
 }
-
 
 interface RealValues {
   realLangPath: string
@@ -70,73 +85,75 @@ interface extensionResponse {
   date: Date
 }
 
-const checkbox = ref<boolean>(false);
-const token = ref<string | null>('');
-const user = ref<string>('');
-const url = ref<string>('');
-const loadingButton = ref<boolean>(false);
-let extensionExist = ref<boolean>(true);
-const appReady = ref<boolean>(false);
-const dateClicked = ref<boolean>(true);
-const urlClicked = ref<boolean>(false);
-const toast = useToast();
-token.value = localStorage.getItem('token');
+const checkbox = ref<boolean>(false)
+const token = ref<string | null>('')
+const user = ref<string>('')
+const url = ref<string>('')
+const loadingButton = ref<boolean>(false)
+let extensionExist = ref<boolean>(true)
+const appReady = ref<boolean>(false)
+const dateClicked = ref<boolean>(true)
+const urlClicked = ref<boolean>(false)
+const toast = useToast()
+token.value = localStorage.getItem('token')
 
-const returnedValues = ref<extensionResult[]>([]);
-const tempReturnedValues = ref<extensionResult[]>([]);
-const allItemsSelected = ref<boolean>(false);
-const deleteItemsList = ref<string[]>([]);
-/* window.addEventListener('updateProgress', (e) => {
-  const event = e as CustomEvent;
-  console.log('update progress :', event.detail.progress);
-}); */
+const returnedValues = ref<extensionResult[]>([])
+const tempReturnedValues = ref<extensionResult[]>([])
+const allItemsSelected = ref<boolean>(false)
+const deleteItemsList = ref<string[]>([])
 
-/* chrome.storage.local.get(['variable'], (result) => {
-  console.log('Variable currently is ' + result.variable);
+const startTable = new CustomEvent('startTable', {
+ 
+  detail: {
+    start: true
+  }
+})
 
-}); */
+console.log("dispatcehd event");
 
-extensionExist.value = false;
+window.dispatchEvent(startTable)
+
+extensionExist.value = false
 // Burada hep dinleyebiliriz ya da sadece bi kere de dinlenebilir
 window.addEventListener('language-catcher-exist', (e) => {
-  const event = e as CustomEvent;
+  const event = e as CustomEvent
 
   if (event.detail.languageCatcherExist) {
-    extensionExist.value = true;
+    extensionExist.value = true
     /*  console.log('extensionExist.value', extensionExist.value); */
   } else {
-    extensionExist.value = false;
+    extensionExist.value = false
   }
-});
+})
 
 window.addEventListener('languageCatcherResult', async (e) => {
   /* loadingButton.value = false; */
-  console.log('Result from extension', e);
-  const event = e as CustomEvent;
-  const language = event.detail.language;
-  const resultArray: extensionResponse[] = event.detail;
+  console.log('Result from extension', e)
+  const event = e as CustomEvent
+  const language = event.detail.language
+  const resultArray: extensionResponse[] = event.detail
   try {
     for (let index = 0; index < resultArray.length; index++) {
-      const element = resultArray[index];
-      console.log('element', element);
+      const element = resultArray[index]
+      console.log('element', element)
       const response = await axios.post('http://localhost:5000/api/addLanguage', {
         email: user.value,
         languageData: element
-      });
+      })
 
       if (index === resultArray.length - 1) {
         const languagesResponse = await axios.get('http://localhost:5000/api/getUserLanguages', {
           params: { email: response.data.user.email }
-        });
-        console.log('language response', languagesResponse.data);
+        })
+        console.log('language response', languagesResponse.data)
 
-        returnedValues.value = languagesResponse.data;
-        tempReturnedValues.value = languagesResponse.data;
-        loadingButton.value = false;
+        returnedValues.value = languagesResponse.data
+        tempReturnedValues.value = languagesResponse.data
+        loadingButton.value = false
         /* languagesResponse.data.sort((a: extensionResult, b: extensionResult) => {
           return new Date(b.date).getTime() - new Date(a.date).getTime();
         }); */
-        console.log('sorted languages', languagesResponse.data);
+        console.log('sorted languages', languagesResponse.data)
       }
     }
 
@@ -146,120 +163,120 @@ window.addEventListener('languageCatcherResult', async (e) => {
     console.log('languagesResponse', languagesResponse.data);
     returnedValues.value = languagesResponse.data; */
   } catch (error) {
-    console.log(error);
+    console.log(error)
   }
 
   /*   returnedValues.value.push(event.detail); */
   /*  console.log(language);
   console.log('array : ', returnedValues.value); */
-  url.value = '';
-});
+  url.value = ''
+})
 
 onMounted(async () => {
-  console.log('token', token.value);
+  console.log('token', token.value)
 
   try {
-   /*  const response = await axios.post('http://localhost:5000/auth/user', {
+    /*  const response = await axios.post('http://localhost:5000/auth/user', {
       token: token.value
     }); */
 
-   /*  console.log(response.data);
+    /*  console.log(response.data);
     user.value = response.data.user.email; */
-    user.value = "furkan@gmail.com"
+    user.value = 'furkan@gmail.com'
     const languagesResponse = await axios.get('http://localhost:5000/api/getUserLanguages', {
-      params: { email: "furkan@gmail.com" }
-    });
+      params: { email: 'furkan@gmail.com' }
+    })
 
-    returnedValues.value = languagesResponse.data;
-    tempReturnedValues.value = languagesResponse.data;
-    console.log('languagesss', languagesResponse.data);
-   /*  console.log('email ', response.data.user.email);
+    returnedValues.value = languagesResponse.data
+    tempReturnedValues.value = languagesResponse.data
+    console.log('languagesss', languagesResponse.data)
+    /*  console.log('email ', response.data.user.email);
     user.value = response.data.user.email; */
 
-    appReady.value = true;
+    appReady.value = true
   } catch (error) {
-    console.log(error);
+    console.log(error)
   }
-});
+})
 
 const sendUrlToExtension = () => {
-  console.log(url.value);
-  loadingButton.value = true;
+  console.log(url.value)
+  loadingButton.value = true
 
   if (url.value === '' || !url.value.includes('http')) {
-    loadingButton.value = false;
-    toast.error('Url geçerli değil');
-    return;
+    loadingButton.value = false
+    toast.error('Url geçerli değil')
+    return
   }
   const sendedURL = new CustomEvent('language-catcher-start', {
     detail: {
       status: 'OK',
       url: url.value
     }
-  });
+  })
 
-  window.dispatchEvent(sendedURL);
-};
+  window.dispatchEvent(sendedURL)
+}
 
 const logout = async () => {
-  const response = await axios.get('http://localhost:5000/auth/logout');
+  const response = await axios.get('http://localhost:5000/auth/logout')
 
-  localStorage.removeItem('token');
-  window.location.href = '/';
-};
+  localStorage.removeItem('token')
+  window.location.href = '/'
+}
 
 const sortDate = () => {
   if (dateClicked.value === false) {
     returnedValues.value.sort((a: extensionResult, b: extensionResult) => {
-      return new Date(a.date).getTime() - new Date(b.date).getTime();
-    });
-    dateClicked.value = true;
+      return new Date(a.date).getTime() - new Date(b.date).getTime()
+    })
+    dateClicked.value = true
   } else {
     returnedValues.value.sort((a: extensionResult, b: extensionResult) => {
-      return new Date(b.date).getTime() - new Date(a.date).getTime();
-    });
-    dateClicked.value = false;
+      return new Date(b.date).getTime() - new Date(a.date).getTime()
+    })
+    dateClicked.value = false
   }
-  returnedValues.value = [...returnedValues.value];
-  console.log('sorted values', returnedValues.value);
-};
+  returnedValues.value = [...returnedValues.value]
+  console.log('sorted values', returnedValues.value)
+}
 
 const sortUrls = () => {
   if (urlClicked.value === false) {
     returnedValues.value.sort((a: extensionResult, b: extensionResult) => {
-      console.log('splittedd ', a.domain.split('/'));
-      const aValue = a.domain.split('/')[2];
-      const bValue = b.domain.split('/')[2];
+      console.log('splittedd ', a.domain.split('/'))
+      const aValue = a.domain.split('/')[2]
+      const bValue = b.domain.split('/')[2]
 
-      console.log('valuesssss', aValue, bValue);
+      console.log('valuesssss', aValue, bValue)
       if (aValue < bValue) {
-        return -1;
+        return -1
       }
       if (aValue > bValue) {
-        return 1;
+        return 1
       }
-      return 0;
-    });
-    urlClicked.value = true;
+      return 0
+    })
+    urlClicked.value = true
   } else {
     returnedValues.value.sort((a: extensionResult, b: extensionResult) => {
-      const aValue = a.domain.split('/')[2];
-      const bValue = b.domain.split('/')[2];
+      const aValue = a.domain.split('/')[2]
+      const bValue = b.domain.split('/')[2]
 
-      console.log('valuesssss', aValue, bValue);
+      console.log('valuesssss', aValue, bValue)
       if (aValue < bValue) {
-        return 1;
+        return 1
       }
       if (aValue > bValue) {
-        return -1;
+        return -1
       }
-      return 0;
-    });
-    urlClicked.value = false;
+      return 0
+    })
+    urlClicked.value = false
   }
 
-  console.log('sorted names ', returnedValues.value);
-};
+  console.log('sorted names ', returnedValues.value)
+}
 
 /* 
 const toogleDate = () => {
@@ -267,43 +284,43 @@ const toogleDate = () => {
 }; */
 
 const deleteItemsFunc = (id: string) => {
-  console.log('received id ', id);
+  console.log('received id ', id)
   if (deleteItemsList.value.includes(id)) {
-    deleteItemsList.value = deleteItemsList.value.filter((item) => item !== id);
-    console.log(deleteItemsList.value);
-    return;
+    deleteItemsList.value = deleteItemsList.value.filter((item) => item !== id)
+    console.log(deleteItemsList.value)
+    return
   }
-  deleteItemsList.value.push(id);
-  console.log('delete items', deleteItemsList.value);
-};
+  deleteItemsList.value.push(id)
+  console.log('delete items', deleteItemsList.value)
+}
 
 const deleteItems = async () => {
   if (deleteItemsList.value.length === 0) {
-    appReady.value = true;
-    return;
+    appReady.value = true
+    return
   }
-  appReady.value = false;
-  console.log('ReturnedValues.value', returnedValues.value);
-  console.log('tempReturnedValues.value', tempReturnedValues.value);
+  appReady.value = false
+  console.log('ReturnedValues.value', returnedValues.value)
+  console.log('tempReturnedValues.value', tempReturnedValues.value)
 
-  console.log('delete items clicked  ', deleteItemsList.value);
-  console.log('user ', user.value);
+  console.log('delete items clicked  ', deleteItemsList.value)
+  console.log('user ', user.value)
   try {
     const response = await axios.delete('http://localhost:5000/api/deletesLanguages', {
       params: { email: user.value, languageIdList: deleteItemsList.value }
-    });
+    })
 
-    console.log('abi gitti artık ', response.data);
+    console.log('abi gitti artık ', response.data)
 
-    returnedValues.value = response.data;
-    tempReturnedValues.value = response.data;
-    console.log('returned values', returnedValues.value);
-    console.log('after delete items list ', deleteItemsList.value);
-    appReady.value = true;
-    allItemsSelected.value = false;
-    deleteItemsList.value = [];
+    returnedValues.value = response.data
+    tempReturnedValues.value = response.data
+    console.log('returned values', returnedValues.value)
+    console.log('after delete items list ', deleteItemsList.value)
+    appReady.value = true
+    allItemsSelected.value = false
+    deleteItemsList.value = []
   } catch (error) {
-    console.log(error);
+    console.log(error)
   }
   /*   if (allItemsSelected.value === true) {
     console.log('all items selected');
@@ -346,69 +363,69 @@ const deleteItems = async () => {
       console.log(error);
     }
   } */
-};
+}
 
-const extensionId = 'bkoahppiepfhhkofbhlagafcbklmdedi';
-const messageBody = 'exist';
+const extensionId = 'bkoahppiepfhhkofbhlagafcbklmdedi'
+const messageBody = 'exist'
 if (chrome?.runtime?.sendMessage) {
   chrome.runtime.sendMessage(extensionId, messageBody, function (response) {
-    console.log('The extension IS installed.', response);
-  });
+    console.log('The extension IS installed.', response)
+  })
 } else {
-  console.log('The extension is NOT installed.');
+  console.log('The extension is NOT installed.')
 }
 
-const openFilter = ref<boolean>(false);
-const searchedUrl = ref<string>('');
-let oldReturnedValues = ref<extensionResult[]>([]);
-oldReturnedValues.value = JSON.parse(JSON.stringify(returnedValues.value));
+const openFilter = ref<boolean>(false)
+const searchedUrl = ref<string>('')
+let oldReturnedValues = ref<extensionResult[]>([])
+oldReturnedValues.value = JSON.parse(JSON.stringify(returnedValues.value))
 
 const searchUrl = () => {
-  console.log('old values', oldReturnedValues.value);
-  console.log('searched url', searchedUrl.value);
-  const searchedValues = tempReturnedValues.value.filter((value : any) => {
-    return value.domain.includes(searchedUrl.value);
-  });
+  console.log('old values', oldReturnedValues.value)
+  console.log('searched url', searchedUrl.value)
+  const searchedValues = tempReturnedValues.value.filter((value: any) => {
+    return value.domain.includes(searchedUrl.value)
+  })
 
-  returnedValues.value = searchedValues;
-  console.log('searched values', searchedValues);
-};
-
-if (searchedUrl.value === '') {
-  returnedValues.value = oldReturnedValues.value;
+  returnedValues.value = searchedValues
+  console.log('searched values', searchedValues)
 }
 
-const highAccuracy = ref<boolean>(false);
-const mediumAccuracy = ref<boolean>(false);
-const lowAccuracy = ref<boolean>(false);
+if (searchedUrl.value === '') {
+  returnedValues.value = oldReturnedValues.value
+}
+
+const highAccuracy = ref<boolean>(false)
+const mediumAccuracy = ref<boolean>(false)
+const lowAccuracy = ref<boolean>(false)
 
 const filterAccuracy = () => {
   if (!highAccuracy.value && !mediumAccuracy.value && !lowAccuracy.value) {
-    returnedValues.value = tempReturnedValues.value;
-    return;
+    returnedValues.value = tempReturnedValues.value
+    return
   }
-  console.log('hifh ', highAccuracy.value);
+  console.log('hifh ', highAccuracy.value)
 
   /*  let flag : boolean = false */
-  returnedValues.value = tempReturnedValues.value.filter((value : any) => {
-    if (highAccuracy.value && value.languageAccuracy === 'high') return true;
-    if (mediumAccuracy.value && value.languageAccuracy === 'medium') return true;
-    if (lowAccuracy.value && value.languageAccuracy === 'low') return true;
+  returnedValues.value = tempReturnedValues.value.filter((value: any) => {
+    if (highAccuracy.value && value.languageAccuracy === 'high') return true
+    if (mediumAccuracy.value && value.languageAccuracy === 'medium') return true
+    if (lowAccuracy.value && value.languageAccuracy === 'low') return true
     /* 
     if(flag) return true; */
-    return false;
-  });
+    return false
+  })
 
-  console.log('returned values', returnedValues.value);
-};
+  console.log('returned values', returnedValues.value)
+}
 
-watch([highAccuracy, mediumAccuracy, lowAccuracy], filterAccuracy);
-watch(searchedUrl, searchUrl);
+watch([highAccuracy, mediumAccuracy, lowAccuracy], filterAccuracy)
+watch(searchedUrl, searchUrl)
 </script>
 
 <template>
-  <div class="h-full w-full"> 
-<!--     <div class="topBar m-a flex w-full items-center justify-between px-8 py-6">
+  <div class="h-full w-full">
+    <!--     <div class="topBar m-a flex w-full items-center justify-between px-8 py-6">
       <div class="cursor-pointer text-[#2F33B0] hover:text-[#C0C5E5]">{{ user }}</div>
 
       <div class="mr-3 cursor-pointer text-[#2F33B0] hover:text-[#C0C5E5]" @click="logout">
@@ -416,7 +433,7 @@ watch(searchedUrl, searchUrl);
       </div>
     </div> -->
     <div class="m-a w-full h-full">
-<!--       <div class="m-a relative inline-block flex max-w-[600px] items-center justify-center">
+      <!--       <div class="m-a relative inline-block flex max-w-[600px] items-center justify-center">
         <div v-if="extensionExist" class="w-full">
           <input
             type="text"
@@ -439,7 +456,7 @@ watch(searchedUrl, searchUrl);
         </div>
       </div> -->
       <!--  <div class="block overflow-x-auto">   -->
-      <div class="mx-a  mb-5 mt-10 w-[100%] rounded-lg lg:w-[100%]">
+      <div class="mx-a mb-5 mt-10 w-[100%] rounded-lg lg:w-[100%]">
         <div class="filters">
           <div class="mb-2 flex w-full items-center justify-end">
             <div class="flex items-center">
@@ -549,7 +566,6 @@ watch(searchedUrl, searchUrl);
                   v-else
                   class="ma top-50 absolute z-50 flex h-full w-full items-center justify-center"
                 >
-               
                   <v-progress-circular
                     :size="150"
                     color="primary"

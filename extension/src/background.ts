@@ -4,6 +4,17 @@ import type { LanguageData } from './types'
 /* 
 chrome.storage.local.set({ variable: "exist" }); */
 
+let showTable = false;
+
+chrome.action.onClicked.addListener((tab) => {
+  console.log("Hello");
+  showTable = !showTable;
+  if (tab.id) {
+    chrome.tabs.sendMessage(tab.id, { action: 'toogleTable' , showTable: showTable });
+  }
+});
+
+
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   console.log('background received message', request)
   console.log('URL : ', request.url)
@@ -101,6 +112,9 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       })
     })
     return true
+  }
+  else if(request.action === 'showTable'){
+    console.log("backgronn aldı mesajı");
   }
   return false
 })

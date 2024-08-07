@@ -20,7 +20,7 @@ export default defineManifest(() => ({
   version_name: version,
 
   action: {
-    default_popup: 'index.html', //path to the HTML file
+    /* default_popup: 'index.html', */ //path to the HTML file
     default_icon: 'src/images/history16.png' // icon for the image
   },
   permissions: ["activeTab" , "tabs" , "scripting" , "background"],

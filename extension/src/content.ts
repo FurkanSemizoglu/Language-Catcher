@@ -17,51 +17,123 @@ const realValues: RealValues = {
   realLangLocalStorage: '',
   realLangMeta: ''
 }
-
-
-const container = document.getElementById('showTable');
+/* const container = document.getElementById('showTable')
 if (container) {
-  const iframe = document.createElement('iframe');
-  iframe.src = chrome.runtime.getURL('popup.html');
-  iframe.style.width = '100%';
-  iframe.style.height = '100%';
-  iframe.style.border = 'none';
-  container.appendChild(iframe);
+  const iframe = document.createElement('iframe')
+  iframe.src = chrome.runtime.getURL('popup.html')
+  iframe.style.width = '100%'
+  iframe.style.height = '100%'
+  iframe.style.border = 'none'
+  container.appendChild(iframe)
+} */
+
+let isInjected = true
+
+function showTableContent() {
+  console.log('çalıl1')
+
+  const container = document.getElementById('showTable')
+  if (container) {
+    const div = document.createElement('div')
+   /*  div.innerHTML = chrome.runtime.getURL('popup.html') */
+    div.style.width = '100%'
+    div.style.height = '100%'
+    div.style.border = 'none'
+
+    const url = chrome.runtime.getURL('popup.html')
+    fetch(url)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`)
+        }
+        return response.text()
+      })
+      .then((html) => {
+        div.innerHTML = html
+        container.appendChild(div)
+      })
+      .catch((error) => console.error('Error fetching index.html:', error))
+  }
+  /* 
+  const targetDiv = document.getElementById('showTable')
+  if (targetDiv) {
+    const appDiv = document.createElement('div')
+    appDiv.id = 'app'
+    targetDiv.appendChild(appDiv)
+
+    // Inject Vue app script into the page
+    const script = document.createElement('script')
+    script.src = chrome.runtime.getURL('src/main.ts')
+    script.type = 'module'
+    document.body.appendChild(script)
+  } */
+  /*   const container = document.getElementById('showTable')
+if (container) {
+  const iframe = document.createElement('iframe')
+  iframe.src = chrome.runtime.getURL('popup.html')
+  iframe.style.width = '100%'
+  iframe.style.height = '100%'
+  iframe.style.border = 'none'
+  container.appendChild(iframe) */
+  /*   const container = document.getElementById('showTable')
+  if (container) {
+    const div = document.createElement('div');
+    div.style.width = '100%';
+    div.style.height = '100%';
+    div.style.border = 'none';
+    console.log("çalıl2");
+
+    fetch(chrome.runtime.getURL('popup.vue'))
+    .then(response => response.text())
+    .then(html => {
+      console.log("çalıl3" , html);
+
+      div.innerHTML = html;
+      container.appendChild(div);
+    })
+    .catch(error => console.error('Error fetching popup.html:', error.message)); 
+  }*/
+  /* const div = document.getElementById('showTable');
+    if (div && !isInjected) {
+      const popupDiv = document.createElement('div');
+      popupDiv.id = 'extension-popup-content';
+      div.appendChild(popupDiv);
+      isInjected = true;
+  
+      // Here, you can send a message to the popup to render its content into #extension-popup-content
+      chrome.runtime.sendMessage({ action: 'injectContent' });
+    } */
 }
 
-// chrome storage ile kayıt edebilirsin belki bu değeri
-/* export const languageCatcher : boolean = true
+function removeTableContent() {
+  const popupDiv = document.getElementById('extension-popup-content')
+  if (popupDiv) {
+    popupDiv.remove()
+    isInjected = false
+  }
+}
 
-console.log("Extension is running :  " , languageCatcher); */
-
-
-/* chrome.runtime.onMessageExternal.addListener((message: any, sender: any, sendResponse: any) => {
-  console.log("Received message:", message);
-  console.log("Sender:", sender);
-  
-  sendResponse({ exist: true });
-}); */
-
-/* chrome.runtime.onInstalled.addListener(function (details) {
-  const languageCatcherExist = new CustomEvent('language-catcher-exist', {
-    detail: {
-      languageCatcherExist: true
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  /*   console.log("BUraa gelin mü" , message.showTable); */
+  if (message.action === 'toogleTable') {
+    if (message.showTable) {
+      console.log('BUraa gelin mü')
+      showTableContent()
+    } else {
+      removeTableContent()
     }
-  })
-
-  window.dispatchEvent(languageCatcherExist)
-  if (details.reason == 'install') {
-    console.log('This is a first install!')
-    const languageCatcherExist = new CustomEvent('language-catcher-exist', {
-      detail: {
-        languageCatcherExist: true
-      }
-    })
-
-    window.dispatchEvent(languageCatcherExist)
-  } else if (details.reason == 'update') {
-    var thisVersion = chrome.runtime.getManifest().version
-    console.log('Updated from ' + details.previousVersion + ' to ' + thisVersion + '!')
+  }
+})
+/* window.addEventListener('startTable', (e) => {
+  console.log('startTable in content.ts')
+  const container = document.getElementById('showTable')
+  if (container) {
+    const iframe = document.createElement('iframe')
+    iframe.src = chrome.runtime.getURL('popup.html')
+    iframe.style.width = '100%'
+    iframe.style.height = '100%'
+    iframe.style.border = 'none'
+    container.appendChild(iframe)
   }
 })
  */
@@ -86,17 +158,10 @@ setInterval(function () {
 }, 750) */
 
 window.addEventListener('language-catcher-start', (e) => {
-  /*   const languageCatcherExist = new CustomEvent('language-catcher-exist', {
-    detail: {
-      languageCatcherExist: true
-    }
-  })
-  
-  window.dispatchEvent(languageCatcherExist) */
   console.log('Language catcher is starting')
   const event = e as CustomEvent
   const url = event.detail.url
-  const urlList: string[] = event.detail.url.split(',').map((url: string) => url.trim());
+  const urlList: string[] = event.detail.url.split(',').map((url: string) => url.trim())
   console.log('domaain ', urlList)
 
   let index = 0
@@ -104,48 +169,6 @@ window.addEventListener('language-catcher-start', (e) => {
   const languageCatcherResultArray: ExtensionResponse[] = []
 
   recurciveProcess(url, languageCatcherResultArray, urlList, index)
-
-  // Burada kullanıcı bilgisi uygulamadan istenilebliir
-  // Burasında uygulama bütün siteleri açıp yapıyor
-  /*  for (let index = 0; index < urlList.length; index++) {
-    chrome.runtime.sendMessage({ message: 'URL-sended', url: urlList[index] }, (response: any) => {
-      console.log('message sent to background to run in application')
-      console.log('response from background for url sended for application ', response)
-  
-      let langName: string = '-'
-      let langNativeName: string = '-'
-      const status = response.language === 'not detected' ? 'failed' : 'completed'
-      if (status === 'completed') {
-        langName = languages[response.language].name
-        langNativeName = languages[response.language].nativeName
-      }
-      const date = new Date()
-      console.log('real values : ', response.realValues)
-      const languageCatcherResult = new CustomEvent('languageCatcherResult', {
-        detail: {
-          status: status,
-          domain: urlList[index],
-          language: response.language,
-          languageFetchedFrom: response.findedPlaces,
-          langName: langName,
-          langNativeName: langNativeName,
-          languageLocation: response.languageLocation,
-          languageAccuracy: response.accuracy,
-          realValues: response.realValues,
-          date: date
-        }
-      })
-
-      const languageCatcherResultArray : extensionResponse[] =  []
-      languageCatcherResultArray.push(languageCatcherResult.detail)
-      console.log('languageCatcherResultArray : ', languageCatcherResultArray)
-      languageCatcherResultArray.forEach((result) => {
-        const languageCatcherResult = new CustomEvent('languageCatcherResult', {
-          detail: result
-        });
-        window.dispatchEvent(languageCatcherResult);
-      });
-    }) */
 })
 
 const sendProgressEvent = (index: number, arrayLength: number) => {
@@ -195,15 +218,14 @@ const recurciveProcess = (
 
     sendProgressEvent(index + 1, urlList.length)
 
-
     if (index < urlList.length - 1) {
       recurciveProcess(URL, languageCatcherResultArray, urlList, index + 1)
     } else {
       const languageCatcherResultArrayEvent = new CustomEvent('languageCatcherResult', {
         detail: languageCatcherResultArray
       })
-      console.log("senda dataa array : ", languageCatcherResultArray);
-      console.log("send data worksss " , index);
+      console.log('senda dataa array : ', languageCatcherResultArray)
+      console.log('send data worksss ', index)
 
       window.dispatchEvent(languageCatcherResultArrayEvent)
     }
@@ -230,6 +252,17 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
       sendResponse(data)
     })
+  } else if (request.action === 'showTable') {
+    console.log('works showtablw')
+    const container = document.getElementById('showTable')
+    if (container) {
+      const iframe = document.createElement('iframe')
+      iframe.src = chrome.runtime.getURL('popup.html')
+      iframe.style.width = '100%'
+      iframe.style.height = '100%'
+      iframe.style.border = 'none'
+      container.appendChild(iframe)
+    }
   }
   return true // şurası return true olunca çalıştı
 })

@@ -1,5 +1,6 @@
 import 'virtual:uno.css'
 import { createApp } from 'vue'
+import '../src/assets/style.css'
 
 // Vuetify
 import 'vuetify/styles'
