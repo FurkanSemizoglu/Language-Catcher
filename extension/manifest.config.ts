@@ -38,6 +38,12 @@ export default defineManifest(() => ({
       js: ['src/content.ts'],
       run_at: "document_start"
     }
+  ],
+  web_accessible_resources: [
+    {
+      resources: ["index.html"],
+      matches: ["<all_urls>"]
+    }
   ]/* ,
   externally_connectable: {
     matches: ["https://*.example.com/*" , "http://*.localhost:5173.com/*"]

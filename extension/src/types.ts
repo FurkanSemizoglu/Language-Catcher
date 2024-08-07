@@ -234,7 +234,30 @@ const languages: { [key: string]: Language } = {
   za: { name: 'Zhuang, Chuang', nativeName: 'Saɯ cueŋƅ, Saw cuengh' }
 }
 
+interface realLangValues {
+  realLangPath: string;
+  realLangAttr: string;
+  realLangStorage: string;
+  realLangLocalStorage: string;
+  realLangMeta: string;
+}
+
+interface urlCardResultProps {
+  email: string;
+  url: string;
+  detectedLanguage: string;
+  detectedPlaces: string[];
+  languageLocation: LanguageLocation;
+  langName: string;
+  langNativeName: string;
+  accuracy: string;
+  id : string;
+  realLangValues: realLangValues;
+  date : Date;
+  index : number;
+  allItemsSelected : boolean;
+}
 
 
 export { languages }
-export type { RealValues , LanguageLocation  , LanguageData , ExtensionResponse }
+export type { RealValues , LanguageLocation  , LanguageData , ExtensionResponse , urlCardResultProps }
