@@ -490,8 +490,9 @@ watch(searchedUrl, searchUrl);
                 </div>
                 <div
                   v-else
-                  class="ma top-50 absolute flex h-full w-full items-center justify-center"
+                  class="ma top-50 absolute z-50 flex h-full w-full items-center justify-center"
                 >
+               
                   <v-progress-circular
                     :size="150"
                     color="primary"

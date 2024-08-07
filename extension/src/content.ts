@@ -20,9 +20,9 @@ const realValues: RealValues = {
 
 
 // chrome storage ile kayıt edebilirsin belki bu değeri
-export const languageCatcher : boolean = true
+/* export const languageCatcher : boolean = true
 
-console.log("Extension is running :  " , languageCatcher);
+console.log("Extension is running :  " , languageCatcher); */
 
 
 /* chrome.runtime.onMessageExternal.addListener((message: any, sender: any, sendResponse: any) => {
