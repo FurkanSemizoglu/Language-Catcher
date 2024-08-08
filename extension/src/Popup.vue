@@ -120,7 +120,7 @@ window.addEventListener('language-catcher-exist', (e) => {
 
   if (event.detail.languageCatcherExist) {
     extensionExist.value = true
-    /*  console.log('extensionExist.value', extensionExist.value); */
+     console.log('extensionExist.value', extensionExist.value);
   } else {
     extensionExist.value = false
   }
@@ -150,25 +150,16 @@ window.addEventListener('languageCatcherResult', async (e) => {
         returnedValues.value = languagesResponse.data
         tempReturnedValues.value = languagesResponse.data
         loadingButton.value = false
-        /* languagesResponse.data.sort((a: extensionResult, b: extensionResult) => {
-          return new Date(b.date).getTime() - new Date(a.date).getTime();
-        }); */
+
         console.log('sorted languages', languagesResponse.data)
       }
     }
 
-    /*  const languagesResponse = await axios.get('http://localhost:5000/api/getUserLanguages', {
-      params: { email: user.value }
-    });
-    console.log('languagesResponse', languagesResponse.data);
-    returnedValues.value = languagesResponse.data; */
+
   } catch (error) {
     console.log(error)
   }
 
-  /*   returnedValues.value.push(event.detail); */
-  /*  console.log(language);
-  console.log('array : ', returnedValues.value); */
   url.value = ''
 })
 
@@ -278,10 +269,6 @@ const sortUrls = () => {
   console.log('sorted names ', returnedValues.value)
 }
 
-/* 
-const toogleDate = () => {
-  dateClicked.value = !dateClicked.value;
-}; */
 
 const deleteItemsFunc = (id: string) => {
   console.log('received id ', id)
@@ -322,47 +309,6 @@ const deleteItems = async () => {
   } catch (error) {
     console.log(error)
   }
-  /*   if (allItemsSelected.value === true) {
-    console.log('all items selected');
-
-    const idList = returnedValues.value.map((item) => item._id);
-    try {
-      const response = await axios.delete('http://localhost:5000/api/deletesLanguages', {
-        params: { email: user.value, languageIdList: idList }
-      });
-
-      console.log('abi gitti artık ', response.data);
-      returnedValues.value = [];
-      tempReturnedValues.value = [];
-      allItemsSelected.value = false;
-      appReady.value = true;
-    } catch (error) {
-      console.log(error);
-    }
-
-    return;
-  } else {
-    if(deleteItemsList.value.length === 0) {
-      appReady.value = true;
-      return;
-    }
-    console.log('delete items clicked  ', deleteItemsList.value);
-    console.log('user ', user.value);
-    try {
-      const response = await axios.delete('http://localhost:5000/api/deletesLanguages', {
-        params: { email: user.value, languageIdList: deleteItemsList.value }
-      });
-
-      console.log('abi gitti artık ', response.data);
-
-      returnedValues.value = response.data
-      tempReturnedValues.value = response.data;
-      console.log("returned values", returnedValues.value);   
-      appReady.value = true;
-    } catch (error) {
-      console.log(error);
-    }
-  } */
 }
 
 const extensionId = 'bkoahppiepfhhkofbhlagafcbklmdedi'
@@ -425,38 +371,10 @@ watch(searchedUrl, searchUrl)
 
 <template>
   <div id="popup"class="h-full w-full">
-    <!--     <div class="topBar m-a flex w-full items-center justify-between px-8 py-6">
-      <div class="cursor-pointer text-[#2F33B0] hover:text-[#C0C5E5]">{{ user }}</div>
-
-      <div class="mr-3 cursor-pointer text-[#2F33B0] hover:text-[#C0C5E5]" @click="logout">
-        Çıkış Yap
-      </div>
-    </div> -->
+  
     <div class="m-a w-full h-full">
-      <!--       <div class="m-a relative inline-block flex max-w-[600px] items-center justify-center">
-        <div v-if="extensionExist" class="w-full">
-          <input
-            type="text"
-            v-model="url"
-            :placeholder="extensionExist ? 'URL giriniz' : 'Eklentiniz aktif değil'"
-            :disabled="extensionExist ? false : true"
-            class="bg-#FCFCFC border-b-coolGray w-full rounded-3xl border p-4 focus:border-none focus:outline-[#DCE2EE]"
-          />
-          <button
-            class="absolute right-0 h-full rounded-r-3xl bg-[#2F33B0] p-4 text-white transition duration-300 ease-in-out hover:bg-[#3E83F7]"
-            @click="sendUrlToExtension()"
-          >
-            Search
-          </button>
-        </div>
-        <div v-else>
-          <div class="notExistAlert text-red ma rounded-md p-5 text-xl">
-            Eklenti aktif değil !!!
-          </div>
-        </div>
-      </div> -->
-      <!--  <div class="block overflow-x-auto">   -->
-      <div class="mx-a mb-5 mt-10 w-[100%] rounded-lg lg:w-[100%]">
+     
+      <div class="mx-a  w-[100%] rounded-lg lg:w-[100%]">
         <div class="filters">
           <div class="mb-2 flex w-full items-center justify-end">
             <div class="flex items-center">
@@ -502,7 +420,7 @@ watch(searchedUrl, searchUrl)
             </div>
           </div>
         </div>
-        <div class="block w-[100%]">
+        <div class="block w-[100%] relative">
           <div class="block w-[100%] overflow-x-auto">
             <div class="min-w-800px block">
               <div
@@ -541,7 +459,7 @@ watch(searchedUrl, searchUrl)
                   </div>
                 </div>
               </div>
-              <div class="relative">
+              <div class="">
                 <div v-if="appReady" class="max-h-500px w-full overflow-y-auto">
                   <div v-for="(value, index) in returnedValues" :key="value._id">
                     <UrlCard

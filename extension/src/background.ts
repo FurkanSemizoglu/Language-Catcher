@@ -7,7 +7,7 @@ chrome.storage.local.set({ variable: "exist" }); */
 let showTable = true;
 
 chrome.action.onClicked.addListener((tab) => {
-  console.log("Hello");
+  
  
   if (tab.id) {
     chrome.tabs.sendMessage(tab.id, { action: 'toogleTable' , showTable: showTable });

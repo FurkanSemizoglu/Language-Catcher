@@ -30,7 +30,6 @@ if (container) {
 let isInjected = true
 
 function showTableContent() {
-  console.log('çalıl1')
   const container = document.getElementById('showTable')
   if (container) {
     const iframe = document.createElement('iframe')
@@ -39,10 +38,13 @@ function showTableContent() {
     iframe.style.width = '100%'
     iframe.style.height = '100%'
     iframe.style.border = 'none'
+  /*   iframe.scrolling = 'no' */
+    /* iframe.scrollTo({ top: 0, left: 0, behavior: 'smooth' }); */
+   /*  iframe.style.overflow = 'hidden' */
     container.appendChild(iframe)
-  } 
+  }
 
-/*   const container = document.getElementById('showTable')
+  /*   const container = document.getElementById('showTable')
   if (container) {
     const div = document.createElement('div')
  
@@ -157,7 +159,6 @@ setInterval(function () {
   window.dispatchEvent(languageCatcherExist)
 }, 0.2 * 1000)
 
-
 window.addEventListener('language-catcher-start', (e) => {
   console.log('Language catcher is starting')
   const event = e as CustomEvent
@@ -253,14 +254,13 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
       sendResponse(data)
     })
-  }else if (request.action === 'toogleTable') {
+  } else if (request.action === 'toogleTable') {
     if (request.showTable) {
-      console.log('BUraa gelin mü')
       showTableContent()
     } else {
       removeTableContent()
     }
-  }/* else if (request.action === 'showTable') {
+  } /* else if (request.action === 'showTable') {
     console.log('works showtablw')
     const container = document.getElementById('showTable')
     if (container) {
