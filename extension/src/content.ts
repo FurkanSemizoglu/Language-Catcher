@@ -17,15 +17,7 @@ const realValues: RealValues = {
   realLangLocalStorage: '',
   realLangMeta: ''
 }
-/* const container = document.getElementById('showTable')
-if (container) {
-  const iframe = document.createElement('iframe')
-  iframe.src = chrome.runtime.getURL('popup.html')
-  iframe.style.width = '100%'
-  iframe.style.height = '100%'
-  iframe.style.border = 'none'
-  container.appendChild(iframe)
-} */
+
 
 let isInjected = true
 

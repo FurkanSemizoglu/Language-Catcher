@@ -16,6 +16,9 @@ import { useToast } from 'vue-toastification'
 
 import UrlCard from './components/UrlCard.vue'
 import LoadingBarCard from './components/LoadingBarCard.vue'
+
+import type { extensionResult ,ExtensionResponse as extensionResponse } from './types'
+
 chrome.tabs.query({ active: true, currentWindow: true }, (tabs: any) => {
   console.log('mmessage is sending')
   chrome.tabs.sendMessage(
@@ -28,62 +31,12 @@ chrome.tabs.query({ active: true, currentWindow: true }, (tabs: any) => {
     }
   )
 })
-/* chrome.tabs.query({ currentWindow: true, active: true }, function (tabs) {
-  var activeTab = tabs[0]
-  chrome.tabs.sendMessage(tabs[0].id, { message: 'start' })
-})
- */
-interface LanguageLocation {
-  localStorage: boolean
-  sessionStorage: boolean
-  metaTag: boolean
-  htmlTag: boolean
-  url: boolean
-  paragraph: boolean
-}
 
-interface realLangValues {
-  realLangPath: string
-  realLangAttr: string
-  realLangStorage: string
-  realLangLocalStorage: string
-  realLangMeta: string
-}
 
-interface extensionResult {
-  _id: string
-  status: string
-  domain: string
-  language: string
-  languageFetchedFrom: string[]
-  langName: string
-  langNativeName: string
-  languageLocation: LanguageLocation
-  languageAccuracy: string
-  realLangValues: realLangValues
-  date: Date
-}
 
-interface RealValues {
-  realLangPath: string
-  realLangAttr: string
-  realLangStorage: string
-  realLangLocalStorage: string
-  realLangMeta: string
-}
 
-interface extensionResponse {
-  status: string
-  domain: string
-  language: string
-  languageFetchedFrom: string[]
-  langName: string
-  langNativeName: string
-  languageLocation: LanguageLocation
-  languageAccuracy: string
-  realValues: RealValues
-  date: Date
-}
+
+
 
 const checkbox = ref<boolean>(false)
 const token = ref<string | null>('')
@@ -460,7 +413,7 @@ watch(searchedUrl, searchUrl)
                 </div>
               </div>
               <div class="">
-                <div v-if="appReady" class="max-h-500px w-full overflow-y-auto">
+                <div v-if="appReady" class=" w-full overflow-y-auto"> <!--  max-h-500px -->
                   <div v-for="(value, index) in returnedValues" :key="value._id">
                     <UrlCard
                       :email="user"

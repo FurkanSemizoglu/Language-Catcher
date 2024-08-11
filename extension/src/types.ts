@@ -3,13 +3,7 @@ interface Language {
   nativeName: string
 }
 
-interface RealValues {
-  realLangPath: string
-  realLangAttr: string
-  realLangStorage: string
-  realLangLocalStorage: string
-  realLangMeta: string
-}
+
 
 
 interface LanguageData {
@@ -31,6 +25,19 @@ interface LanguageLocation {
 }
 
 interface ExtensionResponse {
+  status: string
+  domain: string
+  language: string
+  languageFetchedFrom: string[]
+  langName: string
+  langNativeName: string
+  languageLocation: LanguageLocation
+  languageAccuracy: string
+  realValues: RealValues
+  date: Date
+}
+
+interface extensionResponse {
   status: string
   domain: string
   language: string
@@ -257,7 +264,28 @@ interface urlCardResultProps {
   index : number;
   allItemsSelected : boolean;
 }
+interface extensionResult {
+  _id: string
+  status: string
+  domain: string
+  language: string
+  languageFetchedFrom: string[]
+  langName: string
+  langNativeName: string
+  languageLocation: LanguageLocation
+  languageAccuracy: string
+  realLangValues: realLangValues
+  date: Date
+}
+
+interface RealValues {
+  realLangPath: string
+  realLangAttr: string
+  realLangStorage: string
+  realLangLocalStorage: string
+  realLangMeta: string
+}
 
 
 export { languages }
-export type { RealValues , LanguageLocation  , LanguageData , ExtensionResponse , urlCardResultProps }
+export type { RealValues , LanguageLocation  , LanguageData , ExtensionResponse , urlCardResultProps , extensionResult}
