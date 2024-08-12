@@ -428,9 +428,9 @@ watch(searchedUrl, searchUrl);
             </div>
           </div>
         </div>
-        <div class="block w-[100%]">
+        <div class="block w-[100%] relative">
           <div class="block w-[100%] overflow-x-auto">
-            <div class="min-w-800px block">
+            <div class="min-w-800px block ">
               <div
                 class="cols-7 font-600 min-h-65px grid rounded-t-lg border border-gray-300 bg-[#2F33B0] text-white"
                 style="grid-template-columns: 0.5fr 1.5fr 2fr 2fr 2fr 2fr 2fr"
@@ -467,7 +467,7 @@ watch(searchedUrl, searchUrl);
                   </div>
                 </div>
               </div>
-              <div class="relative">
+              <div class="">
                 <div v-if="appReady" class="max-h-500px w-full overflow-y-auto">
                   <div v-for="(value, index) in returnedValues" :key="value._id">
                     <UrlCard
