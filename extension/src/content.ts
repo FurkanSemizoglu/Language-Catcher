@@ -18,7 +18,6 @@ const realValues: RealValues = {
   realLangMeta: ''
 }
 
-
 let isInjected = true
 
 function showTableContent() {
@@ -30,83 +29,8 @@ function showTableContent() {
     iframe.style.width = '100%'
     iframe.style.height = '100%'
     iframe.style.border = 'none'
-  /*   iframe.scrolling = 'no' */
-    /* iframe.scrollTo({ top: 0, left: 0, behavior: 'smooth' }); */
-   /*  iframe.style.overflow = 'hidden' */
     container.appendChild(iframe)
   }
-
-  /*   const container = document.getElementById('showTable')
-  if (container) {
-    const div = document.createElement('div')
- 
-    div.style.width = '100%'
-    div.style.height = '100%'
-    div.style.border = 'none'
-
-    const url = chrome.runtime.getURL('popup.html')
-    fetch(url)
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`)
-        }
-        return response.text()
-      })
-      .then((html) => {
-        div.innerHTML = html
-        container.appendChild(div)
-      })
-      .catch((error) => console.error('Error fetching index.html:', error))
-  } */
-  /* 
-  const targetDiv = document.getElementById('showTable')
-  if (targetDiv) {
-    const appDiv = document.createElement('div')
-    appDiv.id = 'app'
-    targetDiv.appendChild(appDiv)
-
-    // Inject Vue app script into the page
-    const script = document.createElement('script')
-    script.src = chrome.runtime.getURL('src/main.ts')
-    script.type = 'module'
-    document.body.appendChild(script)
-  } */
-  /*   const container = document.getElementById('showTable')
-if (container) {
-  const iframe = document.createElement('iframe')
-  iframe.src = chrome.runtime.getURL('popup.html')
-  iframe.style.width = '100%'
-  iframe.style.height = '100%'
-  iframe.style.border = 'none'
-  container.appendChild(iframe) */
-  /*   const container = document.getElementById('showTable')
-  if (container) {
-    const div = document.createElement('div');
-    div.style.width = '100%';
-    div.style.height = '100%';
-    div.style.border = 'none';
-    console.log("çalıl2");
-
-    fetch(chrome.runtime.getURL('popup.vue'))
-    .then(response => response.text())
-    .then(html => {
-      console.log("çalıl3" , html);
-
-      div.innerHTML = html;
-      container.appendChild(div);
-    })
-    .catch(error => console.error('Error fetching popup.html:', error.message)); 
-  }*/
-  /* const div = document.getElementById('showTable');
-    if (div && !isInjected) {
-      const popupDiv = document.createElement('div');
-      popupDiv.id = 'extension-popup-content';
-      div.appendChild(popupDiv);
-      isInjected = true;
-  
-      // Here, you can send a message to the popup to render its content into #extension-popup-content
-      chrome.runtime.sendMessage({ action: 'injectContent' });
-    } */
 }
 
 function removeTableContent() {
@@ -117,30 +41,6 @@ function removeTableContent() {
   }
 }
 
-/* chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-
-  if (message.action === 'toogleTable') {
-    if (message.showTable) {
-      console.log('BUraa gelin mü')
-      showTableContent()
-    } else {
-      removeTableContent()
-    }
-  }
-}) */
-/* window.addEventListener('startTable', (e) => {
-  console.log('startTable in content.ts')
-  const container = document.getElementById('showTable')
-  if (container) {
-    const iframe = document.createElement('iframe')
-    iframe.src = chrome.runtime.getURL('popup.html')
-    iframe.style.width = '100%'
-    iframe.style.height = '100%'
-    iframe.style.border = 'none'
-    container.appendChild(iframe)
-  }
-})
- */
 setInterval(function () {
   const languageCatcherExist = new CustomEvent('language-catcher-exist', {
     detail: {
@@ -164,6 +64,19 @@ window.addEventListener('language-catcher-start', (e) => {
 
   recurciveProcess(url, languageCatcherResultArray, urlList, index)
 })
+
+
+const languageCatcherStart = (url: string) => {
+  const urlList: string[] = url.split(',').map((url: string) => url.trim())
+  console.log('domaain ', urlList)
+
+  let index = 0
+
+  const languageCatcherResultArray: ExtensionResponse[] = []
+
+  return recurciveProcess(url, languageCatcherResultArray, urlList, index)
+}
+
 
 const sendProgressEvent = (index: number, arrayLength: number) => {
   const updateProgress = new CustomEvent('updateProgress', {
@@ -220,8 +133,8 @@ const recurciveProcess = (
       })
       console.log('senda dataa array : ', languageCatcherResultArray)
       console.log('send data worksss ', index)
-
       window.dispatchEvent(languageCatcherResultArrayEvent)
+      return languageCatcherResultArray;
     }
   })
 }
@@ -252,18 +165,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     } else {
       removeTableContent()
     }
-  } /* else if (request.action === 'showTable') {
-    console.log('works showtablw')
-    const container = document.getElementById('showTable')
-    if (container) {
-      const iframe = document.createElement('iframe')
-      iframe.src = chrome.runtime.getURL('popup.html')
-      iframe.style.width = '100%'
-      iframe.style.height = '100%'
-      iframe.style.border = 'none'
-      container.appendChild(iframe)
-    }
-  } */
+  } else if (request.action === 'start-language-catcher') {
+    sendResponse(languageCatcherStart(request.url))
+    return true 
+  }
   return true // şurası return true olunca çalıştı
 })
 

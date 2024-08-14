@@ -1,20 +1,19 @@
 console.log('background is running')
 
+
 import type { LanguageData } from './types'
 /* 
 chrome.storage.local.set({ variable: "exist" }); */
 
-let showTable = true;
+let showTable = true
 
 chrome.action.onClicked.addListener((tab) => {
-  
- 
   if (tab.id) {
-    chrome.tabs.sendMessage(tab.id, { action: 'toogleTable' , showTable: showTable });
-    showTable = !showTable;
+    console.log('open bg')
+    chrome.tabs.sendMessage(tab.id, { action: 'toogleTable', showTable: showTable })
+    showTable = !showTable
   }
-});
-
+})
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   console.log('background received message', request)
@@ -48,48 +47,50 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
     try {
       console.log('trying new tab creation')
-      chrome.windows.create({ url: newURL  , state : "minimized"}).then((window: chrome.windows.Window) => {
-        console.log('tab created successfully')
-        chrome.tabs.onUpdated.addListener(function listener(tabId, changeInfo, tab) {
-          console.log('new window has been triggered')
-          if (changeInfo.status === 'complete' && tab.windowId === window.id) {
-            console.log('tab is complete')
-            try {
-              chrome.tabs.query({ active: true, windowId: window.id }, (tabs: any) => {
-                if (tabs.length > 0) {
-                  chrome.tabs.sendMessage(
-                    tabs[0].id,
-                    {
-                      action: 'ready-to-detect',
-                      tabID: tabs[0].id,
-                      tabUrl: tabs[0].url
-                    },
-                    (response) => {
-                      console.log('response from content languages data  : ', response)
+      chrome.windows
+        .create({ url: newURL, state: 'minimized' })
+        .then((window: chrome.windows.Window) => {
+          console.log('tab created successfully')
+          chrome.tabs.onUpdated.addListener(function listener(tabId, changeInfo, tab) {
+            console.log('new window has been triggered')
+            if (changeInfo.status === 'complete' && tab.windowId === window.id) {
+              console.log('tab is complete')
+              try {
+                chrome.tabs.query({ active: true, windowId: window.id }, (tabs: any) => {
+                  if (tabs.length > 0) {
+                    chrome.tabs.sendMessage(
+                      tabs[0].id,
+                      {
+                        action: 'ready-to-detect',
+                        tabID: tabs[0].id,
+                        tabUrl: tabs[0].url
+                      },
+                      (response) => {
+                        console.log('response from content languages data  : ', response)
 
-                      if (response) {
-                        langData.language = response.language
-                        langData.findedPlaces = response.findedPlaces
-                        langData.paragraphLang = response.paragraphLang ?? false
-                        langData.languageLocation = response.languageLocation
-                        langData.accuracy = response.accuracy
-                        langData.realValues = response.realValues
-                        sendResponse(langData)
+                        if (response) {
+                          langData.language = response.language
+                          langData.findedPlaces = response.findedPlaces
+                          langData.paragraphLang = response.paragraphLang ?? false
+                          langData.languageLocation = response.languageLocation
+                          langData.accuracy = response.accuracy
+                          langData.realValues = response.realValues
+                          sendResponse(langData)
 
-                        chrome.tabs.remove(tabs[0].id)
+                          chrome.tabs.remove(tabs[0].id)
+                        }
                       }
-                    }
-                  )
-                }
-              })
+                    )
+                  }
+                })
 
-              return true // Indicate that sendResponse will be called asynchronously
-            } catch (error) {
-              console.log('error in background', error)
+                return true // Indicate that sendResponse will be called asynchronously
+              } catch (error) {
+                console.log('error in background', error)
+              }
             }
-          }
+          })
         })
-      })
     } catch (error) {
       console.log('error while creating new tab', error)
     }
@@ -113,9 +114,32 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       })
     })
     return true
+  } else if (request.action === 'showTable') {
+    console.log('backgronn aldı mesajı')
   }
-  else if(request.action === 'showTable'){
-    console.log("backgronn aldı mesajı");
+
+  if (request.action === 'language-catcher-start') {
+    // Tüm content script'lere mesaj gönder
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs: any) => {
+      chrome.tabs.sendMessage(
+        tabs[0].id,
+        { action: 'start-language-catcher' , url: request.url},
+        (response) => {
+          console.log("responsee " , response);
+           sendResponse(response)
+           }
+      )
+    })
+    return true;
+    /* 
+    chrome.tabs.query({}, (tabs) => {
+      tabs.forEach(tab => {
+        chrome.tabs.sendMessage(tab.id, {
+          action: 'language-catcher-start',
+          url: request.url
+        });
+      });
+    }); */
   }
   return false
 })

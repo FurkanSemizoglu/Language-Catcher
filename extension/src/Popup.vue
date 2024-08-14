@@ -17,26 +17,7 @@ import { useToast } from 'vue-toastification'
 import UrlCard from './components/UrlCard.vue'
 import LoadingBarCard from './components/LoadingBarCard.vue'
 
-import type { extensionResult ,ExtensionResponse as extensionResponse } from './types'
-
-chrome.tabs.query({ active: true, currentWindow: true }, (tabs: any) => {
-  console.log('mmessage is sending')
-  chrome.tabs.sendMessage(
-    tabs[0].id,
-    {
-      action: 'showTable'
-    },
-    (response) => {
-      console.log('response from content tableee : ', response)
-    }
-  )
-})
-
-
-
-
-
-
+import type { extensionResult, ExtensionResponse as extensionResponse } from './types'
 
 const checkbox = ref<boolean>(false)
 const token = ref<string | null>('')
@@ -55,7 +36,7 @@ const tempReturnedValues = ref<extensionResult[]>([])
 const allItemsSelected = ref<boolean>(false)
 const deleteItemsList = ref<string[]>([])
 
-const startTable = new CustomEvent('startTable', {
+/* const startTable = new CustomEvent('startTable', {
  
   detail: {
     start: true
@@ -64,23 +45,22 @@ const startTable = new CustomEvent('startTable', {
 
 console.log("dispatcehd event");
 
-window.dispatchEvent(startTable)
+window.dispatchEvent(startTable) */
 
-extensionExist.value = false
+extensionExist.value = true
 // Burada hep dinleyebiliriz ya da sadece bi kere de dinlenebilir
 window.addEventListener('language-catcher-exist', (e) => {
   const event = e as CustomEvent
 
   if (event.detail.languageCatcherExist) {
     extensionExist.value = true
-     console.log('extensionExist.value', extensionExist.value);
+    console.log('extensionExist.value', extensionExist.value)
   } else {
     extensionExist.value = false
   }
 })
 
 window.addEventListener('languageCatcherResult', async (e) => {
-  /* loadingButton.value = false; */
   console.log('Result from extension', e)
   const event = e as CustomEvent
   const language = event.detail.language
@@ -107,8 +87,6 @@ window.addEventListener('languageCatcherResult', async (e) => {
         console.log('sorted languages', languagesResponse.data)
       }
     }
-
-
   } catch (error) {
     console.log(error)
   }
@@ -150,6 +128,7 @@ const sendUrlToExtension = () => {
   if (url.value === '' || !url.value.includes('http')) {
     loadingButton.value = false
     toast.error('Url geçerli değil')
+    console.log('url geçerli değil')
     return
   }
   const sendedURL = new CustomEvent('language-catcher-start', {
@@ -159,7 +138,55 @@ const sendUrlToExtension = () => {
     }
   })
 
+  chrome.runtime.sendMessage(
+    {
+      action: 'language-catcher-start',
+      url: url.value
+    },
+    async (response) => {
+      if (chrome.runtime.lastError) {
+        console.error(chrome.runtime.lastError.message)
+      } else {
+        console.log('Response received:', response)
+
+        const resultArray: extensionResponse[] = response
+        console.log("result array", resultArray);
+        try {
+          for (let index = 0; index < resultArray.length; index++) {
+            const element = resultArray[index]
+            console.log('element', element)
+            const response = await axios.post('http://localhost:5000/api/addLanguage', {
+              email: user.value,
+              languageData: element
+            })
+
+            if (index === resultArray.length - 1) {
+              const languagesResponse = await axios.get(
+                'http://localhost:5000/api/getUserLanguages',
+                {
+                  params: { email: response.data.user.email }
+                }
+              )
+              console.log('language response', languagesResponse.data)
+
+              returnedValues.value = languagesResponse.data
+              tempReturnedValues.value = languagesResponse.data
+              loadingButton.value = false
+
+              console.log('sorted languages', languagesResponse.data)
+            }
+          }
+        } catch (error) {
+          console.log(error)
+        }
+
+        url.value = ''
+      }
+    }
+  )
+  console.log('event dispatched')
   window.dispatchEvent(sendedURL)
+  console.log('event dispatched 2')
 }
 
 const logout = async () => {
@@ -222,7 +249,6 @@ const sortUrls = () => {
   console.log('sorted names ', returnedValues.value)
 }
 
-
 const deleteItemsFunc = (id: string) => {
   console.log('received id ', id)
   if (deleteItemsList.value.includes(id)) {
@@ -264,7 +290,7 @@ const deleteItems = async () => {
   }
 }
 
-const extensionId = 'bkoahppiepfhhkofbhlagafcbklmdedi'
+/* const extensionId = 'bkoahppiepfhhkofbhlagafcbklmdedi'
 const messageBody = 'exist'
 if (chrome?.runtime?.sendMessage) {
   chrome.runtime.sendMessage(extensionId, messageBody, function (response) {
@@ -272,7 +298,7 @@ if (chrome?.runtime?.sendMessage) {
   })
 } else {
   console.log('The extension is NOT installed.')
-}
+} */
 
 const openFilter = ref<boolean>(false)
 const searchedUrl = ref<string>('')
@@ -323,11 +349,32 @@ watch(searchedUrl, searchUrl)
 </script>
 
 <template>
-  <div id="popup"class="h-full w-full">
-  
+  <div id="popup" class="h-full w-full">
     <div class="m-a w-full h-full">
-     
-      <div class="mx-a  w-[100%] rounded-lg lg:w-[100%]">
+      <div class="m-a relative inline-block flex max-w-[600px] items-center justify-center">
+        <div v-if="extensionExist" class="w-full">
+          <input
+            type="text"
+            v-model="url"
+            :placeholder="extensionExist ? 'URL giriniz' : 'Eklentiniz aktif değil'"
+            :disabled="extensionExist ? false : true"
+            class="bg-#FCFCFC border-b-coolGray w-full rounded-3xl border p-4 focus:border-none focus:outline-[#DCE2EE]"
+          />
+          <button
+            class="absolute right-0 h-full rounded-r-3xl bg-[#2F33B0] p-4 text-white transition duration-300 ease-in-out hover:bg-[#3E83F7]"
+            @click="sendUrlToExtension()"
+          >
+            Search
+          </button>
+        </div>
+        <div v-else>
+          <div class="notExistAlert text-red ma rounded-md p-5 text-xl">
+            Eklenti aktif değil !!!
+          </div>
+        </div>
+      </div>
+
+      <div class="mx-a w-[100%] rounded-lg lg:w-[100%]">
         <div class="filters">
           <div class="mb-2 flex w-full items-center justify-end">
             <div class="flex items-center">
@@ -413,7 +460,8 @@ watch(searchedUrl, searchUrl)
                 </div>
               </div>
               <div class="">
-                <div v-if="appReady" class=" w-full overflow-y-auto"> <!--  max-h-500px -->
+                <div v-if="appReady" class="w-full overflow-y-auto">
+                  <!--  max-h-500px -->
                   <div v-for="(value, index) in returnedValues" :key="value._id">
                     <UrlCard
                       :email="user"
