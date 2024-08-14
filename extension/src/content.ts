@@ -66,7 +66,7 @@ window.addEventListener('language-catcher-start', (e) => {
 })
 
 
-const languageCatcherStart = (url: string) => {
+/* const languageCatcherStart = (url: string) : Promise<ExtensionResponse[]>   => {
   const urlList: string[] = url.split(',').map((url: string) => url.trim())
   console.log('domaain ', urlList)
 
@@ -74,9 +74,82 @@ const languageCatcherStart = (url: string) => {
 
   const languageCatcherResultArray: ExtensionResponse[] = []
 
-  return recurciveProcess(url, languageCatcherResultArray, urlList, index)
+  const resultArray =  recurciveProcess(url, languageCatcherResultArray, urlList, index)
+  console.log("result array lang start " , resultArray);
+  console.log("languageCatcherResultArray lang start " , languageCatcherResultArray);
+  return languageCatcherResultArray
 }
+ */
+const languageCatcherStart = (url: string): Promise<ExtensionResponse[]> => {
+  const urlList: string[] = url.split(',').map((url: string) => url.trim());
+  console.log('domain ', urlList);
 
+  let index = 0;
+  const languageCatcherResultArray: ExtensionResponse[] = [];
+
+  return new Promise((resolve, reject) => {
+    const processNextURL = (index: number) => {
+      if (index >= urlList.length) {
+        resolve(languageCatcherResultArray);
+        return;
+      }
+
+      recurciveProcess(urlList[index], languageCatcherResultArray, urlList, index)
+        .then(() => processNextURL(index + 1))
+        .catch((error) => reject(error));
+    };
+
+    processNextURL(index);
+  });
+};
+
+const recurciveProcess = (
+  URL: string,
+  languageCatcherResultArray: ExtensionResponse[],
+  urlList: string[],
+  index: number
+): Promise<void> => {
+  return new Promise((resolve, reject) => {
+    chrome.runtime.sendMessage({ message: 'URL-sended', url: urlList[index] }, (response: any) => {
+      if (chrome.runtime.lastError) {
+        return reject(chrome.runtime.lastError);
+      }
+
+      console.log('message sent to background to run in application');
+      console.log('response from background for url sent for application ', response);
+
+      let langName: string = '-';
+      let langNativeName: string = '-';
+      const status = response.language === 'not detected' ? 'failed' : 'completed';
+      if (status === 'completed') {
+        langName = languages[response.language].name;
+        langNativeName = languages[response.language].nativeName;
+      }
+      const date = new Date();
+      console.log('real values : ', response.realValues);
+      const languageCatcherResult = new CustomEvent('languageCatcherResult', {
+        detail: {
+          status: status,
+          domain: urlList[index],
+          language: response.language,
+          languageFetchedFrom: response.findedPlaces,
+          langName: langName,
+          langNativeName: langNativeName,
+          languageLocation: response.languageLocation,
+          languageAccuracy: response.accuracy,
+          realValues: response.realValues,
+          date: date
+        }
+      });
+
+      languageCatcherResultArray.push(languageCatcherResult.detail);
+
+      sendProgressEvent(index + 1, urlList.length);
+
+      resolve();
+    });
+  });
+};
 
 const sendProgressEvent = (index: number, arrayLength: number) => {
   const updateProgress = new CustomEvent('updateProgress', {
@@ -87,12 +160,12 @@ const sendProgressEvent = (index: number, arrayLength: number) => {
   window.dispatchEvent(updateProgress)
 }
 
-const recurciveProcess = (
+/* const recurciveProcess = (
   URL: string,
   languageCatcherResultArray: ExtensionResponse[],
   urlList: string[],
   index: number
-) => {
+) : ExtensionResponse[] | null => {
   chrome.runtime.sendMessage({ message: 'URL-sended', url: urlList[index] }, (response: any) => {
     console.log('message sent to background to run in application')
     console.log('response from background for url sended for application ', response)
@@ -137,7 +210,8 @@ const recurciveProcess = (
       return languageCatcherResultArray;
     }
   })
-}
+  return null
+} */
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   console.log('who is sender', sender)
@@ -166,8 +240,20 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       removeTableContent()
     }
   } else if (request.action === 'start-language-catcher') {
-    sendResponse(languageCatcherStart(request.url))
-    return true 
+   /*  const responseArray :  ExtensionResponse[]   = languageCatcherStart(request.url)
+    console.log('responseArray:', responseArray);
+    sendResponse(responseArray) */
+    languageCatcherStart(request.url)
+      .then((responseArray) => {
+        console.log('responseArray:', responseArray);
+        sendResponse(responseArray);
+      })
+      .catch((error) => {
+        console.error('Error processing language catcher:', error);
+        sendResponse([]);
+      });
+    return true; // Asynchronous response
+    /* return true  */
   }
   return true // şurası return true olunca çalıştı
 })

@@ -125,6 +125,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         tabs[0].id,
         { action: 'start-language-catcher' , url: request.url},
         (response) => {
+          console.log("response geldi gözüküyo");
           console.log("responsee " , response);
            sendResponse(response)
            }
