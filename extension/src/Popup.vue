@@ -374,7 +374,7 @@ watch(searchedUrl, searchUrl)
         </div>
       </div>
 
-      <div class="mx-a w-[100%] rounded-lg lg:w-[100%]">
+      <div class="mx-a w-[100%] mt-5 rounded-lg lg:w-[100%]">
         <div class="filters">
           <div class="mb-2 flex w-full items-center justify-end">
             <div class="flex items-center">
