@@ -17,6 +17,12 @@ const realValues: RealValues = {
   realLangLocalStorage: '',
   realLangMeta: ''
 }
+window.addEventListener('existUser', (e) => {
+  const event = e as CustomEvent
+  console.log('evetn')
+
+  console.log('event', event.detail.user)
+})
 
 let isInjected = true
 
@@ -24,6 +30,7 @@ function showTableContent() {
   const container = document.getElementById('showTable')
   if (container) {
     const iframe = document.createElement('iframe')
+    /*  iframe.src = 'http://localhost:5173/' */
     iframe.src = chrome.runtime.getURL('popup.html')
     iframe.id = 'popupIframe'
     iframe.style.width = '100%'
@@ -65,7 +72,6 @@ window.addEventListener('language-catcher-start', (e) => {
   recurciveProcess(url, languageCatcherResultArray, urlList, index)
 })
 
-
 /* const languageCatcherStart = (url: string) : Promise<ExtensionResponse[]>   => {
   const urlList: string[] = url.split(',').map((url: string) => url.trim())
   console.log('domaain ', urlList)
@@ -81,27 +87,27 @@ window.addEventListener('language-catcher-start', (e) => {
 }
  */
 const languageCatcherStart = (url: string): Promise<ExtensionResponse[]> => {
-  const urlList: string[] = url.split(',').map((url: string) => url.trim());
-  console.log('domain ', urlList);
+  const urlList: string[] = url.split(',').map((url: string) => url.trim())
+  console.log('domain ', urlList)
 
-  let index = 0;
-  const languageCatcherResultArray: ExtensionResponse[] = [];
+  let index = 0
+  const languageCatcherResultArray: ExtensionResponse[] = []
 
   return new Promise((resolve, reject) => {
     const processNextURL = (index: number) => {
       if (index >= urlList.length) {
-        resolve(languageCatcherResultArray);
-        return;
+        resolve(languageCatcherResultArray)
+        return
       }
 
       recurciveProcess(urlList[index], languageCatcherResultArray, urlList, index)
         .then(() => processNextURL(index + 1))
-        .catch((error) => reject(error));
-    };
+        .catch((error) => reject(error))
+    }
 
-    processNextURL(index);
-  });
-};
+    processNextURL(index)
+  })
+}
 
 const recurciveProcess = (
   URL: string,
@@ -112,21 +118,21 @@ const recurciveProcess = (
   return new Promise((resolve, reject) => {
     chrome.runtime.sendMessage({ message: 'URL-sended', url: urlList[index] }, (response: any) => {
       if (chrome.runtime.lastError) {
-        return reject(chrome.runtime.lastError);
+        return reject(chrome.runtime.lastError)
       }
 
-      console.log('message sent to background to run in application');
-      console.log('response from background for url sent for application ', response);
+      console.log('message sent to background to run in application')
+      console.log('response from background for url sent for application ', response)
 
-      let langName: string = '-';
-      let langNativeName: string = '-';
-      const status = response.language === 'not detected' ? 'failed' : 'completed';
+      let langName: string = '-'
+      let langNativeName: string = '-'
+      const status = response.language === 'not detected' ? 'failed' : 'completed'
       if (status === 'completed') {
-        langName = languages[response.language].name;
-        langNativeName = languages[response.language].nativeName;
+        langName = languages[response.language].name
+        langNativeName = languages[response.language].nativeName
       }
-      const date = new Date();
-      console.log('real values : ', response.realValues);
+      const date = new Date()
+      console.log('real values : ', response.realValues)
       const languageCatcherResult = new CustomEvent('languageCatcherResult', {
         detail: {
           status: status,
@@ -140,16 +146,16 @@ const recurciveProcess = (
           realValues: response.realValues,
           date: date
         }
-      });
+      })
 
-      languageCatcherResultArray.push(languageCatcherResult.detail);
+      languageCatcherResultArray.push(languageCatcherResult.detail)
 
-      sendProgressEvent(index + 1, urlList.length);
+      sendProgressEvent(index + 1, urlList.length)
 
-      resolve();
-    });
-  });
-};
+      resolve()
+    })
+  })
+}
 
 const sendProgressEvent = (index: number, arrayLength: number) => {
   const updateProgress = new CustomEvent('updateProgress', {
@@ -240,19 +246,19 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       removeTableContent()
     }
   } else if (request.action === 'start-language-catcher') {
-   /*  const responseArray :  ExtensionResponse[]   = languageCatcherStart(request.url)
+    /*  const responseArray :  ExtensionResponse[]   = languageCatcherStart(request.url)
     console.log('responseArray:', responseArray);
     sendResponse(responseArray) */
     languageCatcherStart(request.url)
       .then((responseArray) => {
-        console.log('responseArray:', responseArray);
-        sendResponse(responseArray);
+        console.log('responseArray:', responseArray)
+        sendResponse(responseArray)
       })
       .catch((error) => {
-        console.error('Error processing language catcher:', error);
-        sendResponse([]);
-      });
-    return true; // Asynchronous response
+        console.error('Error processing language catcher:', error)
+        sendResponse([])
+      })
+    return true // Asynchronous response
     /* return true  */
   }
   return true // şurası return true olunca çalıştı

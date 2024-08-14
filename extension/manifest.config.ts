@@ -46,6 +46,6 @@ export default defineManifest(() => ({
     }
   ]/* ,
   externally_connectable: {
-    matches: ["https://*.example.com/*" , "http://*.localhost:5173.com/*"]
-  } */
+    matches: ["http://localhost:5175/" ]
+  }  */
 }))

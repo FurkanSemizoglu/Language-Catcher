@@ -47,9 +47,14 @@ console.log("dispatcehd event");
 
 window.dispatchEvent(startTable) */
 
+window.addEventListener('existUser', (e) => {
+  const event = e as CustomEvent
+  console.log('event', event.detail.userExist)
+})
+
 extensionExist.value = true
-// Burada hep dinleyebiliriz ya da sadece bi kere de dinlenebilir
-window.addEventListener('language-catcher-exist', (e) => {
+
+/* window.addEventListener('language-catcher-exist', (e) => {
   const event = e as CustomEvent
 
   if (event.detail.languageCatcherExist) {
@@ -58,9 +63,9 @@ window.addEventListener('language-catcher-exist', (e) => {
   } else {
     extensionExist.value = false
   }
-})
+}) */
 
-window.addEventListener('languageCatcherResult', async (e) => {
+/* window.addEventListener('languageCatcherResult', async (e) => {
   console.log('Result from extension', e)
   const event = e as CustomEvent
   const language = event.detail.language
@@ -92,7 +97,9 @@ window.addEventListener('languageCatcherResult', async (e) => {
   }
 
   url.value = ''
-})
+}) */
+
+console.log('local storage', localStorage.getItem('user'))
 
 onMounted(async () => {
   console.log('token', token.value)
@@ -150,7 +157,7 @@ const sendUrlToExtension = () => {
         console.log('Response received:', response)
 
         const resultArray: extensionResponse[] = response
-        console.log("result array", resultArray);
+        console.log('result array', resultArray)
         try {
           for (let index = 0; index < resultArray.length; index++) {
             const element = resultArray[index]
@@ -344,15 +351,19 @@ const filterAccuracy = () => {
   console.log('returned values', returnedValues.value)
 }
 
+const userExist = ref<boolean>(false)
+const loginPage = ref<boolean>(false)
+
+import LoginPage from './components/LoginPage.vue'
 watch([highAccuracy, mediumAccuracy, lowAccuracy], filterAccuracy)
 watch(searchedUrl, searchUrl)
 </script>
 
 <template>
   <div id="popup" class="h-full w-full">
-    <div class="m-a w-full h-full">
+    <div v-if="!loginPage" class="m-a w-full h-full">
       <div class="m-a relative inline-block flex max-w-[600px] items-center justify-center">
-        <div v-if="extensionExist" class="w-full">
+        <div v-if="extensionExist && userExist" class="w-full">
           <input
             type="text"
             v-model="url"
@@ -367,9 +378,16 @@ watch(searchedUrl, searchUrl)
             Search
           </button>
         </div>
-        <div v-else>
+        <div v-else-if="!extensionExist">
           <div class="notExistAlert text-red ma rounded-md p-5 text-xl">
             Eklenti aktif değil !!!
+          </div>
+        </div>
+        <div v-else-if="!userExist">
+          <div class="notExistAlert text-red ma rounded-md p-5 text-xl">
+            Url aratmak için lütfen
+            <span class="text-blue cursor-pointer" @click="loginPage = !loginPage">giriş</span>
+            yapınız.
           </div>
         </div>
       </div>
@@ -497,6 +515,9 @@ watch(searchedUrl, searchUrl)
         </div>
       </div>
       <!-- </div> -->
+    </div>
+    <div v-else>
+      <LoginPage />
     </div>
   </div>
 
