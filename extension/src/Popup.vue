@@ -20,7 +20,7 @@ import LoadingBarCard from './components/LoadingBarCard.vue'
 import type { extensionResult, ExtensionResponse as extensionResponse } from './types'
 
 const checkbox = ref<boolean>(false)
-const token = ref<string | null>('')
+let token = ref<string | null>('')
 const user = ref<string>('')
 const url = ref<string>('')
 const loadingButton = ref<boolean>(false)
@@ -36,6 +36,8 @@ const tempReturnedValues = ref<extensionResult[]>([])
 const allItemsSelected = ref<boolean>(false)
 const deleteItemsList = ref<string[]>([])
 
+const userExist = ref<boolean>(false)
+const loginPage = ref<boolean>(false)
 /* const startTable = new CustomEvent('startTable', {
  
   detail: {
@@ -101,19 +103,26 @@ extensionExist.value = true
 
 console.log('local storage', localStorage.getItem('user'))
 
-onMounted(async () => {
-  console.log('token', token.value)
-
+const getTableDatas = async (token :string) => {
   try {
-    /*  const response = await axios.post('http://localhost:5000/auth/user', {
-      token: token.value
-    }); */
+    const response = await axios.post('http://localhost:5000/auth/user', {
+      token: token
+    })
 
-    /*  console.log(response.data);
-    user.value = response.data.user.email; */
-    user.value = 'furkan@gmail.com'
+    console.log(response.data)
+
+    if (response.data) {
+      userExist.value = true
+    } else {
+      userExist.value = false
+    }
+
+    user.value = response.data.user.email
+
+    // Burada bütün veriler gösterilecek  token yok ise yani başka apiye istek atılacak
+    /* user.value = 'furkan@gmail.com' */
     const languagesResponse = await axios.get('http://localhost:5000/api/getUserLanguages', {
-      params: { email: 'furkan@gmail.com' }
+      params: { email: user.value }
     })
 
     returnedValues.value = languagesResponse.data
@@ -126,6 +135,15 @@ onMounted(async () => {
   } catch (error) {
     console.log(error)
   }
+}
+
+onMounted(async () => {
+  console.log('token', token.value)
+  if (token.value === null) {
+    console.log('token null')
+    return
+  }
+  getTableDatas(token.value)
 })
 
 const sendUrlToExtension = () => {
@@ -351,12 +369,24 @@ const filterAccuracy = () => {
   console.log('returned values', returnedValues.value)
 }
 
-const userExist = ref<boolean>(false)
-const loginPage = ref<boolean>(false)
-
 import LoginPage from './components/LoginPage.vue'
+import AuthPage from './components/AuthPage.vue'
+
 watch([highAccuracy, mediumAccuracy, lowAccuracy], filterAccuracy)
 watch(searchedUrl, searchUrl)
+
+const pageChecker = (isLoggedIn: boolean) => {
+  if (isLoggedIn) {
+    loginPage.value = false
+  } else {
+    loginPage.value = true
+  }
+}
+
+const tokenTaken = (tokenn: string) => {
+  // aslında tokenı local storagedan alıyor
+  token.value = tokenn
+}
 </script>
 
 <template>
@@ -394,6 +424,7 @@ watch(searchedUrl, searchUrl)
 
       <div class="mx-a w-[100%] mt-5 rounded-lg lg:w-[100%]">
         <div class="filters">
+          <div class="flex items-center">{{ user }}</div>
           <div class="mb-2 flex w-full items-center justify-end">
             <div class="flex items-center">
               <div class="mr-2 rounded-lg border">
@@ -517,7 +548,7 @@ watch(searchedUrl, searchUrl)
       <!-- </div> -->
     </div>
     <div v-else>
-      <LoginPage />
+      <AuthPage @main-page="pageChecker" @token="getTableDatas" />
     </div>
   </div>
 

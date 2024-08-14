@@ -1,83 +1,89 @@
 <script setup lang="ts">
-import axios from 'axios';
-import { ref, watch } from 'vue';
+import axios from 'axios'
+import { ref, watch , defineEmits  } from 'vue'
 
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+import { faEye } from '@fortawesome/free-solid-svg-icons'
+import { faEyeSlash } from '@fortawesome/free-solid-svg-icons'
+import { useToast } from 'vue-toastification'
+import RegisterPage from './RegisterPage.vue'
 
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { faEye } from '@fortawesome/free-solid-svg-icons';
-import { faEyeSlash } from '@fortawesome/free-solid-svg-icons';
-import { useToast } from 'vue-toastification';
-import RegisterPage from './RegisterPage.vue';
+const email = ref<string>('')
+const password = ref<string>('')
 
-const email = ref<string>('');
-const password = ref<string>('');
+const toast = useToast()
 
+const passwordFieldType = ref('password')
 
-const toast = useToast();
-
-const passwordFieldType = ref('password');
-
-const loginPage = ref<boolean>(true);
+const loginPage = ref<boolean>(true)
 
 const togglePasswordVisibility = () => {
-  passwordFieldType.value = passwordFieldType.value === 'password' ? 'text' : 'password';
-};
+  passwordFieldType.value = passwordFieldType.value === 'password' ? 'text' : 'password'
+}
 
-const emptyInput = ref<boolean>(true);
+const emptyInput = ref<boolean>(true)
 
 watch([email, password], () => {
   if (email.value && password.value) {
-    console.log('email and password found');
-    emptyInput.value = false;
+    console.log('email and password found')
+    emptyInput.value = false
   } else {
-    console.log('email or password not found');
-    emptyInput.value = true;
+    console.log('email or password not found')
+    emptyInput.value = true
   }
-});
+})
 
+// burayı koyduktan sonra hata çıktı
+const emit = defineEmits<{
+  (e: 'mainPage', isLoggedIn: boolean): void;
+  (e: 'token', token: string): void;
+  (e : 'page', page: string): void;
+}>();
 
 const login = async () => {
-  console.log(email.value + ' ' + password.value);
+  console.log(email.value + ' ' + password.value)
 
   if (email.value && password.value) {
     const bodyFormData = {
       email: email.value,
       password: password.value
-    };
+    }
 
     try {
       const response = await axios.post('http://localhost:5000/auth/login', bodyFormData, {
         headers: {
           'Content-Type': 'application/json'
         }
-      });
+      })
 
-      console.log(response.data);
+      console.log(response.data)
 
       if (response.status) {
-        toast.success('Login successful');
+        toast.success('Login successful')
         /*    localStorage.setItem('token', response.data.token); */
-        localStorage.setItem('token', response.data.token);
+        localStorage.setItem('token', response.data.token)
+        emit('token', response.data.token)
+        emit('mainPage', true)
       }
     } catch (err) {
       if (axios.isAxiosError(err)) {
-        console.error('Axios error status:', err.response?.status);
-        console.error('Axios error data:', err.response?.data);
+        console.error('Axios error status:', err.response?.status)
+        console.error('Axios error data:', err.response?.data)
 
-        toast.error(err.response?.data.message);
+        toast.error(err.response?.data.message)
       } else {
-        console.error('Unexpected error:', err);
-        console.log('Unexpected error occurred');
+        console.error('Unexpected error:', err)
+        console.log('Unexpected error occurred')
       }
     }
   } else {
-    toast.error('Email or password input not found');
+    toast.error('Email or password input not found')
   }
-};
+}
 </script>
 <template>
   <div v-if="loginPage" class="m-0 flex h-screen w-full flex items-center justify-center">
-    <div class="flex flex-col  w-full items-center justify-center bg-[#FFFFFF] p-4 ">
+    <div class="flex flex-col w-full items-center justify-center bg-[#FFFFFF] p-4">
       <div class="mx-a ml-4 flex w-[90%] flex-col items-center justify-center">
         <div class="font-900 mb-4 text-3xl text-[#2C39A6]">Giriş</div>
         <div class="mt-2 flex w-full flex-col items-center justify-center gap-4">
@@ -108,14 +114,12 @@ const login = async () => {
           </div>
 
           <div class="mt-2 flex gap-4">
-            <RouterLink to="/register"
-              ><button
-                class="font-500 cursor-pointer  text-lg rounded-md border-none bg-[#FFFFFF] p-4 text-[#2C39A6] transition-colors duration-300 ease-in-out hover:bg-[#E7E8EE]"
-                @click="loginPage = false"
-                >
-                Kayıt ol
-              </button>
-            </RouterLink>
+            <button
+              class="font-500 cursor-pointer text-lg rounded-md border-none bg-[#FFFFFF] p-4 text-[#2C39A6] transition-colors duration-300 ease-in-out hover:bg-[#E7E8EE]"
+              @click="$emit('page', 'register')"
+            >
+              Kayıt ol
+            </button>
 
             <button
               class="font-500 cursor-pointer text-lg rounded-md border-none bg-[#FFFFFF] p-4 text-[#2C39A6] transition-colors duration-300 ease-in-out hover:bg-[#E7E8EE]"
@@ -132,7 +136,7 @@ const login = async () => {
   </div>
   <div v-else>
     <RegisterPage />
-  </div>  
+  </div>
   <div class="absolute bottom-0 right-0">
     <img width="50" src="../../public/efilliBar.svg" alt="Logo" />
   </div>
