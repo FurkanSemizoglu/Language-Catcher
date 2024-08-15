@@ -141,6 +141,19 @@ onMounted(async () => {
   console.log('token', token.value)
   if (token.value === null) {
     console.log('token null')
+    const response = await axios.get('http://localhost:5000/api/getAllLanguages')
+  /*   if (response.data) {
+      userExist.value = true
+    } else {
+      userExist.value = false
+    } */
+
+    returnedValues.value = response.data
+    tempReturnedValues.value = response.data
+    console.log('languagesss', response.data)
+
+
+    appReady.value = true
     return
   }
   getTableDatas(token.value)

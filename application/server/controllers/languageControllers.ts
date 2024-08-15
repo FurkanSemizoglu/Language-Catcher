@@ -158,4 +158,14 @@ const deletesLanguages = async (req: Request, res: Response) => {
   }
 };
 
-module.exports = { addLanguageToUser, getUserLanguages, deleteLanguage , deletesLanguages };
+
+const getAllLanguages = async (req: Request, res: Response) => {
+  try {
+    const languages = await Language.find({}).populate("languageLocation").populate("realLangValues");
+    res.status(200).json(languages);
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+}
+
+module.exports = { addLanguageToUser, getUserLanguages, deleteLanguage , deletesLanguages , getAllLanguages };

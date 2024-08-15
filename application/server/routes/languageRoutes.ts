@@ -1,6 +1,6 @@
 const express = require("express");
 const cors = require("cors");
-const { addLanguageToUser , getUserLanguages , deleteLanguage , deletesLanguages} = require("../controllers/languageControllers");
+const { addLanguageToUser , getUserLanguages , deleteLanguage , deletesLanguages , getAllLanguages} = require("../controllers/languageControllers");
 
 const router = express.Router();
 
@@ -10,6 +10,7 @@ router.post('/addLanguage', addLanguageToUser);
 router.get('/getUserLanguages', getUserLanguages);
 router.delete('/deleteLanguage', deleteLanguage);
 router.delete('/deletesLanguages' , deletesLanguages)
+router.get('/getAllLanguages', getAllLanguages)
 /* 
 router.get('/api/getLanguageList', getLanguageList);
 router.post('/api/getLanguageById', getLanguageById);
