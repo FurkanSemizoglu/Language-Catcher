@@ -134,11 +134,15 @@ const deletesLanguages = async (req: Request, res: Response) => {
     }
 
     if (!Array.isArray(languageIdList)) {
-      return res.status(400).json({ error: "languageIdList should be an array" });
+      return res
+        .status(400)
+        .json({ error: "languageIdList should be an array" });
     }
 
     for (const element of languageIdList) {
-      const language = await Language.findById(element).populate("languageLocation").populate("realLangValues");
+      const language = await Language.findById(element)
+        .populate("languageLocation")
+        .populate("realLangValues");
 
       if (language && language.languageLocation && language.realLangValues) {
         await LanguageLocation.findByIdAndDelete(language.languageLocation._id);
@@ -150,7 +154,7 @@ const deletesLanguages = async (req: Request, res: Response) => {
     user.languageUrls = user.languageUrls.filter(
       (lang: any) => !languageIdList.includes(lang._id.toString())
     );
-   
+
     await user.save();
     res.status(200).json(user.languageUrls);
   } catch (error: any) {
@@ -158,14 +162,49 @@ const deletesLanguages = async (req: Request, res: Response) => {
   }
 };
 
-
 const getAllLanguages = async (req: Request, res: Response) => {
   try {
-    const languages = await Language.find({}).populate("languageLocation").populate("realLangValues");
+    const languages = await Language.find({})
+      .populate("languageLocation")
+      .populate("realLangValues");
     res.status(200).json(languages);
   } catch (error: any) {
     res.status(500).json({ error: error.message });
   }
-}
+};
 
-module.exports = { addLanguageToUser, getUserLanguages, deleteLanguage , deletesLanguages , getAllLanguages };
+const addLanguagesToGivenUser = async (req: Request, res: Response) => {
+  try {
+    const { email, languages } = req.body;
+    const user = await User.findOne({ email }).populate({
+      path: "languageUrls",
+      populate: [
+        {
+          path: "languageLocation",
+          model: "LanguageLocation",
+        },
+        {
+          path: "realLangValues",
+          model: "RealLangValues",
+        },
+      ],
+    });
+
+    if (!user) {
+      const newUser = await User.create({
+        email,
+        password: "123456",
+      });
+    }
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+module.exports = {
+  addLanguageToUser,
+  getUserLanguages,
+  deleteLanguage,
+  deletesLanguages,
+  getAllLanguages,
+};

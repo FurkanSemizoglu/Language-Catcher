@@ -48,11 +48,11 @@ const loginPage = ref<boolean>(false)
 console.log("dispatcehd event");
 
 window.dispatchEvent(startTable) */
-
+/* 
 window.addEventListener('existUser', (e) => {
   const event = e as CustomEvent
   console.log('event', event.detail.userExist)
-})
+}) */
 
 extensionExist.value = true
 
@@ -101,62 +101,167 @@ extensionExist.value = true
   url.value = ''
 }) */
 
+/* chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  console.log("mesaj bekleniyor" ,request);
+  if (request.message === 'existUser') {
+    console.log('user exist', request.user)
+    userExist.value = true
+    user.value = request.user
+  }
+})
+
+
+console.log("userrr" , localStorage.getItem('user')) */
+
+/* chrome.storage.local.get('userExistence', (data) => {
+  if (data.userExistence && data.userExistence.message === 'existUser') {
+    console.log('user exist', data.userExistence.user)
+    userExist.value = true
+    user.value = data.userExistence.user
+  }
+}) */
+
 console.log('local storage', localStorage.getItem('user'))
 
-const getTableDatas = async (token :string) => {
-  try {
-    const response = await axios.post('http://localhost:5000/auth/user', {
-      token: token
-    })
+const getTableDatas = async (token: string) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const response = await axios.post('http://localhost:5000/auth/user', {
+        token: token
+      })
 
-    console.log(response.data)
+      console.log(response.data)
 
-    if (response.data) {
-      userExist.value = true
-    } else {
-      userExist.value = false
-    }
+      if (response.data) {
+        userExist.value = true
+      } else {
+        userExist.value = false
+      }
 
-    user.value = response.data.user.email
+      user.value = response.data.user.email
 
-    // Burada bütün veriler gösterilecek  token yok ise yani başka apiye istek atılacak
-    /* user.value = 'furkan@gmail.com' */
-    const languagesResponse = await axios.get('http://localhost:5000/api/getUserLanguages', {
-      params: { email: user.value }
-    })
+      // Burada bütün veriler gösterilecek  token yok ise yani başka apiye istek atılacak
+      /* user.value = 'furkan@gmail.com' */
+      const languagesResponse = await axios.get('http://localhost:5000/api/getUserLanguages', {
+        params: { email: user.value }
+      })
 
-    returnedValues.value = languagesResponse.data
-    tempReturnedValues.value = languagesResponse.data
-    console.log('languagesss', languagesResponse.data)
-    /*  console.log('email ', response.data.user.email);
+      returnedValues.value = languagesResponse.data
+      tempReturnedValues.value = languagesResponse.data
+      console.log('languagesss', languagesResponse.data)
+      /*  console.log('email ', response.data.user.email);
     user.value = response.data.user.email; */
 
-    appReady.value = true
-  } catch (error) {
-    console.log(error)
-  }
+      appReady.value = true
+      resolve('success')
+    } catch (error) {
+      console.log(error)
+      reject('error')
+      // burada token expire olursa yapılcak işlemleri ayarla
+    }
+  })
+}
+
+const existUserhandler = async (email: string) => {
+  return new Promise(async (resolve, reject) => {
+    const bodyFormData = {
+      email: email,
+      password: 'Furkan55?'
+    }
+    const response = await axios.post('http://localhost:5000/auth/login', bodyFormData, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+    console.log('exist user handler', response.data)
+
+    /*     localStorage.deleteItem('token')  böyle bir kullanım yok
+     */
+    localStorage.removeItem('token')
+    console.log('token response ', response.data.token)
+
+    localStorage.setItem('token', response.data.token)
+    token.value = response.data.token
+    getTableDatas(response.data.token).then((response) => {
+      console.log('response', response)
+    })
+
+    resolve(response.data.token)
+
+    reject('error')
+  })
 }
 
 onMounted(async () => {
   console.log('token', token.value)
+  chrome.storage.local.get('userExistence', async (data) => {
+    if (data.userExistence && data.userExistence.message === 'existUser') {
+      console.log('user exist', data.userExistence.user)
+      userExist.value = true
+      user.value = data.userExistence.user
+      existUserhandler(user.value).then((response) => {
+        console.log('responseeeeee', response)
+
+        if (response) {
+          token.value = response as string
+          chrome.storage.local.clear()
+          localStorage.removeItem('token')
+        }
+      })
+      return
+    } /* else {
+      if (userExist.value) {
+        chrome.storage.local.clear()
+        return
+      } else {
+        if (token.value === null) {
+          console.log('token null')
+          const response = await axios.get('http://localhost:5000/api/getAllLanguages')
+
+          returnedValues.value = response.data
+          tempReturnedValues.value = response.data
+          console.log('languagesss', response.data)
+
+          appReady.value = true
+          return
+        } else if (!userExist) {
+          console.log('token verisi çalışıt')
+          getTableDatas(token.value)
+        }
+      }
+
+      console.log('buranın çalışmaması lazım')
+    } */
+  })
+
+  if (userExist.value) {
+    console.log('burda storage silindi')
+    chrome.storage.local.clear()
+    return
+  }
+
+  console.log("user existence " , userExist);
+
   if (token.value === null) {
     console.log('token null')
     const response = await axios.get('http://localhost:5000/api/getAllLanguages')
-  /*   if (response.data) {
-      userExist.value = true
-    } else {
-      userExist.value = false
-    } */
 
     returnedValues.value = response.data
     tempReturnedValues.value = response.data
     console.log('languagesss', response.data)
 
-
     appReady.value = true
     return
+  } else if (!userExist.value) {
+    console.log('token verisi çalışıt')
+    getTableDatas(token.value)
   }
-  getTableDatas(token.value)
+
+  console.log('buranın çalışmaması lazım')
+
+  /*   if (user.value !== '') {
+    console.log('user in mounted', user.value)
+  } */
 })
 
 const sendUrlToExtension = () => {
@@ -436,7 +541,7 @@ const tokenTaken = (tokenn: string) => {
       </div>
 
       <div class="mx-a w-[100%] mt-5 rounded-lg lg:w-[100%]">
-        <div class="filters">
+        <div class="filters flex items-center justify-between">
           <div class="flex items-center">{{ user }}</div>
           <div class="mb-2 flex w-full items-center justify-end">
             <div class="flex items-center">

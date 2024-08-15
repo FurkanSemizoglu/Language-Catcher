@@ -1,6 +1,5 @@
 console.log('background is running')
 
-
 import type { LanguageData } from './types'
 /* 
 chrome.storage.local.set({ variable: "exist" }); */
@@ -116,22 +115,34 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     return true
   } else if (request.action === 'showTable') {
     console.log('backgronn aldı mesajı')
+  } else if (request.message === 'existUser') {
+    console.log("bg mesajı aldı " , request.user);
+    const user = request.user
+
+    console.log("user : ", user);
+    /* localStorage.setItem('user', JSON.stringify(user)) */
+    chrome.runtime.sendMessage({
+      message: 'existUser',
+      user: request.user
+    })
+ 
+    chrome.storage.local.set({ userExistence : { message: 'existUser', user: user } });
+    return true
   }
 
   if (request.action === 'language-catcher-start') {
-    // Tüm content script'lere mesaj gönder
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs: any) => {
       chrome.tabs.sendMessage(
         tabs[0].id,
-        { action: 'start-language-catcher' , url: request.url},
+        { action: 'start-language-catcher', url: request.url },
         (response) => {
-          console.log("response geldi gözüküyo");
-          console.log("responsee " , response);
-           sendResponse(response)
-           }
+          console.log('response geldi gözüküyo')
+          console.log('responsee ', response)
+          sendResponse(response)
+        }
       )
     })
-    return true;
+    return true
     /* 
     chrome.tabs.query({}, (tabs) => {
       tabs.forEach(tab => {

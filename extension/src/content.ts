@@ -17,11 +17,13 @@ const realValues: RealValues = {
   realLangLocalStorage: '',
   realLangMeta: ''
 }
+
 window.addEventListener('existUser', (e) => {
   const event = e as CustomEvent
-  console.log('evetn')
-
   console.log('event', event.detail.user)
+  chrome.runtime.sendMessage({ message: 'existUser', user: event.detail.user }, (response) => {
+    console.log('response from background for existUser', response)
+  })
 })
 
 let isInjected = true
