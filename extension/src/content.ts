@@ -260,7 +260,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         console.error('Error processing language catcher:', error)
         sendResponse([])
       })
-    return true // Asynchronous response
+    return true 
     /* return true  */
   }
   return true // şurası return true olunca çalıştı
