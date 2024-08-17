@@ -240,7 +240,7 @@ onMounted(async () => {
     return
   }
 
-  console.log("user existence " , userExist);
+  console.log('user existence ', userExist)
 
   if (token.value === null) {
     console.log('token null')
@@ -591,8 +591,8 @@ const tokenTaken = (tokenn: string) => {
           <div class="block w-[100%] overflow-x-auto">
             <div class="min-w-800px block">
               <div
-                class="cols-7 font-600 min-h-65px grid rounded-t-lg border border-gray-300 bg-[#2F33B0] text-white"
-                style="grid-template-columns: 0.5fr 1.5fr 2fr 2fr 2fr 2fr 2fr"
+                class="cols-8 font-600 min-h-65px grid rounded-t-lg border border-gray-300 bg-[#2F33B0] text-white"
+                style="grid-template-columns: 0.5fr 1.5fr 2fr 2fr 2fr 2fr 2fr 2fr"
               >
                 <div class="flex h-full w-full items-center p-4">
                   <FontAwesomeIcon
@@ -606,11 +606,14 @@ const tokenTaken = (tokenn: string) => {
                 </div>
                 <div class="flex h-full w-full items-center p-4 hover:font-bold">URL</div>
                 <div class="flex h-full w-full items-center p-4">LANGUAGE</div>
-                <div class="flex h-full w-full items-center p-4">
+                <div class="flex h-full w-full items-center ">
                   <div>DETECTED PLACES</div>
                 </div>
                 <div class="flex h-full w-full items-center p-4">
                   <div>ACCURACY</div>
+                </div>
+                <div class="flex h-full w-full items-center p-4">
+                  USER
                 </div>
                 <div
                   class="flex h-full w-full cursor-pointer items-center justify-between p-4 hover:font-bold"
@@ -644,6 +647,7 @@ const tokenTaken = (tokenn: string) => {
                       :date="new Date(value.date)"
                       :index="index"
                       :allItemsSelected="allItemsSelected"
+                      :belongUser="value.belongUser.email"
                       @cardId="deleteItemsFunc"
                     />
                   </div>
@@ -652,6 +656,7 @@ const tokenTaken = (tokenn: string) => {
                   v-else
                   class="ma top-50 absolute z-50 flex h-full w-full items-center justify-center"
                 >
+                
                   <v-progress-circular
                     :size="150"
                     color="primary"

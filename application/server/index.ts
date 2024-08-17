@@ -2,9 +2,9 @@ import { request } from "express";
 import { mongo } from "mongoose";
 
 const express = require("express");
-const Express = require("express");
+/* const Express = require("express");
 const Request = require("express");
-const Response = require("express");
+const Response = require("express"); */
 const bodyParser = require("body-parser")
 
 const dotenv = require("dotenv");

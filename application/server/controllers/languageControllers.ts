@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import path from "path";
 const Language = require("../models/language");
 const User = require("../models/user");
 const LanguageLocation = require("../models/languageLocation");
@@ -41,6 +42,7 @@ const addLanguageToUser = async (req: Request, res: Response) => {
       languageAccuracy: languageData.languageAccuracy,
       realLangValues: realLangValue._id,
       date: languageData.date,
+      belongUser: user._id
     });
     await language.save();
 
@@ -77,9 +79,14 @@ const getUserLanguages = async (req: Request, res: Response) => {
           path: "realLangValues",
           model: "RealLangValues",
         },
+        {
+          path: "belongUser",
+          model: "User",
+          select: "email"
+        }
       ],
     });
-
+    console.log(user.languageUrls);
     res.status(200).json(user.languageUrls);
   } catch (error: any) {
     res.status(500).json({ error: error.message });
@@ -166,7 +173,8 @@ const getAllLanguages = async (req: Request, res: Response) => {
   try {
     const languages = await Language.find({})
       .populate("languageLocation")
-      .populate("realLangValues");
+      .populate("realLangValues")
+      .populate("belongUser", "email");
     res.status(200).json(languages);
   } catch (error: any) {
     res.status(500).json({ error: error.message });

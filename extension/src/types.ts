@@ -263,6 +263,7 @@ interface urlCardResultProps {
   date : Date;
   index : number;
   allItemsSelected : boolean;
+  belongUser : string;
 }
 interface extensionResult {
   _id: string
@@ -276,6 +277,10 @@ interface extensionResult {
   languageAccuracy: string
   realLangValues: realLangValues
   date: Date
+  belongUser : {
+    email: string
+    _id: string
+  }
 }
 
 interface RealValues {

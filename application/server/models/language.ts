@@ -36,7 +36,13 @@ const languageSchema  = new mongoose.Schema({
     },
     date: {
         type: Date,
+    },
+    belongUser: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true  
     }
+
 
 }, {timestamps : true});
 

@@ -24,7 +24,6 @@ const languageLocationSchema = new mongoose.Schema({
         type: Boolean,
         required: true
     }
-
 }, {timestamps : true});
 
 const LanguageLocation = mongoose.model('LanguageLocation', languageLocationSchema ,"LanguageLocationData");
