@@ -142,10 +142,11 @@ const getTableDatas = async (token: string) => {
 
       // Burada bütün veriler gösterilecek  token yok ise yani başka apiye istek atılacak
       /* user.value = 'furkan@gmail.com' */
-      const languagesResponse = await axios.get('http://localhost:5000/api/getUserLanguages', {
+      const languagesResponse = await axios.get('http://localhost:5000/api/getAllLanguages')
+   /*    const languagesResponse = await axios.get('http://localhost:5000/api/getUserLanguages', {
         params: { email: user.value }
       })
-
+ */
       returnedValues.value = languagesResponse.data
       tempReturnedValues.value = languagesResponse.data
       console.log('languagesss', languagesResponse.data)
@@ -164,6 +165,7 @@ const getTableDatas = async (token: string) => {
 
 const existUserhandler = async (email: string) => {
   return new Promise(async (resolve, reject) => {
+ /*    const response = await axios.get('http://localhost:5000/api/getAllLanguages') */
     const bodyFormData = {
       email: email,
       password: 'Furkan55?'

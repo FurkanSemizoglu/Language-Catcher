@@ -99,7 +99,8 @@ const deleteLanguage = async (req: Request, res: Response) => {
     const user = await User.findOne({ email });
     const language = await Language.findById(languageId)
       .populate("languageLocation")
-      .populate("realLangValues");
+      .populate("realLangValues")
+      .populate("belongUser", "email");
 
     await LanguageLocation.findByIdAndDelete(language.languageLocation._id);
     await RealLangValues.findByIdAndDelete(language.realLangValues._id);
@@ -133,6 +134,11 @@ const deletesLanguages = async (req: Request, res: Response) => {
           path: "realLangValues",
           model: "RealLangValues",
         },
+        {
+          path: "belongUser",
+          model: "User",
+          select: "email"
+        }
       ],
     });
 
@@ -149,8 +155,8 @@ const deletesLanguages = async (req: Request, res: Response) => {
     for (const element of languageIdList) {
       const language = await Language.findById(element)
         .populate("languageLocation")
-        .populate("realLangValues");
-
+        .populate("realLangValues")
+        .populate("belongUser", "email");
       if (language && language.languageLocation && language.realLangValues) {
         await LanguageLocation.findByIdAndDelete(language.languageLocation._id);
         await RealLangValues.findByIdAndDelete(language.realLangValues._id);
