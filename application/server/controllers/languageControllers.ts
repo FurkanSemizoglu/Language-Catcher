@@ -42,7 +42,7 @@ const addLanguageToUser = async (req: Request, res: Response) => {
       languageAccuracy: languageData.languageAccuracy,
       realLangValues: realLangValue._id,
       date: languageData.date,
-      belongUser: user._id
+      belongUser: user._id,
     });
     await language.save();
 
@@ -82,8 +82,8 @@ const getUserLanguages = async (req: Request, res: Response) => {
         {
           path: "belongUser",
           model: "User",
-          select: "email"
-        }
+          select: "email",
+        },
       ],
     });
     console.log(user.languageUrls);
@@ -97,6 +97,10 @@ const deleteLanguage = async (req: Request, res: Response) => {
   try {
     const { email, languageId } = req.query;
     const user = await User.findOne({ email });
+    let languages = await Language.find({})
+      .populate("languageLocation")
+      .populate("realLangValues")
+      .populate("belongUser", "email");
     const language = await Language.findById(languageId)
       .populate("languageLocation")
       .populate("realLangValues")
@@ -108,8 +112,9 @@ const deleteLanguage = async (req: Request, res: Response) => {
     user.languageUrls = user.languageUrls.filter(
       (lang: any) => lang._id != languageId
     );
+    languages = languages.filter((lang: any) => lang._id != languageId);
     await user.save();
-    res.status(200).json(user.languageUrls);
+    res.status(200).json(languages);
   } catch (error: any) {
     res.status(500).json({ error: error.message });
   }
@@ -137,8 +142,8 @@ const deletesLanguages = async (req: Request, res: Response) => {
         {
           path: "belongUser",
           model: "User",
-          select: "email"
-        }
+          select: "email",
+        },
       ],
     });
 
@@ -152,6 +157,11 @@ const deletesLanguages = async (req: Request, res: Response) => {
         .json({ error: "languageIdList should be an array" });
     }
 
+    let languages = await Language.find({})
+      .populate("languageLocation")
+      .populate("realLangValues")
+      .populate("belongUser", "email");
+
     for (const element of languageIdList) {
       const language = await Language.findById(element)
         .populate("languageLocation")
@@ -164,12 +174,16 @@ const deletesLanguages = async (req: Request, res: Response) => {
       }
     }
 
+    languages = languages.filter(
+      (lang: any) => !languageIdList.includes(lang._id.toString())
+    );
+
     user.languageUrls = user.languageUrls.filter(
       (lang: any) => !languageIdList.includes(lang._id.toString())
     );
 
     await user.save();
-    res.status(200).json(user.languageUrls);
+    res.status(200).json(languages);
   } catch (error: any) {
     res.status(500).json({ error: error.message });
   }
