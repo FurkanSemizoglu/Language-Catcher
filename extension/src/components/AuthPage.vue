@@ -1,5 +1,7 @@
 <script setup lang="ts">
+import LoginCard from './LoginCard.vue';
 import LoginPage from './LoginPage.vue'
+import RegisterCard from './RegisterCard.vue';
 import RegisterPage from './RegisterPage.vue'
 import { ref , defineEmits} from 'vue'
 
@@ -29,9 +31,11 @@ const token = (token: string) => {
 
 <template>
   <div v-if="loginPage">
-    <LoginPage @page="changePage" @main-page="mainPage" @token="token"/>
+    <LoginCard  @page="changePage" @main-page="mainPage" @token="token"/>
+   <!--  <LoginPage @page="changePage" @main-page="mainPage" @token="token"/> -->
   </div>
   <div v-else>
-    <RegisterPage @page="changePage"/>
+    <RegisterCard @page="changePage"/>
+    <!-- <RegisterPage @page="changePage"/> -->
   </div>
 </template>

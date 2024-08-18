@@ -49,11 +49,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   }
 })
 
-
-
-
 extensionExist.value = true
-
 
 console.log('local storage', localStorage.getItem('user'))
 
@@ -77,7 +73,7 @@ const getTableDatas = async (token: string) => {
       // Burada bütün veriler gösterilecek  token yok ise yani başka apiye istek atılacak
       /* user.value = 'furkan@gmail.com' */
       const languagesResponse = await axios.get('http://localhost:5000/api/getAllLanguages')
-   /*    const languagesResponse = await axios.get('http://localhost:5000/api/getUserLanguages', {
+      /*    const languagesResponse = await axios.get('http://localhost:5000/api/getUserLanguages', {
         params: { email: user.value }
       })
  */
@@ -99,7 +95,7 @@ const getTableDatas = async (token: string) => {
 
 const existUserhandler = async (email: string) => {
   return new Promise(async (resolve, reject) => {
- /*    const response = await axios.get('http://localhost:5000/api/getAllLanguages') */
+    /*    const response = await axios.get('http://localhost:5000/api/getAllLanguages') */
     const bodyFormData = {
       email: email,
       password: 'Furkan55?'
@@ -130,6 +126,10 @@ const existUserhandler = async (email: string) => {
 
 onMounted(async () => {
   console.log('token', token.value)
+  /*   setTimeout(() => {
+    appReady.value = false
+  }, 400) */
+
   chrome.storage.local.get('userExistence', async (data) => {
     if (data.userExistence && data.userExistence.message === 'existUser') {
       console.log('user exist', data.userExistence.user)
@@ -145,7 +145,7 @@ onMounted(async () => {
         }
       })
       return
-    } 
+    }
   })
 
   if (userExist.value) {
@@ -218,7 +218,7 @@ const sendUrlToExtension = () => {
             })
 
             if (index === resultArray.length - 1) {
-            /*   const languagesResponse = await axios.get(
+              /*   const languagesResponse = await axios.get(
                 'http://localhost:5000/api/getUserLanguages',
                 {
                   params: { email: response.data.user.email }
@@ -324,10 +324,10 @@ const deleteItems = async () => {
     return
   }
 
-  console.log("token delete items", token);
-  if(token.value === null){
+  console.log('token delete items', token)
+  if (token.value === null) {
     appReady.value = true
-    console.log("token boşa gridi");
+    console.log('token boşa gridi')
     // burada bir uyarı göster. Toast mesajını aktif ettiğin zaman
     return
   }
@@ -410,8 +410,8 @@ const filterAccuracy = () => {
   console.log('returned values', returnedValues.value)
 }
 
-import LoginPage from './components/LoginPage.vue'
 import AuthPage from './components/AuthPage.vue'
+import LoginCard from './components/LoginCard.vue'
 
 watch([highAccuracy, mediumAccuracy, lowAccuracy], filterAccuracy)
 watch(searchedUrl, searchUrl)
@@ -426,15 +426,22 @@ const pageChecker = (isLoggedIn: boolean) => {
 
 const tokenTaken = (tokenn: string) => {
   // aslında tokenı local storagedan alıyor
+  userExist.value = true
+  extensionExist.value = true
   token.value = tokenn
 }
+
 </script>
 
 <template>
   <div id="popup" class="h-full w-full">
-    <div v-if="!loginPage" class="m-a w-full h-full">
+    <div class="m-a w-full h-full">
       <div class="m-a relative inline-block flex max-w-[600px] items-center justify-center">
-        <div v-if="extensionExist && userExist" class="w-full">
+        <div v-if="loginPage">
+          <AuthPage @main-page="pageChecker" @token="getTableDatas" />
+          <!--  <LoginCard /> -->
+        </div>
+        <div v-else-if="extensionExist && userExist" class="w-full">
           <input
             type="text"
             v-model="url"
@@ -529,15 +536,13 @@ const tokenTaken = (tokenn: string) => {
                 </div>
                 <div class="flex h-full w-full items-center p-4 hover:font-bold">URL</div>
                 <div class="flex h-full w-full items-center p-4">LANGUAGE</div>
-                <div class="flex h-full w-full items-center ">
+                <div class="flex h-full w-full items-center">
                   <div>DETECTED PLACES</div>
                 </div>
                 <div class="flex h-full w-full items-center p-4">
                   <div>ACCURACY</div>
                 </div>
-                <div class="flex h-full w-full items-center p-4">
-                  USER
-                </div>
+                <div class="flex h-full w-full items-center p-4">USER</div>
                 <div
                   class="flex h-full w-full cursor-pointer items-center justify-between p-4 hover:font-bold"
                   @click="sortDate()"
@@ -579,9 +584,8 @@ const tokenTaken = (tokenn: string) => {
                   v-else
                   class="ma top-50 absolute z-50 flex h-full w-full items-center justify-center"
                 >
-                
                   <v-progress-circular
-                    :size="150"
+                    :size="100"
                     color="primary"
                     indeterminate
                   ></v-progress-circular>
@@ -593,12 +597,12 @@ const tokenTaken = (tokenn: string) => {
       </div>
       <!-- </div> -->
     </div>
-    <div v-else>
+    <!--  <div v-else>
       <AuthPage @main-page="pageChecker" @token="getTableDatas" />
-    </div>
+    </div> -->
   </div>
 
-  <LoadingBarCard :loadingButton="loadingButton"  :updateNumber="updateProgressNumber"/>
+  <LoadingBarCard :loadingButton="loadingButton" :updateNumber="updateProgressNumber" />
 </template>
 
 <style scoped>

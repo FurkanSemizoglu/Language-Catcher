@@ -118,6 +118,11 @@ const detectedLangCode = ref<string>('')
 /* const tempLangCode = props.detectedLanguage.split('-')[0]
 detectedLangCode.value = tempLangCode[0].toUpperCase() + tempLangCode.slice(1)  */
 detectedLangCode.value = props.detectedLanguage.split('-')[0].toUpperCase()
+
+if(props.detectedLanguage === 'not detected'){
+  detectedLangCode.value = '-'
+}
+
 /* if(props.allItemsSelected){
   checkbox.value = true;
 }
@@ -133,21 +138,21 @@ const openNewTab = () => {
 
 <template>
   <div
-    class="cols-8 min-h-100px grid h-auto border border-gray-300"
+    class="cardHeight cols-8  grid h-auto border border-gray-300"
     style="grid-template-columns: 0.5fr 1.5fr 2fr 2fr 2fr 2fr 2fr 2fr"
     :class="checkbox ? 'bg-[#EBEAEA]' : index % 2 === 0 ? 'bg-white' : 'bg-[#FCFCFC]'"
   >
-    <div class="flex h-full w-full items-center p-4">
+    <div class="flex h-full w-full items-center px-4">
       <FontAwesomeIcon
         :icon="checkbox ? faSquareCheck : faSquare"
         @click="checkboxFunc(), $emit('cardId', props.id)"
         class="cursor-pointer"
       />
     </div>
-    <div class="flex h-full w-full items-center justify-center p-4 text-[#A2A0A1]">
+    <div class="flex h-full w-full items-center justify-center px-4 text-[#A2A0A1]">
       {{ props.index + 1 }}
     </div>
-    <div class="flex h-auto w-full items-center justify-between p-4">
+    <div class="flex h-auto w-full items-center justify-between px-4">
       <div
         class="iconContainer max-w-full break-words flex items-center justify-between gap-2 cursor-pointer" @click="openNewTab"
       >
@@ -158,7 +163,7 @@ const openNewTab = () => {
       </div>
     </div>
 
-    <div class="langContainer flex h-full w-full items-center justify-between p-4 gap-2 cursor-pointer">
+    <div class="langContainer flex h-full w-full items-center justify-between px-4 gap-2 cursor-pointer">
       <div>
         {{ detectedLangCode }}
       </div>
@@ -166,7 +171,7 @@ const openNewTab = () => {
         {{ detectedLanguagesText }}
       </div>
     </div>
-    <div class="flex h-full w-full items-center justify-between p-4">
+    <div class="flex h-full w-full items-center justify-between px-4">
       <div>
         <span v-for="(place, index) in props.detectedPlaces" :key="index"
           >{{ place
@@ -182,10 +187,10 @@ const openNewTab = () => {
  
     </div> -->
     <AccuracyCircle :accuracy="props.accuracy" />
-    <div class="flex h-full w-full items-center p-4">
+    <div class="flex h-full w-full items-center px-4">
       <div class="max-w-full break-words">{{ props.belongUser }}</div>
     </div>
-    <div class="flex h-full w-full items-center justify-between p-4">
+    <div class="flex h-full w-full items-center justify-between px-4">
       <div class="ml-2 max-w-min">{{ localeDate }}</div>
       <div>
         <!--   <FontAwesomeIcon
@@ -207,7 +212,7 @@ const openNewTab = () => {
 
     <!-- <div class="w-4/5">-</div> -->
     <transition name="detailTransition">
-      <div v-if="showDetails" class="col-span-7 p-4">
+      <div v-if="showDetails" class="col-span-7 px-4">
         <!-- <div class="bg-#F2F2F2 mb-5 h-[1px] w-full border-t"></div> -->
         <div class="cols-2 grid">
           <div>
@@ -225,6 +230,10 @@ const openNewTab = () => {
 </template>
 
 <style scoped>
+
+.cardHeight{
+  min-height: 100px;
+}
 .propsDiv {
   opacity: 0;
   transform: translateX(0);
