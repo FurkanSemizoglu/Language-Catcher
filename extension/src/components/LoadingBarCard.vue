@@ -1,23 +1,36 @@
 <script setup lang="ts">
-import { defineProps, onMounted, ref } from 'vue';
+import { defineProps, onMounted, ref, watch } from 'vue';
 
-const props = defineProps<{ loadingButton: boolean }>();
+const props = defineProps<{ loadingButton: boolean  , updateNumber : number}>();
 const progressDegree = ref<number>(0);
 progressDegree.value === 0;
 
+
+watch(() => props.updateNumber, (newValue) => {
+  if (newValue) {
+    progressDegree.value = newValue * 100;
+  }
+});
+
+console.log("loadi,ng cardddd" , props.updateNumber);
+progressDegree.value = props.updateNumber * 100;
+if (progressDegree.value === 100) {
+    setTimeout(() => {
+      progressDegree.value = 0;
+    }, 4000);
+  }/* 
 window.addEventListener('updateProgress', (e) => {
   const event = e as CustomEvent;
   console.log('update progress :', event.detail.progress);
 
   progressDegree.value = event.detail.progress * 100;
 
-  // burada progress degree 0 olmalı
   if (progressDegree.value === 100) {
     setTimeout(() => {
       progressDegree.value = 0;
     }, 4000);
   }
-});
+}); */
 </script>
 
 <template>

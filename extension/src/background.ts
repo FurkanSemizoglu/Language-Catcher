@@ -129,6 +129,14 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     chrome.storage.local.set({ userExistence : { message: 'existUser', user: user } });
     return true
   }
+  else if(request.message === 'updateProgress'){
+    chrome.runtime.sendMessage({
+      message: 'updateProgress',
+      progress: request.progress
+    })
+
+    return true
+  }
 
   if (request.action === 'language-catcher-start') {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs: any) => {

@@ -122,6 +122,13 @@ detectedLangCode.value = props.detectedLanguage.split('-')[0].toUpperCase()
   checkbox.value = true;
 }
  */
+
+
+
+const openNewTab = () => {
+  window.open(props.url, '_blank')
+}
+
 </script>
 
 <template>
@@ -142,12 +149,12 @@ detectedLangCode.value = props.detectedLanguage.split('-')[0].toUpperCase()
     </div>
     <div class="flex h-auto w-full items-center justify-between p-4">
       <div
-        class="iconContainer max-w-full break-words flex items-center justify-between gap-2 cursor-pointer"
+        class="iconContainer max-w-full break-words flex items-center justify-between gap-2 cursor-pointer" @click="openNewTab"
       >
         <div class="iconImage">
           <img :src="iconUrl" width="24px" class="z-1" />
         </div>
-        <div class="propsDiv">{{ props.url }}</div>
+        <div class="propsDiv">{{ domain }}</div>
       </div>
     </div>
 
@@ -167,13 +174,14 @@ detectedLangCode.value = props.detectedLanguage.split('-')[0].toUpperCase()
         </span>
       </div>
     </div>
-    <AccuracyCircle :accuracy="props.accuracy" />
+    
   <!--   <div
       class="accuracyContainer max-w-full px-6 flex h-full w-full items-center p-4 justify-between"
     >
     
  
     </div> -->
+    <AccuracyCircle :accuracy="props.accuracy" />
     <div class="flex h-full w-full items-center p-4">
       <div class="max-w-full break-words">{{ props.belongUser }}</div>
     </div>

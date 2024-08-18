@@ -38,88 +38,22 @@ const deleteItemsList = ref<string[]>([])
 
 const userExist = ref<boolean>(false)
 const loginPage = ref<boolean>(false)
-/* const startTable = new CustomEvent('startTable', {
- 
-  detail: {
-    start: true
+
+const updateProgressNumber = ref<number>(0)
+
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  console.log('request', request)
+  if (request.message === 'updateProgress') {
+    console.log('proges in popup', request.progress)
+    updateProgressNumber.value = request.progress
   }
 })
 
-console.log("dispatcehd event");
 
-window.dispatchEvent(startTable) */
-/* 
-window.addEventListener('existUser', (e) => {
-  const event = e as CustomEvent
-  console.log('event', event.detail.userExist)
-}) */
+
 
 extensionExist.value = true
 
-/* window.addEventListener('language-catcher-exist', (e) => {
-  const event = e as CustomEvent
-
-  if (event.detail.languageCatcherExist) {
-    extensionExist.value = true
-    console.log('extensionExist.value', extensionExist.value)
-  } else {
-    extensionExist.value = false
-  }
-}) */
-
-/* window.addEventListener('languageCatcherResult', async (e) => {
-  console.log('Result from extension', e)
-  const event = e as CustomEvent
-  const language = event.detail.language
-  const resultArray: extensionResponse[] = event.detail
-  try {
-    for (let index = 0; index < resultArray.length; index++) {
-      const element = resultArray[index]
-      console.log('element', element)
-      const response = await axios.post('http://localhost:5000/api/addLanguage', {
-        email: user.value,
-        languageData: element
-      })
-
-      if (index === resultArray.length - 1) {
-        const languagesResponse = await axios.get('http://localhost:5000/api/getUserLanguages', {
-          params: { email: response.data.user.email }
-        })
-        console.log('language response', languagesResponse.data)
-
-        returnedValues.value = languagesResponse.data
-        tempReturnedValues.value = languagesResponse.data
-        loadingButton.value = false
-
-        console.log('sorted languages', languagesResponse.data)
-      }
-    }
-  } catch (error) {
-    console.log(error)
-  }
-
-  url.value = ''
-}) */
-
-/* chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  console.log("mesaj bekleniyor" ,request);
-  if (request.message === 'existUser') {
-    console.log('user exist', request.user)
-    userExist.value = true
-    user.value = request.user
-  }
-})
-
-
-console.log("userrr" , localStorage.getItem('user')) */
-
-/* chrome.storage.local.get('userExistence', (data) => {
-  if (data.userExistence && data.userExistence.message === 'existUser') {
-    console.log('user exist', data.userExistence.user)
-    userExist.value = true
-    user.value = data.userExistence.user
-  }
-}) */
 
 console.log('local storage', localStorage.getItem('user'))
 
@@ -211,29 +145,7 @@ onMounted(async () => {
         }
       })
       return
-    } /* else {
-      if (userExist.value) {
-        chrome.storage.local.clear()
-        return
-      } else {
-        if (token.value === null) {
-          console.log('token null')
-          const response = await axios.get('http://localhost:5000/api/getAllLanguages')
-
-          returnedValues.value = response.data
-          tempReturnedValues.value = response.data
-          console.log('languagesss', response.data)
-
-          appReady.value = true
-          return
-        } else if (!userExist) {
-          console.log('token verisi çalışıt')
-          getTableDatas(token.value)
-        }
-      }
-
-      console.log('buranın çalışmaması lazım')
-    } */
+    } 
   })
 
   if (userExist.value) {
@@ -306,12 +218,13 @@ const sendUrlToExtension = () => {
             })
 
             if (index === resultArray.length - 1) {
-              const languagesResponse = await axios.get(
+            /*   const languagesResponse = await axios.get(
                 'http://localhost:5000/api/getUserLanguages',
                 {
                   params: { email: response.data.user.email }
                 }
-              )
+              ) */
+              const languagesResponse = await axios.get('http://localhost:5000/api/getAllLanguages')
               console.log('language response', languagesResponse.data)
 
               returnedValues.value = languagesResponse.data
@@ -685,7 +598,7 @@ const tokenTaken = (tokenn: string) => {
     </div>
   </div>
 
-  <LoadingBarCard :loadingButton="loadingButton" />
+  <LoadingBarCard :loadingButton="loadingButton"  :updateNumber="updateProgressNumber"/>
 </template>
 
 <style scoped>

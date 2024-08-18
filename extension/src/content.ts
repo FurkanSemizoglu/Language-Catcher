@@ -160,12 +160,14 @@ const recurciveProcess = (
 }
 
 const sendProgressEvent = (index: number, arrayLength: number) => {
-  const updateProgress = new CustomEvent('updateProgress', {
+ /*  const updateProgress = new CustomEvent('updateProgress', {
     detail: {
       progress: index / arrayLength
     }
   })
-  window.dispatchEvent(updateProgress)
+  window.dispatchEvent(updateProgress) */
+  chrome.runtime.sendMessage({ message : "updateProgress",  progress: index / arrayLength })
+
 }
 
 /* const recurciveProcess = (
@@ -441,7 +443,7 @@ const checkUrl = (detectedLanguages: string[], detectedPlaces: string[]) => {
   urlFlag = false
   if (returnedUrl !== '') {
     detectedLanguages.push(returnedUrl)
-    detectedPlaces.push('url')
+    detectedPlaces.push('Url')
 
     console.log('detected languages from url : ', returnedUrl)
     urlFlag = true
@@ -452,11 +454,11 @@ const checkHtmlLang = (detectedLanguages: string[], detectedPlaces: string[]) =>
   const detectedLangFromHTML = detectHtmlLang()
   if (detectedLangFromHTML !== '') {
     if (detectedLanguages.length > 0 && detectedLanguages[0] === detectedLangFromHTML) {
-      detectedPlaces.push('lang etiketi')
+      detectedPlaces.push('Lang Etiketi')
       htmlTag = true
     } else if (detectedLanguages.length === 0) {
       detectedLanguages.push(detectedLangFromHTML)
-      detectedPlaces.push('lang etiketi')
+      detectedPlaces.push('Lang Etiketi')
       htmlTag = true
     } else {
       console.log('url lang etiketinden farklı ')
@@ -498,12 +500,12 @@ const checkMetaTag = (detectedLanguages: string[], detectedPlaces: string[]) => 
   const detectedMetaTag = detectMetaTag()
   if (detectedMetaTag !== '') {
     if (detectedLanguages.length > 0 && detectedLanguages[0] === detectedMetaTag) {
-      detectedPlaces.push('meta tag')
+      detectedPlaces.push('Meta Tag')
       console.log('detected meta tag : ', detectedMetaTag)
       metaTag = true
     } else if (detectedLanguages.length === 0) {
       detectedLanguages.push(detectedMetaTag)
-      detectedPlaces.push('meta tag')
+      detectedPlaces.push('Meta Tag')
       console.log('detected meta tag : ', detectedMetaTag)
       metaTag = true
     } else {
