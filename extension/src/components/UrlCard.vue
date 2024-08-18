@@ -105,6 +105,19 @@ watch(
   }
 )
 
+function getDomainFromUrl(url: string) {
+  const parsedUrl = new URL(url)
+  return parsedUrl.hostname
+}
+
+const url = props.url
+const domain = getDomainFromUrl(url)
+const iconUrl = `https://icon.horse/icon/${domain}`
+
+const detectedLangCode = ref<string>('')
+/* const tempLangCode = props.detectedLanguage.split('-')[0]
+detectedLangCode.value = tempLangCode[0].toUpperCase() + tempLangCode.slice(1)  */
+detectedLangCode.value = props.detectedLanguage.split('-')[0].toUpperCase()
 /* if(props.allItemsSelected){
   checkbox.value = true;
 }
@@ -128,10 +141,23 @@ watch(
       {{ props.index + 1 }}
     </div>
     <div class="flex h-auto w-full items-center justify-between p-4">
-      <div class="max-w-full break-words">{{ props.url }}</div>
+      <div
+        class="iconContainer max-w-full break-words flex items-center justify-between gap-2 cursor-pointer"
+      >
+        <div class="iconImage">
+          <img :src="iconUrl" width="24px" class="z-1" />
+        </div>
+        <div class="propsDiv">{{ props.url }}</div>
+      </div>
     </div>
-    <div class="flex h-full w-full items-center justify-between p-4">
-      {{ detectedLanguagesText }}
+
+    <div class="langContainer flex h-full w-full items-center justify-between p-4 gap-2 cursor-pointer">
+      <div>
+        {{ detectedLangCode }}
+      </div>
+      <div class="langDiv">
+        {{ detectedLanguagesText }}
+      </div>
     </div>
     <div class="flex h-full w-full items-center justify-between p-4">
       <div>
@@ -141,12 +167,15 @@ watch(
         </span>
       </div>
     </div>
-    <div class="px-6 flex h-full w-full items-center p-4">
-      <AccuracyCircle :accuracy="props.accuracy" />
-
-    </div>
+    <AccuracyCircle :accuracy="props.accuracy" />
+  <!--   <div
+      class="accuracyContainer max-w-full px-6 flex h-full w-full items-center p-4 justify-between"
+    >
+    
+ 
+    </div> -->
     <div class="flex h-full w-full items-center p-4">
-      <div class="max-w-full break-words"> {{ props.belongUser }}</div>
+      <div class="max-w-full break-words">{{ props.belongUser }}</div>
     </div>
     <div class="flex h-full w-full items-center justify-between p-4">
       <div class="ml-2 max-w-min">{{ localeDate }}</div>
@@ -188,6 +217,85 @@ watch(
 </template>
 
 <style scoped>
+.propsDiv {
+  opacity: 0;
+  transform: translateX(0);
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s ease;
+}
+
+.iconContainer:hover .propsDiv {
+  opacity: 1;
+  transform: translateX(10px);
+}
+
+
+.langDiv {
+  opacity: 0;
+  transform: translateX(0);
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s ease;
+}
+
+.langContainer:hover .langDiv {
+  opacity: 1;
+  transform: translateX(10px);
+}
+
+.accuracyDiv {
+  opacity: 0;
+  transform: translateX(0);
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s ease;
+}
+
+.accuracyContainer:hover .propsDiv {
+  opacity: 1;
+  transform: translateX(10px);
+}
+
+/*
+.icon-container {
+  position: relative;
+  width: 100%;
+}
+
+.iconImage::after {
+  content: attr(data-url);
+  background: red;
+  height: 10px;
+  width: 100%;
+  position: absolute;
+  right: 0;
+  transition: 100ms;
+}
+
+.icon-container::after:hover {
+  content: attr(data-url);
+}
+
+*/
+/* .url-text {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateX(-100%) translateY(-50%);
+  white-space: nowrap;
+  opacity: 0;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  font-size: 10px;
+  color: #333;
+}
+
+.icon-container:hover .url-text {
+  transform: translateX(0) translateY(-50%);
+  opacity: 1;
+}
+ */
+
 .detailTransition-enter-active,
 .detailTransition-leave-active {
   transition: opacity 0.5s ease;

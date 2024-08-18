@@ -410,6 +410,14 @@ const deleteItems = async () => {
     appReady.value = true
     return
   }
+
+  console.log("token delete items", token);
+  if(token.value === null){
+    appReady.value = true
+    console.log("token boşa gridi");
+    // burada bir uyarı göster. Toast mesajını aktif ettiğin zaman
+    return
+  }
   appReady.value = false
   console.log('ReturnedValues.value', returnedValues.value)
   console.log('tempReturnedValues.value', tempReturnedValues.value)
