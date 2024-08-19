@@ -92,7 +92,7 @@ const login = async () => {
         v-model="password"
         placeholder="Password"
         :type="passwordFieldType"
-        class="border border-[#2F33B0] p-2 w-full hover:border-2"
+        class="border border-[#2F33B0] p-2 w-full focus:border-[#2C39A6] focus:outline-[#DCE2EE]"
       />
       <FontAwesomeIcon
         @click="togglePasswordVisibility"

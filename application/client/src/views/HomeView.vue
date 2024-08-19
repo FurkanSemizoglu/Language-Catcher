@@ -39,7 +39,7 @@ const deleteItemsList = ref<string[]>([]);
 
 }); */
 
-extensionExist.value = false;
+extensionExist.value = true;
 // Burada hep dinleyebiliriz ya da sadece bi kere de dinlenebilir
 window.addEventListener('language-catcher-exist', (e) => {
   const event = e as CustomEvent;
@@ -143,7 +143,7 @@ const sendUrlToExtension = () => {
 
   window.dispatchEvent(sendedURL);
 };
-
+// kullanıldığı domainin tabına kaydet localstorageda
 const logout = async () => {
   const response = await axios.get('http://localhost:5000/auth/logout');
 

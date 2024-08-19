@@ -25,7 +25,7 @@ watch(
       {{ shortName }}
     </div>
 
-    <div v-if="openProfileDetail" class="absolute bottom-0 mb-36 bg-red">
+    <div v-if="openProfileDetail" class="absolute bottom-0 top-20 mb-36 bg-red">
       <div>
         {{ props.user }}
       </div>

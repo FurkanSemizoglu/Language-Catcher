@@ -151,14 +151,11 @@ const tempLoading = ref<boolean>(true)
 
 onMounted(async () => {
   console.log('token', token.value)
-  console.log("temp load 1" , tempLoading.value);
-    setTimeout(() => {
+  console.log('temp load 1', tempLoading.value)
+  setTimeout(() => {
     tempLoading.value = false
-    console.log("temp load 2" , tempLoading.value);
+    console.log('temp load 2', tempLoading.value)
   }, 1000)
-  /*   appReadyTiming().then((response) => {
-    console.log('response', response)
-  }) */
 
   chrome.storage.local.get('userExistence', async (data) => {
     if (data.userExistence && data.userExistence.message === 'existUser') {
@@ -188,11 +185,13 @@ onMounted(async () => {
 
   if (token.value === null) {
     console.log('token null')
-    const response = await axios.get('http://localhost:5000/api/getAllLanguages')
+    const storedValues = localStorage.getItem("returnedValues");
+    returnedValues.value = storedValues ? JSON.parse(storedValues) : [];
+    /*     const response = await axios.get('http://localhost:5000/api/getAllLanguages')
 
     returnedValues.value = response.data
     tempReturnedValues.value = response.data
-    console.log('languagesss', response.data)
+    console.log('languagesss', response.data) */
 
     appReady.value = true
     return
@@ -203,9 +202,6 @@ onMounted(async () => {
 
   console.log('buranın çalışmaması lazım')
 
-  /*   if (user.value !== '') {
-    console.log('user in mounted', user.value)
-  } */
 })
 
 const sendUrlToExtension = () => {
@@ -215,15 +211,8 @@ const sendUrlToExtension = () => {
   if (url.value === '' || !url.value.includes('http')) {
     loadingButton.value = false
     toast.error('Url geçerli değil')
-    console.log('url geçerli değil')
     return
   }
-  const sendedURL = new CustomEvent('language-catcher-start', {
-    detail: {
-      status: 'OK',
-      url: url.value
-    }
-  })
 
   chrome.runtime.sendMessage(
     {
@@ -239,6 +228,39 @@ const sendUrlToExtension = () => {
         const resultArray: extensionResponse[] = response
         console.log('result array', resultArray)
         try {
+          if (token.value === null) {
+            for (let index = 0; index < resultArray.length; index++) {
+              const element = resultArray[index]
+              const transformedElement: extensionResult = {
+                
+                _id: "id" + Math.random().toString(16).slice(2), 
+                status: element.status,
+                domain: element.domain,
+                language: element.language,
+                languageFetchedFrom: element.languageFetchedFrom,
+                langName: element.langName,
+                langNativeName: element.langNativeName,
+                languageLocation: element.languageLocation,
+                languageAccuracy: element.languageAccuracy,
+                realLangValues: element.realValues, // Assuming realLangValues and realValues are similar
+                date: element.date,
+                belongUser: {
+                  email: '', // Add the appropriate value here
+                  _id: '' // Add the appropriate value here
+                }
+              }
+              returnedValues.value.push(transformedElement)
+              tempReturnedValues.value.push(transformedElement)
+            }
+
+            /*  returnedValues.value.concat(resultArray) */
+            loadingButton.value = false
+            appReady.value = true
+            localStorage.setItem('returnedValues', JSON.stringify(returnedValues.value))
+            // veriler burada localStorage a kaydedilebilir
+            return
+          }
+
           for (let index = 0; index < resultArray.length; index++) {
             const element = resultArray[index]
             console.log('element', element)
@@ -272,9 +294,9 @@ const sendUrlToExtension = () => {
       }
     }
   )
-  console.log('event dispatched')
+  /*   console.log('event dispatched')
   window.dispatchEvent(sendedURL)
-  console.log('event dispatched 2')
+  console.log('event dispatched 2') */
 }
 
 const logout = async () => {
@@ -338,6 +360,11 @@ const sortUrls = () => {
 }
 
 const deleteItemsFunc = (id: string) => {
+
+/*   if(token === null){
+    toast.error('Lütfen giriş yapınız!')
+    return
+  } */
   console.log('received id ', id)
   if (deleteItemsList.value.includes(id)) {
     deleteItemsList.value = deleteItemsList.value.filter((item) => item !== id)
@@ -349,13 +376,28 @@ const deleteItemsFunc = (id: string) => {
 }
 
 const deleteItems = async () => {
+
+
+
   if (deleteItemsList.value.length === 0) {
     appReady.value = true
     toast.error('Veri seçilmedi!')
     return
   } else if (token.value === null) {
     appReady.value = true
-    toast.error('Lütfen giriş yapınız!')
+
+    console.log("delete list" , deleteItemsList.value);
+    returnedValues.value = returnedValues.value.filter((value) => {
+      return !deleteItemsList.value.includes(value._id)
+    })
+    tempReturnedValues.value = tempReturnedValues.value.filter((value) => {
+      return !deleteItemsList.value.includes(value._id)
+    })
+
+    localStorage.setItem('returnedValues', JSON.stringify(returnedValues.value))
+    appReady.value = true
+    allItemsSelected.value = false
+    deleteItemsList.value = []
     return
   }
   appReady.value = false
@@ -448,18 +490,20 @@ const tokenTaken = (tokenn: string) => {
   extensionExist.value = true
   token.value = tokenn
 }
+
+const loginText = ref<boolean>(true)
 </script>
 
 <template>
   <div id="popup" class="h-full w-full p-2">
     <div class="m-a w-full h-full">
       <div class="m-a relative inline-block flex max-w-[600px] items-center justify-center">
-        <div v-if="loginPage">
+        <div v-if="loginPage === true">
           <AuthPage @main-page="pageChecker" @token="getTableDatas" />
           <!--  <LoginCard /> -->
         </div>
         <div
-          v-else-if="extensionExist && userExist"
+          v-else-if="extensionExist"
           class="animate__animated animate__fadeInDown w-full flex items-center justify-between gap-2"
         >
           <input
@@ -481,18 +525,36 @@ const tokenTaken = (tokenn: string) => {
             Eklenti aktif değil !!!
           </div>
         </div>
-        <div v-else-if="!userExist">
+        <!--    <div v-else-if="!userExist">
           <div class="animate__animated animate__fadeInDown ma rounded-md p-5 text-xl">
             Url aratmak için lütfen
             <span class="text-[#2C39A6] cursor-pointer" @click="loginPage = !loginPage">giriş</span>
             yapınız.
           </div>
-        </div>
+        </div> -->
       </div>
 
       <div class="mx-a w-[100%] mt-5 lg:w-[100%]">
         <div class="filters flex items-center justify-between">
-          <div class="flex items-center"><ProfileComponent :user="user" /></div>
+          <div class="flex items-center">
+            <div v-if="user">
+              <ProfileComponent :user="user" />
+            </div>
+            <div v-else>
+             <!--  <div class="animate__animated animate__fadeInDown ma rounded-md p-5 text-xl">
+                Url aratmak için lütfen
+                <span class="text-[#2C39A6] cursor-pointer" @click="loginPage = !loginPage">giriş</span>
+                yapınız.
+              </div> -->
+              <div v-if="loginText" class="animate__animated animate__fadeInDown ma rounded-md p-5 text-lg" @click="loginText = !loginText">
+                <span class="text-[#2C39A6] cursor-pointer flex items-center w-100px" @click="loginPage = !loginPage">giriş yapınız.</span>
+               
+              </div>
+              <div v-else class="block cursor-pointer" @click="loginText = !loginText ,loginPage = !loginPage">
+                <--
+              </div>
+            </div>
+          </div>
           <div class="mb-2 flex w-full items-center justify-end">
             <div class="flex items-center">
               <div class="mr-2 rounded-lg border">
@@ -513,7 +575,7 @@ const tokenTaken = (tokenn: string) => {
 
               <div
                 v-if="openFilter"
-                class="-top-25 -left-50 absolute rounded-lg border-[#2F33B0] p-4 shadow-lg flex items-center justify-between "
+                class="-top-25 -left-45 absolute rounded-lg border-[#2F33B0] p-4 shadow-lg flex items-center justify-between"
               >
                 <div class="">
                   <div class="mb-5 flex items-center justify-center">Accuracy Filter</div>
@@ -528,7 +590,7 @@ const tokenTaken = (tokenn: string) => {
                     <label>Low</label>
                   </div>
                 </div>
-               <!--  <div>Show just mine urls.</div> -->
+                <!--  <div>Show just mine urls.</div> -->
               </div>
             </div>
             <div>
