@@ -45,21 +45,39 @@ const login = async () => {
     }
 
     try {
-      const response = await axios.post('http://localhost:5000/auth/login', bodyFormData, {
+      /*  const response = await axios.post('http://localhost:5000/auth/login', bodyFormData, {
         headers: {
           'Content-Type': 'application/json'
         }
-      })
+      }) */
 
-      console.log(response.data)
+      chrome.runtime.sendMessage(
+        {
+          message: 'login',
+          bodyFormData: bodyFormData
+        },
+        (response) => {
+          console.log(response.data)
+
+          if (response.status) {
+            toast.success('Login successful')
+            /*    localStorage.setItem('token', response.data.token); */
+            localStorage.setItem('token', response.data.token)
+            emit('token', response.data.token)
+            emit('mainPage', true)
+          }
+        }
+      )
+
+      /*     console.log(response.data)
 
       if (response.status) {
         toast.success('Login successful')
-        /*    localStorage.setItem('token', response.data.token); */
+     
         localStorage.setItem('token', response.data.token)
         emit('token', response.data.token)
         emit('mainPage', true)
-      }
+      } */
     } catch (err) {
       if (axios.isAxiosError(err)) {
         console.error('Axios error status:', err.response?.status)
@@ -107,7 +125,7 @@ const login = async () => {
 
     <div class="flex gap-2 items-center">
       <button
-        class="p-2 px-4 bg-[#2C39A6] font-300 text-white text-md transition duration-300 ease-in-out hover:bg-[#4B95FF] "
+        class="p-2 px-4 bg-[#2C39A6] font-300 text-white text-md transition duration-300 ease-in-out hover:bg-[#4B95FF]"
         @click="login"
       >
         Giriş

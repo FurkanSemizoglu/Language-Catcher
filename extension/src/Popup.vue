@@ -77,11 +77,45 @@ console.log('local storage', localStorage.getItem('user'))
 const getTableDatas = async (token: string) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const response = await axios.post('http://localhost:5000/auth/user', {
+      /*     const response = await axios.post('http://localhost:5000/auth/user', {
         token: token
-      })
+      }) */
 
-      console.log(response.data)
+      chrome.runtime.sendMessage(
+        {
+          message: 'getUser',
+          token: token
+        },
+        (response) => {
+          console.log('response getr userr', response.data)
+
+          if (response.data) {
+            userExist.value = true
+          } else {
+            userExist.value = false
+          }
+
+          user.value = response.data.user.email
+
+          console.log('get userrr', response.data.user.email)
+
+          chrome.runtime.sendMessage(
+            {
+              message: 'getUserlanguages',
+              user: user.value
+            },
+            (response) => {
+              returnedValues.value = response.data
+              tempReturnedValues.value = response.data
+              console.log('languagesss', response.data)
+
+              appReady.value = true
+              resolve(returnedValues.value)
+            }
+          )
+        }
+      )
+      /*       console.log(response.data)
 
       if (response.data) {
         userExist.value = true
@@ -89,18 +123,32 @@ const getTableDatas = async (token: string) => {
         userExist.value = false
       }
 
-      user.value = response.data.user.email
+      user.value = response.data.user.email */
 
       // Burada bütün veriler gösterilecek  token yok ise yani başka apiye istek atılacak
       /* user.value = 'furkan@gmail.com' */
-      const languagesResponse = await axios.get('http://localhost:5000/api/getAllLanguages')
-      /*    const languagesResponse = await axios.get('http://localhost:5000/api/getUserLanguages', {
+      /*       const languagesResponse = await axios.get('http://localhost:5000/api/getAllLanguages') */
+      /*  const languagesResponse = await axios.get('http://localhost:5000/api/getUserLanguages', {
         params: { email: user.value }
-      })
- */
-      returnedValues.value = languagesResponse.data
+      }) */
+      /*  chrome.runtime.sendMessage(
+        {
+          message: 'getUserlanguages',
+          user: user.value
+        },
+        (response) => {
+          returnedValues.value = response.data
+          tempReturnedValues.value = response.data
+          console.log('languagesss', response.data)
+
+          appReady.value = true
+          resolve('success')
+        }
+      ) */
+      /*       returnedValues.value = languagesResponse.data
       tempReturnedValues.value = languagesResponse.data
-      console.log('languagesss', languagesResponse.data)
+      console.log('languagesss', languagesResponse.data) */
+
       /*  console.log('email ', response.data.user.email);
     user.value = response.data.user.email; */
 
@@ -123,25 +171,46 @@ const existUserhandler = async (email: string) => {
       email: email,
       password: 'Furkan55?'
     }
-    const response = await axios.post('http://localhost:5000/auth/login', bodyFormData, {
+    /*    const response = await axios.post('http://localhost:5000/auth/login', bodyFormData, {
       headers: {
         'Content-Type': 'application/json'
       }
-    })
-    console.log('exist user handler', response.data)
+    }) */
 
-    /*     localStorage.deleteItem('token')  böyle bir kullanım yok
-     */
+    chrome.runtime.sendMessage(
+      {
+        message: 'login',
+        bodyFormData: bodyFormData
+      },
+      (response) => {
+        if (chrome.runtime.lastError) {
+          console.error('Error:', chrome.runtime.lastError.message)
+          return
+        }
+        console.log('response', response)
+        localStorage.removeItem('token')
+        console.log('token response ', response.token)
+
+        localStorage.setItem('token', response.token)
+        token.value = response.token
+
+        getTableDatas(response.token).then((response) => {
+          console.log('response', response)
+          resolve(token.value)
+        })
+
+     /*    resolve(response.token) */
+      }
+    )
+
+    /*     console.log('exist user handler', response.data)
+
+  
     localStorage.removeItem('token')
     console.log('token response ', response.data.token)
 
     localStorage.setItem('token', response.data.token)
-    token.value = response.data.token
-    getTableDatas(response.data.token).then((response) => {
-      console.log('response', response)
-    })
-
-    resolve(response.data.token)
+    token.value = response.data.token */
 
     reject('error')
   })
@@ -183,10 +252,10 @@ onMounted(async () => {
 
   console.log('user existence ', userExist)
 
-  if (token.value === null) {
+  if (token.value === null && !userExist.value) {
     console.log('token null')
-    const storedValues = localStorage.getItem("returnedValues");
-    returnedValues.value = storedValues ? JSON.parse(storedValues) : [];
+    const storedValues = localStorage.getItem('returnedValues')
+    returnedValues.value = storedValues ? JSON.parse(storedValues) : []
     /*     const response = await axios.get('http://localhost:5000/api/getAllLanguages')
 
     returnedValues.value = response.data
@@ -195,13 +264,12 @@ onMounted(async () => {
 
     appReady.value = true
     return
-  } else if (!userExist.value) {
+  } else if (!userExist.value && token.value !== null) {
     console.log('token verisi çalışıt')
     getTableDatas(token.value)
   }
 
   console.log('buranın çalışmaması lazım')
-
 })
 
 const sendUrlToExtension = () => {
@@ -232,8 +300,7 @@ const sendUrlToExtension = () => {
             for (let index = 0; index < resultArray.length; index++) {
               const element = resultArray[index]
               const transformedElement: extensionResult = {
-                
-                _id: "id" + Math.random().toString(16).slice(2), 
+                _id: 'id' + Math.random().toString(16).slice(2),
                 status: element.status,
                 domain: element.domain,
                 language: element.language,
@@ -360,8 +427,7 @@ const sortUrls = () => {
 }
 
 const deleteItemsFunc = (id: string) => {
-
-/*   if(token === null){
+  /*   if(token === null){
     toast.error('Lütfen giriş yapınız!')
     return
   } */
@@ -376,9 +442,6 @@ const deleteItemsFunc = (id: string) => {
 }
 
 const deleteItems = async () => {
-
-
-
   if (deleteItemsList.value.length === 0) {
     appReady.value = true
     toast.error('Veri seçilmedi!')
@@ -386,7 +449,7 @@ const deleteItems = async () => {
   } else if (token.value === null) {
     appReady.value = true
 
-    console.log("delete list" , deleteItemsList.value);
+    console.log('delete list', deleteItemsList.value)
     returnedValues.value = returnedValues.value.filter((value) => {
       return !deleteItemsList.value.includes(value._id)
     })
@@ -541,16 +604,27 @@ const loginText = ref<boolean>(true)
               <ProfileComponent :user="user" />
             </div>
             <div v-else>
-             <!--  <div class="animate__animated animate__fadeInDown ma rounded-md p-5 text-xl">
+              <!--  <div class="animate__animated animate__fadeInDown ma rounded-md p-5 text-xl">
                 Url aratmak için lütfen
                 <span class="text-[#2C39A6] cursor-pointer" @click="loginPage = !loginPage">giriş</span>
                 yapınız.
               </div> -->
-              <div v-if="loginText" class="animate__animated animate__fadeInDown ma rounded-md p-5 text-lg" @click="loginText = !loginText">
-                <span class="text-[#2C39A6] cursor-pointer flex items-center w-100px" @click="loginPage = !loginPage">giriş yapınız.</span>
-               
+              <div
+                v-if="loginText"
+                class="animate__animated animate__fadeInDown ma rounded-md p-5 text-lg"
+                @click="loginText = !loginText"
+              >
+                <span
+                  class="text-[#2C39A6] cursor-pointer flex items-center w-100px"
+                  @click="loginPage = !loginPage"
+                  >giriş yapınız.</span
+                >
               </div>
-              <div v-else class="block cursor-pointer" @click="loginText = !loginText ,loginPage = !loginPage">
+              <div
+                v-else
+                class="block cursor-pointer"
+                @click="(loginText = !loginText), (loginPage = !loginPage)"
+              >
                 <--
               </div>
             </div>

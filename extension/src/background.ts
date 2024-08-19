@@ -1,6 +1,8 @@
 console.log('background is running')
 
 import type { LanguageData } from './types'
+import axios from 'axios'
+/* import "regenerator-runtime/runtime.js"; */
 /* 
 chrome.storage.local.set({ variable: "exist" }); */
 
@@ -13,6 +15,44 @@ chrome.action.onClicked.addListener((tab) => {
     showTable = !showTable
   }
 })
+
+const login = (bodyFormData: { email: string; password: string }) => {
+  return new Promise(async (resolve, reject) => {
+    const response = await fetch('http://localhost:5000/auth/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(bodyFormData)
+    })
+
+    // Parse the response
+    const data = await response.json()
+    resolve(data)
+  })
+}
+
+const getUser = (token: string) => {
+  return new Promise(async (resolve, reject) => {
+    const response = await axios.post('http://localhost:5000/auth/user', {
+      token: token
+    })
+
+    console.log('get user response : ', response)
+
+    resolve(response)
+  })
+}
+
+const getUserLanguages = (user: string) => {
+  return new Promise(async (resolve, reject) => {
+    const languagesResponse = await axios.get('http://localhost:5000/api/getUserLanguages', {
+      params: { email: user }
+    })
+
+    resolve(languagesResponse)
+  })
+}
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   console.log('background received message', request)
@@ -38,6 +78,48 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       realLangLocalStorage: '',
       realLangMeta: ''
     }
+  }
+
+  if (request.message === 'login') {
+    console.log('Login part worked', request.bodyFormData)
+
+    try {
+      /*    const response = await fetch('http://localhost:5000/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(request.bodyFormData),
+      });
+
+ 
+      const data = await response.json();
+      console.log('response from bg', data); */
+      login(request.bodyFormData).then((data) => {
+        sendResponse(data)
+      })
+
+      /* sendResponse(data); */
+    } catch (error: any) {
+      console.error('Error during login:', error)
+      sendResponse({ error: error.message })
+    }
+
+    // Return true to indicate that the response will be sent asynchronously
+    return true
+  }
+
+  if (request.message === 'getUser') {
+    try {
+      getUser(request.token).then((data) => {
+        sendResponse(data)
+      })
+    } catch (error: any) {
+      console.error('Error during login:', error)
+      sendResponse({ error: error.message })
+    }
+
+    return true
   }
 
   if (request.message === 'URL-sended') {
@@ -116,28 +198,79 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   } else if (request.action === 'showTable') {
     console.log('backgronn aldı mesajı')
   } else if (request.message === 'existUser') {
-    console.log("bg mesajı aldı " , request.user);
+    console.log('bg mesajı aldı ', request.user)
     const user = request.user
 
-    console.log("user : ", user);
+    console.log('user : ', user)
     /* localStorage.setItem('user', JSON.stringify(user)) */
     chrome.runtime.sendMessage({
       message: 'existUser',
       user: request.user
     })
- 
-    chrome.storage.local.set({ userExistence : { message: 'existUser', user: user } });
+
+    chrome.storage.local.set({ userExistence: { message: 'existUser', user: user } })
     return true
-  }
-  else if(request.message === 'updateProgress'){
+  } else if (request.message === 'updateProgress') {
     chrome.runtime.sendMessage({
       message: 'updateProgress',
       progress: request.progress
     })
 
     return true
-  }
+  } else if (request.message === 'loginnn') {
+    console.log('Login part worked', request.bodyFormData)
 
+    try {
+      /*   const response = await fetch('http://localhost:5000/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(request.bodyFormData),
+      });
+
+      const data = await response.json(); */
+      /*   console.log('response from bg', data); */
+      // Send the response back to the popup script
+      /*  sendResponse(data); */
+    } catch (error: any) {
+      console.error('Error during login:', error)
+      sendResponse({ error: error.message })
+    }
+
+    // Return true to indicate that the response will be sent asynchronously
+    return true
+  } else if (request.message === 'register') {
+  } else if (request.message === 'getUserrr') {
+    /*     const response = await axios.post('http://localhost:5000/auth/user', {
+      token: request.token
+    })
+
+    sendResponse(response.data) */
+    console.log('get user started', request)
+
+    try {
+      getUser(request.token).then((data) => {
+        sendResponse(data)
+      })
+    } catch (error: any) {
+      console.error('Error during login:', error)
+      sendResponse({ error: error.message })
+    }
+
+    return true
+  } else if (request.message === 'getUserLanguages') {
+    /*    const languagesResponse = await axios.get('http://localhost:5000/api/getUserLanguages', {
+      params: { email: request.user }
+    })
+
+    sendResponse(languagesResponse) */
+
+    getUserLanguages(request.user).then((data) => {
+      sendResponse(data)
+    })
+    return true
+  }
   if (request.action === 'language-catcher-start') {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs: any) => {
       chrome.tabs.sendMessage(
