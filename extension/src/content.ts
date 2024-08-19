@@ -50,7 +50,7 @@ function removeTableContent() {
   }
 }
 
-setInterval(function () {
+/* setInterval(function () {
   const languageCatcherExist = new CustomEvent('language-catcher-exist', {
     detail: {
       languageCatcherExist: true
@@ -58,7 +58,7 @@ setInterval(function () {
   })
 
   window.dispatchEvent(languageCatcherExist)
-}, 0.2 * 1000)
+}, 0.2 * 1000) */
 
 window.addEventListener('language-catcher-start', (e) => {
   console.log('Language catcher is starting')
@@ -151,9 +151,13 @@ const recurciveProcess = (
       })
 
       languageCatcherResultArray.push(languageCatcherResult.detail)
+    /*   if(index === 0) {
+        sendProgressEvent(0, urlList.length)
+      }else{
 
-      sendProgressEvent(index + 1, urlList.length)
-
+        sendProgressEvent(index +1, urlList.length)
+      } */
+      sendProgressEvent(index +1, urlList.length)
       resolve()
     })
   })
@@ -166,6 +170,8 @@ const sendProgressEvent = (index: number, arrayLength: number) => {
     }
   })
   window.dispatchEvent(updateProgress) */
+
+  console.log("object progress : ", { message : "updateProgress",  progress: index / arrayLength });
   chrome.runtime.sendMessage({ message : "updateProgress",  progress: index / arrayLength })
 
 }

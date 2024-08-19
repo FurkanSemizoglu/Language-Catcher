@@ -404,7 +404,7 @@ watch(searchedUrl, searchUrl);
 
               <div
                 v-if="openFilter"
-                class="-top-25 -left-30 absolute rounded-lg border-[#2F33B0] p-4 shadow-lg"
+                class="-top-25 -left-50 absolute rounded-lg border-[#2F33B0] p-4 shadow-lg"
               >
                 <div class="mb-5 flex items-center justify-center">Accuracy Filter</div>
                 <div class="flex items-center gap-2">

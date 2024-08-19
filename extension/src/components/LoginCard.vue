@@ -30,11 +30,10 @@ watch([email, password], () => {
   }
 })
 const emit = defineEmits<{
-  (e: 'mainPage', isLoggedIn: boolean): void;
-  (e: 'token', token: string): void;
-  (e : 'page', page: string): void;
-}>();
-
+  (e: 'mainPage', isLoggedIn: boolean): void
+  (e: 'token', token: string): void
+  (e: 'page', page: string): void
+}>()
 
 const login = async () => {
   console.log(email.value + ' ' + password.value)
@@ -93,51 +92,39 @@ const login = async () => {
         v-model="password"
         placeholder="Password"
         :type="passwordFieldType"
-        class="border border-[#2F33B0] p-2 w-full"
-        
+        class="border border-[#2F33B0] p-2 w-full hover:border-2"
       />
       <FontAwesomeIcon
         @click="togglePasswordVisibility"
         :icon="passwordFieldType === 'password' ? faEye : faEyeSlash"
-        class="iconClass  top-0 mt-3 w-5 cursor-pointer"
+        class="iconClass top-0 mt-3 w-5 cursor-pointer"
         style="color: #6f6f6f"
       />
- 
+
       <!--    <input class="inputt bg-#F2F2F2 w-full rounded-lg p-4 text-black focus:border-[#2C39A6]" />
       <label>Password</label> -->
     </div>
 
     <div class="flex gap-2 items-center">
-      <!--  <button
-        class="font-500 cursor-pointer text-lg rounded-md border-none bg-[#FFFFFF] p-4 text-[#2C39A6] transition-colors duration-300 ease-in-out hover:bg-[#E7E8EE]"
-        @click="$emit('page', 'register')"
+      <button
+        class="p-2 px-4 bg-[#2C39A6] font-300 text-white text-md transition duration-300 ease-in-out hover:bg-[#4B95FF] "
+        @click="login"
       >
-        Kayıt ol
-      </button> -->
+        Giriş
+      </button>
 
-      <button class="p-2 px-4 bg-[#2C39A6] font-300 text-white text-md"  @click="login">Giriş</button>
       <button
         class="p-2 px-4 w-auto border border-[#2F33B0] text-[#2C39A6] font-300 bg-white text-md flex justify-center items-center"
         @click="$emit('page', 'register')"
-        >
+      >
         Kayıt <span class="ml-1"> Ol</span>
       </button>
-
-      <!--   <button  class="p-2 px-4  w-150px bg-[#2C39A6] font-300 text-white text-md flex">
-        Kayıt Ol
-      </button> -->
-      <!--     <button
-        class="font-500 cursor-pointer text-lg rounded-md border-none bg-[#FFFFFF] p-4 text-[#2C39A6] transition-colors duration-300 ease-in-out hover:bg-[#E7E8EE]"
-      >
-        Giriş
-      </button> -->
     </div>
   </div>
 </template>
 
 <style scoped>
-
-.iconClass{
+.iconClass {
   position: absolute;
   right: 6px;
 }

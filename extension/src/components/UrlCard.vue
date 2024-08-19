@@ -140,7 +140,7 @@ const openNewTab = () => {
   <div
     class="cardHeight cols-8  grid h-auto border border-gray-300"
     style="grid-template-columns: 0.5fr 1.5fr 2fr 2fr 2fr 2fr 2fr 2fr"
-    :class="checkbox ? 'bg-[#EBEAEA]' : index % 2 === 0 ? 'bg-white' : 'bg-[#FCFCFC]'"
+    :class="checkbox ? 'bg-[#EBEAEA]' : index % 2 === 0 ? 'bg-white' : 'bg-white'"
   >
     <div class="flex h-full w-full items-center px-4">
       <FontAwesomeIcon
@@ -180,12 +180,6 @@ const openNewTab = () => {
       </div>
     </div>
     
-  <!--   <div
-      class="accuracyContainer max-w-full px-6 flex h-full w-full items-center p-4 justify-between"
-    >
-    
- 
-    </div> -->
     <AccuracyCircle :accuracy="props.accuracy" />
     <div class="flex h-full w-full items-center px-4">
       <div class="max-w-full break-words">{{ props.belongUser }}</div>

@@ -30,11 +30,11 @@ const token = (token: string) => {
 </script>
 
 <template>
-  <div v-if="loginPage">
+  <div v-if="loginPage" class="animate__animated animate__fadeInDown">
     <LoginCard  @page="changePage" @main-page="mainPage" @token="token"/>
    <!--  <LoginPage @page="changePage" @main-page="mainPage" @token="token"/> -->
   </div>
-  <div v-else>
+  <div v-else class="animate__animated animate__fadeInDown">
     <RegisterCard @page="changePage"/>
     <!-- <RegisterPage @page="changePage"/> -->
   </div>

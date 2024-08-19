@@ -46,10 +46,31 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.message === 'updateProgress') {
     console.log('proges in popup', request.progress)
     updateProgressNumber.value = request.progress
+    if (updateProgressNumber.value === 1) {
+      setTimeout(() => {
+        updateProgressNumber.value = 0
+      }, 1000)
+    }
   }
 })
 
+watch(
+  () => updateProgressNumber.value,
+  (newValue) => {
+    updateProgressNumber.value = newValue as number
+  }
+)
+
 extensionExist.value = true
+
+const appReadyTiming = () => {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      appReady.value = false
+      resolve('success')
+    }, 400)
+  })
+}
 
 console.log('local storage', localStorage.getItem('user'))
 
@@ -87,6 +108,8 @@ const getTableDatas = async (token: string) => {
       resolve('success')
     } catch (error) {
       console.log(error)
+      localStorage.removeItem('token')
+      window.location.href = '/'
       reject('error')
       // burada token expire olursa yapılcak işlemleri ayarla
     }
@@ -124,11 +147,18 @@ const existUserhandler = async (email: string) => {
   })
 }
 
+const tempLoading = ref<boolean>(true)
+
 onMounted(async () => {
   console.log('token', token.value)
-  /*   setTimeout(() => {
-    appReady.value = false
-  }, 400) */
+  console.log("temp load 1" , tempLoading.value);
+    setTimeout(() => {
+    tempLoading.value = false
+    console.log("temp load 2" , tempLoading.value);
+  }, 1000)
+  /*   appReadyTiming().then((response) => {
+    console.log('response', response)
+  }) */
 
   chrome.storage.local.get('userExistence', async (data) => {
     if (data.userExistence && data.userExistence.message === 'existUser') {
@@ -321,14 +351,11 @@ const deleteItemsFunc = (id: string) => {
 const deleteItems = async () => {
   if (deleteItemsList.value.length === 0) {
     appReady.value = true
+    toast.error('Veri seçilmedi!')
     return
-  }
-
-  console.log('token delete items', token)
-  if (token.value === null) {
+  } else if (token.value === null) {
     appReady.value = true
-    console.log('token boşa gridi')
-    // burada bir uyarı göster. Toast mesajını aktif ettiğin zaman
+    toast.error('Lütfen giriş yapınız!')
     return
   }
   appReady.value = false
@@ -355,16 +382,6 @@ const deleteItems = async () => {
     console.log(error)
   }
 }
-
-/* const extensionId = 'bkoahppiepfhhkofbhlagafcbklmdedi'
-const messageBody = 'exist'
-if (chrome?.runtime?.sendMessage) {
-  chrome.runtime.sendMessage(extensionId, messageBody, function (response) {
-    console.log('The extension IS installed.', response)
-  })
-} else {
-  console.log('The extension is NOT installed.')
-} */
 
 const openFilter = ref<boolean>(false)
 const searchedUrl = ref<string>('')
@@ -412,6 +429,7 @@ const filterAccuracy = () => {
 
 import AuthPage from './components/AuthPage.vue'
 import LoginCard from './components/LoginCard.vue'
+import ProfileComponent from './components/ProfileComponent.vue'
 
 watch([highAccuracy, mediumAccuracy, lowAccuracy], filterAccuracy)
 watch(searchedUrl, searchUrl)
@@ -430,27 +448,29 @@ const tokenTaken = (tokenn: string) => {
   extensionExist.value = true
   token.value = tokenn
 }
-
 </script>
 
 <template>
-  <div id="popup" class="h-full w-full">
+  <div id="popup" class="h-full w-full p-2">
     <div class="m-a w-full h-full">
       <div class="m-a relative inline-block flex max-w-[600px] items-center justify-center">
         <div v-if="loginPage">
           <AuthPage @main-page="pageChecker" @token="getTableDatas" />
           <!--  <LoginCard /> -->
         </div>
-        <div v-else-if="extensionExist && userExist" class="w-full">
+        <div
+          v-else-if="extensionExist && userExist"
+          class="animate__animated animate__fadeInDown w-full flex items-center justify-between gap-2"
+        >
           <input
             type="text"
             v-model="url"
             :placeholder="extensionExist ? 'URL giriniz' : 'Eklentiniz aktif değil'"
             :disabled="extensionExist ? false : true"
-            class="bg-#FCFCFC border-b-coolGray w-full rounded-3xl border p-4 focus:border-none focus:outline-[#DCE2EE]"
+            class="bg-#FCFCFC border-b-coolGray w-full rounded-sm border p-4 focus:border-none focus:outline-[#DCE2EE]"
           />
           <button
-            class="absolute right-0 h-full rounded-r-3xl bg-[#2F33B0] p-4 text-white transition duration-300 ease-in-out hover:bg-[#3E83F7]"
+            class="h-full rounded-r-sm bg-[#2F33B0] p-4 text-white transition duration-300 ease-in-out hover:bg-[#3E83F7]"
             @click="sendUrlToExtension()"
           >
             Search
@@ -462,17 +482,17 @@ const tokenTaken = (tokenn: string) => {
           </div>
         </div>
         <div v-else-if="!userExist">
-          <div class="notExistAlert text-red ma rounded-md p-5 text-xl">
+          <div class="animate__animated animate__fadeInDown ma rounded-md p-5 text-xl">
             Url aratmak için lütfen
-            <span class="text-blue cursor-pointer" @click="loginPage = !loginPage">giriş</span>
+            <span class="text-[#2C39A6] cursor-pointer" @click="loginPage = !loginPage">giriş</span>
             yapınız.
           </div>
         </div>
       </div>
 
-      <div class="mx-a w-[100%] mt-5 rounded-lg lg:w-[100%]">
+      <div class="mx-a w-[100%] mt-5 lg:w-[100%]">
         <div class="filters flex items-center justify-between">
-          <div class="flex items-center">{{ user }}</div>
+          <div class="flex items-center"><ProfileComponent :user="user" /></div>
           <div class="mb-2 flex w-full items-center justify-end">
             <div class="flex items-center">
               <div class="mr-2 rounded-lg border">
@@ -493,19 +513,22 @@ const tokenTaken = (tokenn: string) => {
 
               <div
                 v-if="openFilter"
-                class="-top-25 -left-30 absolute rounded-lg border-[#2F33B0] p-4 shadow-lg"
+                class="-top-25 -left-50 absolute rounded-lg border-[#2F33B0] p-4 shadow-lg flex items-center justify-between "
               >
-                <div class="mb-5 flex items-center justify-center">Accuracy Filter</div>
-                <div class="flex items-center gap-2">
-                  <input type="checkbox" v-model="highAccuracy" class="mr-1" />
-                  <label>High</label>
+                <div class="">
+                  <div class="mb-5 flex items-center justify-center">Accuracy Filter</div>
+                  <div class="flex items-center gap-2">
+                    <input type="checkbox" v-model="highAccuracy" class="mr-1" />
+                    <label>High</label>
 
-                  <input type="checkbox" v-model="mediumAccuracy" class="mr-1" />
-                  <label>Medium</label>
+                    <input type="checkbox" v-model="mediumAccuracy" class="mr-1" />
+                    <label>Medium</label>
 
-                  <input type="checkbox" v-model="lowAccuracy" class="mr-1" />
-                  <label>Low</label>
+                    <input type="checkbox" v-model="lowAccuracy" class="mr-1" />
+                    <label>Low</label>
+                  </div>
                 </div>
+               <!--  <div>Show just mine urls.</div> -->
               </div>
             </div>
             <div>
@@ -521,7 +544,7 @@ const tokenTaken = (tokenn: string) => {
           <div class="block w-[100%] overflow-x-auto">
             <div class="min-w-800px block">
               <div
-                class="cols-8 font-600 min-h-65px grid rounded-t-lg border border-gray-300 bg-[#2F33B0] text-white"
+                class="cols-8 font-600 min-h-65px grid border border-gray-300 bg-[#2F33B0] text-white"
                 style="grid-template-columns: 0.5fr 1.5fr 2fr 2fr 2fr 2fr 2fr 2fr"
               >
                 <div class="flex h-full w-full items-center p-4">
@@ -558,7 +581,7 @@ const tokenTaken = (tokenn: string) => {
                 </div>
               </div>
               <div class="">
-                <div v-if="appReady" class="w-full overflow-y-auto">
+                <div v-if="appReady && tempLoading === false" class="w-full overflow-y-auto">
                   <!--  max-h-500px -->
                   <div v-for="(value, index) in returnedValues" :key="value._id">
                     <UrlCard
@@ -637,9 +660,9 @@ th {
   color: #373ba6;
 }
 
-.notExistAlert {
+/* .notExistAlert {
   border-color: red !important;
-}
+} */
 
 .detailTransition-enter-active,
 .detailTransition-leave-active {
