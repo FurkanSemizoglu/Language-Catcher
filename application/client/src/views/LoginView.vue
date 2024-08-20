@@ -43,20 +43,36 @@ const login = async () => {
     };
 
     try {
-      const response = await axios.post('http://localhost:5000/auth/login', bodyFormData, {
+      /*   const response = await axios.post('http://localhost:5000/auth/login', bodyFormData, {
         headers: {
           'Content-Type': 'application/json'
         }
+      }); */
+
+      const loginFromApp = new CustomEvent('loginFromApp', {
+        detail: {
+          bodyFormData: bodyFormData
+        }
       });
 
-      console.log(response.data);
+      window.dispatchEvent(loginFromApp);
 
-      if (response.status) {
-        toast.success('Login successful');
-        /*    localStorage.setItem('token', response.data.token); */
-        localStorage.setItem('token', response.data.token);
-        router.push('/home');
-      }
+      window.addEventListener('loginResponse', (e) => {
+        const event = e as CustomEvent;
+        const response = event.detail.response;
+        console.log("login response geldi", response);
+        if (response.status) {
+          toast.success('Login successful');
+          console.log("response ne" , response.response);
+          /*    localStorage.setItem('token', response.data.token); */
+          localStorage.setItem('token', response.token);
+          router.push('/home');
+        }
+        else{
+          // 2 kere gelme sıkıntısı var onu çöz
+          toast.error(response.message);
+        }
+      });
     } catch (err) {
       if (axios.isAxiosError(err)) {
         console.error('Axios error status:', err.response?.status);
@@ -88,7 +104,7 @@ const login = async () => {
         Efilli Dil Algılama Uygulaması
       </div>
     </div>
-    <div class="flex flex-col  w-full items-center justify-center bg-[#FFFFFF] p-4 lg:w-[45%]">
+    <div class="flex w-full flex-col items-center justify-center bg-[#FFFFFF] p-4 lg:w-[45%]">
       <div class="mx-a ml-4 flex w-[90%] flex-col items-center justify-center">
         <div class="font-900 mb-4 text-3xl text-[#2C39A6]">Giriş</div>
         <div class="mt-2 flex w-full flex-col items-center justify-center gap-4">

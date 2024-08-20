@@ -122,7 +122,7 @@ const deleteLanguage = async (req: Request, res: Response) => {
 
 const deletesLanguages = async (req: Request, res: Response) => {
   try {
-    const { email, languageIdList } = req.query;
+    const { email, languageIdList } = req.body;
 
     if (!email || !languageIdList) {
       return res.status(400).json({ error: "Missing email or languageIdList" });

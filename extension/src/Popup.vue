@@ -91,28 +91,27 @@ const getTableDatas = async (token: string) => {
 
           if (response.data) {
             userExist.value = true
+            user.value = response.data.user.email
+
+            console.log('get userrr', response.data.user.email)
+
+            chrome.runtime.sendMessage(
+              {
+                message: 'getUserlanguages',
+                user: user.value
+              },
+              (response) => {
+                returnedValues.value = response.data
+                tempReturnedValues.value = response.data
+                console.log('languagesss', response.data)
+
+                appReady.value = true
+                resolve(returnedValues.value)
+              }
+            )
           } else {
             userExist.value = false
           }
-
-          user.value = response.data.user.email
-
-          console.log('get userrr', response.data.user.email)
-
-          chrome.runtime.sendMessage(
-            {
-              message: 'getUserlanguages',
-              user: user.value
-            },
-            (response) => {
-              returnedValues.value = response.data
-              tempReturnedValues.value = response.data
-              console.log('languagesss', response.data)
-
-              appReady.value = true
-              resolve(returnedValues.value)
-            }
-          )
         }
       )
       /*       console.log(response.data)
@@ -153,7 +152,7 @@ const getTableDatas = async (token: string) => {
     user.value = response.data.user.email; */
 
       appReady.value = true
-      resolve('success')
+     /*  resolve('success') */
     } catch (error) {
       console.log(error)
       localStorage.removeItem('token')
@@ -199,7 +198,7 @@ const existUserhandler = async (email: string) => {
           resolve(token.value)
         })
 
-     /*    resolve(response.token) */
+        /*    resolve(response.token) */
       }
     )
 
@@ -219,6 +218,7 @@ const existUserhandler = async (email: string) => {
 const tempLoading = ref<boolean>(true)
 
 onMounted(async () => {
+  chrome.storage.local.clear()
   console.log('token', token.value)
   console.log('temp load 1', tempLoading.value)
   setTimeout(() => {
@@ -309,11 +309,11 @@ const sendUrlToExtension = () => {
                 langNativeName: element.langNativeName,
                 languageLocation: element.languageLocation,
                 languageAccuracy: element.languageAccuracy,
-                realLangValues: element.realValues, // Assuming realLangValues and realValues are similar
+                realLangValues: element.realValues,
                 date: element.date,
                 belongUser: {
-                  email: '', // Add the appropriate value here
-                  _id: '' // Add the appropriate value here
+                  email: '', 
+                  _id: '' 
                 }
               }
               returnedValues.value.push(transformedElement)

@@ -32,8 +32,114 @@ const login = (bodyFormData: { email: string; password: string }) => {
   })
 }
 
-const getUser = (token: string) => {
+const register = (bodyFormData: { email: string; password: string }) => {
   return new Promise(async (resolve, reject) => {
+    const response = await fetch('http://localhost:5000/auth/register', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(bodyFormData)
+    })
+
+    // Parse the response
+    const data = await response.json()
+    resolve(data)
+  })
+}
+
+const getUser = (token: string) => {
+  console.log('get user func called')
+
+  return new Promise(async (resolve, reject) => {
+    console.log('get user func called 2')
+
+    try {
+      const response = await fetch('http://localhost:5000/auth/user', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ token: token })
+      })
+
+      const data = await response.json()
+      console.log('get user response : ', data)
+
+      if (response.ok) {
+        resolve(data)
+      } else {
+        reject(data)
+      }
+    } catch (error) {
+      console.error('Error in getUser:', error)
+      reject(error)
+    }
+  })
+}
+
+const deletesLanguages = (email: string , languageIdList : string[]) => {
+
+  return new Promise(async (resolve, reject) => {
+    console.log('delete language func called 2' ,email , languageIdList)
+
+    try {
+      const response = await fetch('http://localhost:5000/api/deletesLanguages', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ email: email , languageIdList : languageIdList })
+      })
+
+      const data = await response.json()
+      console.log('delete language response : ', data)
+
+      if (response.ok) {
+        resolve(data)
+      } else {
+        reject(data)
+      }
+    } catch (error) {
+      console.error('Error in deleteLanguage:', error)
+      reject(error)
+    }
+  })
+}
+
+const addLanguage = (languageData: LanguageData , email : string) => {
+
+  return new Promise(async (resolve, reject) => {
+    console.log('add language func called 2')
+
+    try {
+      const response = await fetch('http://localhost:5000/api/addLanguage', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ languageData: languageData , email : email })
+      })
+
+      const data = await response.json()
+      console.log('add language response : ', data)
+
+      if (response.ok) {
+        resolve(data)
+      } else {
+        reject(data)
+      }
+    } catch (error) {
+      console.error('Error in addLanguage:', error)
+      reject(error)
+    }
+  })
+}
+/* 
+const getUser = (token: string) => {
+  console.log("get user func called");
+  return new Promise(async (resolve, reject) => {
+    console.log("get user func called 2");
     const response = await axios.post('http://localhost:5000/auth/user', {
       token: token
     })
@@ -42,15 +148,26 @@ const getUser = (token: string) => {
 
     resolve(response)
   })
-}
+} */
 
-const getUserLanguages = (user: string) => {
+const getUserLanguages = (email: string) => {
   return new Promise(async (resolve, reject) => {
-    const languagesResponse = await axios.get('http://localhost:5000/api/getUserLanguages', {
-      params: { email: user }
-    })
+    console.log("get user language" , email);
+    const response = await fetch('http://localhost:5000/api/getUserLanguages?' + new URLSearchParams({ email: email }), {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
 
-    resolve(languagesResponse)
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+
+    const data = await response.json();
+    console.log('Fetched user languages:', data);
+
+    resolve(data)
   })
 }
 
@@ -110,6 +227,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   }
 
   if (request.message === 'getUser') {
+    console.log('get user received from bg')
     try {
       getUser(request.token).then((data) => {
         sendResponse(data)
@@ -241,6 +359,19 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     // Return true to indicate that the response will be sent asynchronously
     return true
   } else if (request.message === 'register') {
+    console.log('register part worked', request.bodyFormData)
+
+    try {
+      register(request.bodyFormData).then((data) => {
+        sendResponse(data)
+      })
+    } catch (error: any) {
+      console.error('Error during login:', error)
+      sendResponse({ error: error.message })
+    }
+
+    // Return true to indicate that the response will be sent asynchronously
+    return true
   } else if (request.message === 'getUserrr') {
     /*     const response = await axios.post('http://localhost:5000/auth/user', {
       token: request.token
@@ -260,15 +391,22 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
     return true
   } else if (request.message === 'getUserLanguages') {
-    /*    const languagesResponse = await axios.get('http://localhost:5000/api/getUserLanguages', {
-      params: { email: request.user }
-    })
-
-    sendResponse(languagesResponse) */
-
-    getUserLanguages(request.user).then((data) => {
+    getUserLanguages(request.email).then((data) => {
       sendResponse(data)
     })
+    return true
+  }
+  else if(request.message === 'addLanguage') {
+    addLanguage(request.languageData , request.email).then((data) => {
+      sendResponse(data)
+    } )
+    return true
+  }
+  else if(request.message === 'deletesLanguages') {
+    console.log("bg aldı language id list" , request.languageIdList)  ;
+    deletesLanguages(request.email , request.languageIdList).then((data) => {
+      sendResponse(data)
+    } )
     return true
   }
   if (request.action === 'language-catcher-start') {

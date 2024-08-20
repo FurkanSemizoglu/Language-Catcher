@@ -62,28 +62,85 @@ window.addEventListener('languageCatcherResult', async (e) => {
     for (let index = 0; index < resultArray.length; index++) {
       const element = resultArray[index];
       console.log('element', element);
-      const response = await axios.post('http://localhost:5000/api/addLanguage', {
+      /*    const response = await axios.post('http://localhost:5000/api/addLanguage', {
         email: user.value,
         languageData: element
+      }); */
+
+      const addLanguageFromApp = new CustomEvent('addLanguageFromApp', {
+        detail: {
+          email: user.value,
+          languageData: element
+        }
+      });
+
+      window.dispatchEvent(addLanguageFromApp);
+
+      //  burada returned values yenilenmiyor onu bi
+      window.addEventListener('addLanguageResponse', async (e) => {
+        const event = e as CustomEvent;
+        console.log('event.detail add language response', event.detail.response.language);
+
+        returnedValues.value.push(event.detail.response.language);
+        tempReturnedValues.value.push(event.detail.response.language);
+        console.log('array : ', returnedValues.value);
       });
 
       if (index === resultArray.length - 1) {
-        const languagesResponse = await axios.get('http://localhost:5000/api/getUserLanguages', {
-          params: { email: response.data.user.email }
+        const getUserLanguagesFromApp = new CustomEvent('getUserLanguagesFromApp', {
+          detail: {
+            email: user.value
+          }
+        });
+
+        window.dispatchEvent(getUserLanguagesFromApp);
+
+        window.addEventListener('getUserLanguagesResponse', async (e) => {
+          const event = e as CustomEvent;
+          console.log('event.detail get user languages response', event.detail);
+
+          console.log('returned values', returnedValues.value);
+          appReady.value = true;
+          returnedValues.value = event.detail.response
+          tempReturnedValues.value = event.detail.response
+          loadingButton.value = false;
+        });
+        /*     const languagesResponse = await axios.get('http://localhost:5000/api/getUserLanguages', {
+          params: { email: user.value }
         });
         console.log('language response', languagesResponse.data);
 
         returnedValues.value = languagesResponse.data;
         tempReturnedValues.value = languagesResponse.data;
-        loadingButton.value = false;
+        loadingButton.value = false; */
         /* languagesResponse.data.sort((a: extensionResult, b: extensionResult) => {
           return new Date(b.date).getTime() - new Date(a.date).getTime();
-        }); */
-        console.log('sorted languages', languagesResponse.data);
+        });
+   /*      console.log('sorted languages', languagesResponse.data); */
       }
     }
 
-    /*  const languagesResponse = await axios.get('http://localhost:5000/api/getUserLanguages', {
+    // returnedvalues güncellenmiyor ona bi bak
+
+    const getUserLanguagesFromApp = new CustomEvent('getUserLanguagesFromApp', {
+      detail: {
+        email: user.value
+      }
+    });
+
+    window.dispatchEvent(getUserLanguagesFromApp);
+
+    window.addEventListener('getUserLanguagesResponse', async (e) => {
+      const event = e as CustomEvent;
+      console.log('event.detail get user languages response', event.detail);
+
+      console.log('returned values', returnedValues.value);
+      appReady.value = true;
+      returnedValues.value = event.detail.response;
+      tempReturnedValues.value = event.detail.response;
+      loadingButton.value = false;
+    });
+/*     const languagesResponse = await axios.get('http://localhost:5000/api/getUserLanguages', {
       params: { email: user.value }
     });
     console.log('languagesResponse', languagesResponse.data);
@@ -102,24 +159,55 @@ onMounted(async () => {
   console.log('token', token.value);
 
   try {
-    const response = await axios.post('http://localhost:5000/auth/user', {
+    /*  const response = await axios.post('http://localhost:5000/auth/user', {
       token: token.value
+    }); */
+
+    const getUserFromApp = new CustomEvent('getUserFromApp', {
+      detail: {
+        token: token.value
+      }
     });
 
-    console.log(response.data);
-    user.value = response.data.user.email;
+    window.dispatchEvent(getUserFromApp);
 
-    const languagesResponse = await axios.get('http://localhost:5000/api/getUserLanguages', {
-      params: { email: response.data.user.email }
+    window.addEventListener('getUserResponse', async (e) => {
+      const event = e as CustomEvent;
+      console.log('event.detail get user response', event.detail);
+
+      user.value = event.detail.response.user.email;
+      const response = event.detail.response;
+
+      const getUserLanguagesFromApp = new CustomEvent('getUserLanguagesFromApp', {
+        detail: {
+          email: response.user.email
+        }
+      });
+
+      window.dispatchEvent(getUserLanguagesFromApp);
+
+      window.addEventListener('getUserLanguagesResponse', async (e) => {
+        const event = e as CustomEvent;
+        console.log('event.detail get user languages response', event.detail);
+
+        returnedValues.value = event.detail.response;
+        tempReturnedValues.value = event.detail.response;
+        console.log('returned values', returnedValues.value);
+        appReady.value = true;
+      });
+
+      /*       const languagesResponse = await axios.get('http://localhost:5000/api/getUserLanguages', {
+        params: { email: response.data.user.email }
+      });
+
+      returnedValues.value = languagesResponse.data;
+      tempReturnedValues.value = languagesResponse.data;
+      console.log('languagesss', languagesResponse.data);
+      console.log('email ', response.data.user.email);
+      user.value = response.data.user.email;
+
+      appReady.value = true; */
     });
-
-    returnedValues.value = languagesResponse.data;
-    tempReturnedValues.value = languagesResponse.data;
-    console.log('languagesss', languagesResponse.data);
-    console.log('email ', response.data.user.email);
-    user.value = response.data.user.email;
-
-    appReady.value = true;
   } catch (error) {
     console.log(error);
   }
@@ -231,8 +319,33 @@ const deleteItems = async () => {
 
   console.log('delete items clicked  ', deleteItemsList.value);
   console.log('user ', user.value);
+  const stringIdList : string[] = deleteItemsList.value.map((item) => item.toString());
   try {
-    const response = await axios.delete('http://localhost:5000/api/deletesLanguages', {
+
+    console.log("object before sending", deleteItemsList.value);
+
+    const deletesLanguagesFromApp = new CustomEvent('deleteLanguagesFromApp', {
+      detail: {
+        email: user.value,
+        languageIdList: stringIdList 
+      }
+    });
+
+    window.dispatchEvent(deletesLanguagesFromApp);
+
+    console.log("gödenrildi dispatch");
+    window.addEventListener('deletesLanguagesResponse', async (e) => {
+      const event = e as CustomEvent;
+      console.log('event.detail delete languages response', event.detail);
+
+      returnedValues.value = event.detail.response;
+      tempReturnedValues.value = event.detail.response;
+      console.log('returned values', returnedValues.value);
+      appReady.value = true;
+      allItemsSelected.value = false;
+      deleteItemsList.value = [];
+    });
+/*     const response = await axios.delete('http://localhost:5000/api/deletesLanguages', {
       params: { email: user.value, languageIdList: deleteItemsList.value }
     });
 
@@ -244,7 +357,7 @@ const deleteItems = async () => {
     console.log('after delete items list ', deleteItemsList.value);
     appReady.value = true;
     allItemsSelected.value = false;
-    deleteItemsList.value = [];
+    deleteItemsList.value = []; */
   } catch (error) {
     console.log(error);
   }
@@ -382,7 +495,7 @@ watch(searchedUrl, searchUrl);
         </div>
       </div>
       <!--  <div class="block overflow-x-auto">   -->
-      <div class="mx-a  mb-5 mt-10 w-[100%] rounded-lg lg:w-[80%]">
+      <div class="mx-a mb-5 mt-10 w-[100%] rounded-lg lg:w-[80%]">
         <div class="filters">
           <div class="mb-2 flex w-full items-center justify-end">
             <div class="flex items-center">
@@ -428,9 +541,9 @@ watch(searchedUrl, searchUrl);
             </div>
           </div>
         </div>
-        <div class="block w-[100%] relative">
+        <div class="relative block w-[100%]">
           <div class="block w-[100%] overflow-x-auto">
-            <div class="min-w-800px block ">
+            <div class="min-w-800px block">
               <div
                 class="cols-7 font-600 min-h-65px grid rounded-t-lg border border-gray-300 bg-[#2F33B0] text-white"
                 style="grid-template-columns: 0.5fr 1.5fr 2fr 2fr 2fr 2fr 2fr"
@@ -491,7 +604,7 @@ watch(searchedUrl, searchUrl);
                 <div
                   v-else
                   class="ma top-50 absolute z-50 flex h-full w-full items-center justify-center"
-                >               
+                >
                   <v-progress-circular
                     :size="150"
                     color="primary"
