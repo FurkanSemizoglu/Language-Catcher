@@ -189,7 +189,7 @@ onMounted(async () => {
     tempLoading.value = false
     console.log('temp load 2', tempLoading.value)
   }, 1000)
-  chrome.storage.local.clear()
+
   chrome.runtime.sendMessage({ message: 'getToken' }, function (response) {
     console.log("token value  ee frommm rumtine lisee " , response);
     token.value = response

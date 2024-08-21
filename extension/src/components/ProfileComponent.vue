@@ -15,17 +15,39 @@ watch(
   }
 )
 /* const shortName = props.user.substring(0, 2).toUpperCase() */
+
+const logOut = () => {
+ chrome.runtime.sendMessage({ message: 'logOut' } , (response)=> {
+    console.log('response', response)
+    if(response.status){
+      location.reload()
+    }
+  })
+ 
+}
 </script>
 <template>
-  <div v-if="props.user" class="relative">
+  <div
+    v-if="props.user"
+    class="relative"
+    @mouseenter="openProfileDetail = true"
+    @mouseleave="openProfileDetail = false"
+  >
     <div
       class="w-25px h-25px p-3 mb-1 border border-[#2F33B0]! flex items-center justify-center cursor-pointer"
       @click="openProfileDetail = !openProfileDetail"
     >
       {{ shortName }}
     </div>
+    <div  class="border border-[#2F33B0]! flex flex-col items-center gap-4 p-4">
+      <div>
+        {{ props.user }}
+      </div>
 
-    <div v-if="openProfileDetail" class="absolute bottom-0 top-20 mb-36 bg-red">
+      <div class="cursor-pointer text-[#2F33B0] " @click="logOut">Çıkış Yap</div>
+    </div>
+
+    <div v-if="openProfileDetail" class="absolute left-4 -top-4 bg-red">
       <div>
         {{ props.user }}
       </div>
@@ -33,7 +55,7 @@ watch(
       <div>Çıkış Yap</div>
     </div>
   </div>
-<!--   <div class="ml-2">
+  <!--   <div class="ml-2">
     <FontAwesomeIcon :icon="faSquare" class="cursor-pointer" />
    
   </div> -->
