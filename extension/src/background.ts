@@ -1,10 +1,6 @@
 console.log('background is running')
 
 import type { LanguageData } from './types'
-import axios from 'axios'
-/* import "regenerator-runtime/runtime.js"; */
-/* 
-chrome.storage.local.set({ variable: "exist" }); */
 
 let showTable = true
 
@@ -26,9 +22,34 @@ const login = (bodyFormData: { email: string; password: string }) => {
       body: JSON.stringify(bodyFormData)
     })
 
-    // Parse the response
     const data = await response.json()
-    resolve(data)
+
+    if (response.ok) {
+      // Assuming data.token contains the token
+      const token = data.token
+      console.log('data token ', token)
+
+      chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+        const activeTab = tabs[0]
+        if (activeTab && activeTab.id) {
+          chrome.tabs.sendMessage(activeTab.id, { action: 'saveToken', token }, (response) => {
+            console.log('response from content languages data  : ', response)
+            resolve(data)
+          })
+        }
+      })
+    }
+  })
+}
+
+const getToken = () => {
+  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    const activeTab = tabs[0]
+    if (activeTab && activeTab.id) {
+      chrome.tabs.sendMessage(activeTab.id, { action: 'getToken' }, (response) => {
+        console.log('response from content languages data  : ', response)
+      })
+    }
   })
 }
 
@@ -78,10 +99,9 @@ const getUser = (token: string) => {
   })
 }
 
-const deletesLanguages = (email: string , languageIdList : string[]) => {
-
+const deletesLanguages = (email: string, languageIdList: string[]) => {
   return new Promise(async (resolve, reject) => {
-    console.log('delete language func called 2' ,email , languageIdList)
+    console.log('delete language func called 2', email, languageIdList)
 
     try {
       const response = await fetch('http://localhost:5000/api/deletesLanguages', {
@@ -89,7 +109,7 @@ const deletesLanguages = (email: string , languageIdList : string[]) => {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ email: email , languageIdList : languageIdList })
+        body: JSON.stringify({ email: email, languageIdList: languageIdList })
       })
 
       const data = await response.json()
@@ -107,8 +127,41 @@ const deletesLanguages = (email: string , languageIdList : string[]) => {
   })
 }
 
-const addLanguage = (languageData: LanguageData , email : string) => {
+const logOut = () => {
+  return new Promise(async (resolve, reject) => {
+    console.log('log out func called 2')
 
+    try {
+      const response = await fetch('http://localhost:5000/auth/logout', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+
+      const data = await response.json()
+      console.log('log out response : ', data)
+
+      if (response.ok) {
+        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+          const activeTab = tabs[0]
+          if (activeTab && activeTab.id) {
+            chrome.tabs.sendMessage(activeTab.id, { action: 'deleteToken' }, (response) => {
+              resolve(data)
+            })
+          }
+        })
+      } else {
+        reject(data)
+      }
+    } catch (error) {
+      console.error('Error in logOut:', error)
+      reject(error)
+    }
+  })
+}
+
+const addLanguage = (languageData: LanguageData, email: string) => {
   return new Promise(async (resolve, reject) => {
     console.log('add language func called 2')
 
@@ -118,7 +171,7 @@ const addLanguage = (languageData: LanguageData , email : string) => {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ languageData: languageData , email : email })
+        body: JSON.stringify({ languageData: languageData, email: email })
       })
 
       const data = await response.json()
@@ -135,37 +188,26 @@ const addLanguage = (languageData: LanguageData , email : string) => {
     }
   })
 }
-/* 
-const getUser = (token: string) => {
-  console.log("get user func called");
-  return new Promise(async (resolve, reject) => {
-    console.log("get user func called 2");
-    const response = await axios.post('http://localhost:5000/auth/user', {
-      token: token
-    })
-
-    console.log('get user response : ', response)
-
-    resolve(response)
-  })
-} */
 
 const getUserLanguages = (email: string) => {
   return new Promise(async (resolve, reject) => {
-    console.log("get user language" , email);
-    const response = await fetch('http://localhost:5000/api/getUserLanguages?' + new URLSearchParams({ email: email }), {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
+    console.log('get user language', email)
+    const response = await fetch(
+      'http://localhost:5000/api/getUserLanguages?' + new URLSearchParams({ email: email }),
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }
+    )
 
     if (!response.ok) {
-      throw new Error('Network response was not ok');
+      throw new Error('Network response was not ok')
     }
 
-    const data = await response.json();
-    console.log('Fetched user languages:', data);
+    const data = await response.json()
+    console.log('Fetched user languages:', data)
 
     resolve(data)
   })
@@ -201,17 +243,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     console.log('Login part worked', request.bodyFormData)
 
     try {
-      /*    const response = await fetch('http://localhost:5000/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(request.bodyFormData),
-      });
-
- 
-      const data = await response.json();
-      console.log('response from bg', data); */
       login(request.bodyFormData).then((data) => {
         sendResponse(data)
       })
@@ -395,20 +426,40 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       sendResponse(data)
     })
     return true
-  }
-  else if(request.message === 'addLanguage') {
-    addLanguage(request.languageData , request.email).then((data) => {
+  } else if (request.message === 'addLanguage') {
+    addLanguage(request.languageData, request.email).then((data) => {
       sendResponse(data)
-    } )
+    })
+    return true
+  } else if (request.message === 'deletesLanguages') {
+    console.log('bg aldı language id list', request.languageIdList)
+    deletesLanguages(request.email, request.languageIdList).then((data) => {
+      sendResponse(data)
+    })
+    return true
+  } else if (request.message === 'logOut') {
+    logOut().then((data) => {
+      sendResponse(data)
+    })
+    return true
+  } else if (request.message === 'getToken') {
+    console.log("get token çalıştı");
+
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      const activeTab = tabs[0]
+      if (activeTab && activeTab.id) {
+        chrome.tabs.sendMessage(activeTab.id, { action: 'getToken' }, (response) => {
+          console.log('response from content languages data  : ', response)
+
+          sendResponse(response.token)
+
+          
+        })
+      }
+    })
     return true
   }
-  else if(request.message === 'deletesLanguages') {
-    console.log("bg aldı language id list" , request.languageIdList)  ;
-    deletesLanguages(request.email , request.languageIdList).then((data) => {
-      sendResponse(data)
-    } )
-    return true
-  }
+
   if (request.action === 'language-catcher-start') {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs: any) => {
       chrome.tabs.sendMessage(

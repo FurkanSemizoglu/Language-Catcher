@@ -65,7 +65,8 @@ const login = async () => {
           toast.success('Login successful');
           console.log("response ne" , response.response);
           /*    localStorage.setItem('token', response.data.token); */
-          localStorage.setItem('token', response.token);
+          /* localStorage.setItem('token', response.token); */
+          localStorage.getItem('token');
           router.push('/home');
         }
         else{

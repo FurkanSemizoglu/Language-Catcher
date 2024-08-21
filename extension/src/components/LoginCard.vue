@@ -57,14 +57,17 @@ const login = async () => {
           bodyFormData: bodyFormData
         },
         (response) => {
-          console.log(response.data)
+          console.log(response)
 
           if (response.status) {
             toast.success('Login successful')
             /*    localStorage.setItem('token', response.data.token); */
-            localStorage.setItem('token', response.data.token)
-            emit('token', response.data.token)
+            localStorage.setItem('token', response.token)
+            emit('token', response.token)
             emit('mainPage', true)
+          }
+          else {
+            toast.error(response.message)
           }
         }
       )

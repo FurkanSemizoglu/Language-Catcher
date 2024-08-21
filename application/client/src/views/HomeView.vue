@@ -158,6 +158,11 @@ window.addEventListener('languageCatcherResult', async (e) => {
 onMounted(async () => {
   console.log('token', token.value);
 
+ /*  chrome.runtime.sendMessage({ message: 'getToken' }, function (response) {
+    console.log("token value  ee frommm rumtine lisee " , response);
+
+  }); */
+
   try {
     /*  const response = await axios.post('http://localhost:5000/auth/user', {
       token: token.value
@@ -196,17 +201,6 @@ onMounted(async () => {
         appReady.value = true;
       });
 
-      /*       const languagesResponse = await axios.get('http://localhost:5000/api/getUserLanguages', {
-        params: { email: response.data.user.email }
-      });
-
-      returnedValues.value = languagesResponse.data;
-      tempReturnedValues.value = languagesResponse.data;
-      console.log('languagesss', languagesResponse.data);
-      console.log('email ', response.data.user.email);
-      user.value = response.data.user.email;
-
-      appReady.value = true; */
     });
   } catch (error) {
     console.log(error);
@@ -233,10 +227,25 @@ const sendUrlToExtension = () => {
 };
 // kullanıldığı domainin tabına kaydet localstorageda
 const logout = async () => {
-  const response = await axios.get('http://localhost:5000/auth/logout');
+/*   const response = await axios.get('http://localhost:5000/auth/logout'); */
 
-  localStorage.removeItem('token');
-  window.location.href = '/';
+  const logOutFromApp = new CustomEvent('logOutFromApp', {
+    detail: {
+      message : 'logOut'
+    }
+  });
+
+  window.dispatchEvent(logOutFromApp);
+
+  window.addEventListener('logOutResponse', async (e) => {
+    const event = e as CustomEvent;
+    console.log('event.detail log out response', event.detail);
+
+   /*  localStorage.removeItem('token'); */
+    window.location.href = '/';
+  });
+/*   localStorage.removeItem('token');
+  window.location.href = '/'; */
 };
 
 const sortDate = () => {

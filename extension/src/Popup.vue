@@ -77,9 +77,6 @@ console.log('local storage', localStorage.getItem('user'))
 const getTableDatas = async (token: string) => {
   return new Promise(async (resolve, reject) => {
     try {
-      /*     const response = await axios.post('http://localhost:5000/auth/user', {
-        token: token
-      }) */
 
       chrome.runtime.sendMessage(
         {
@@ -87,25 +84,30 @@ const getTableDatas = async (token: string) => {
           token: token
         },
         (response) => {
-          console.log('response getr userr', response.data)
+          console.log('bide repsone var mı ', response)
+          console.log('response getr userr', response.user)
 
-          if (response.data) {
+          if (response) {
             userExist.value = true
-            user.value = response.data.user.email
+            user.value = response.user.email
 
-            console.log('get userrr', response.data.user.email)
+            console.log('get userrr', response.user.email)
 
             chrome.runtime.sendMessage(
               {
-                message: 'getUserlanguages',
-                user: user.value
+                message: 'getUserLanguages',
+                email: user.value
               },
               (response) => {
-                returnedValues.value = response.data
-                tempReturnedValues.value = response.data
-                console.log('languagesss', response.data)
+                console.log('get juser languages', response)
+                returnedValues.value = response
+                tempReturnedValues.value = response
+                console.log('languagesss', response)
 
                 appReady.value = true
+                console.log("appready.value " , appReady.value);
+                console.log("temp load" ,tempLoading.value);
+
                 resolve(returnedValues.value)
               }
             )
@@ -114,45 +116,10 @@ const getTableDatas = async (token: string) => {
           }
         }
       )
-      /*       console.log(response.data)
 
-      if (response.data) {
-        userExist.value = true
-      } else {
-        userExist.value = false
-      }
-
-      user.value = response.data.user.email */
-
-      // Burada bütün veriler gösterilecek  token yok ise yani başka apiye istek atılacak
-      /* user.value = 'furkan@gmail.com' */
-      /*       const languagesResponse = await axios.get('http://localhost:5000/api/getAllLanguages') */
-      /*  const languagesResponse = await axios.get('http://localhost:5000/api/getUserLanguages', {
-        params: { email: user.value }
-      }) */
-      /*  chrome.runtime.sendMessage(
-        {
-          message: 'getUserlanguages',
-          user: user.value
-        },
-        (response) => {
-          returnedValues.value = response.data
-          tempReturnedValues.value = response.data
-          console.log('languagesss', response.data)
-
-          appReady.value = true
-          resolve('success')
-        }
-      ) */
-      /*       returnedValues.value = languagesResponse.data
-      tempReturnedValues.value = languagesResponse.data
-      console.log('languagesss', languagesResponse.data) */
-
-      /*  console.log('email ', response.data.user.email);
-    user.value = response.data.user.email; */
 
       appReady.value = true
-     /*  resolve('success') */
+      /*  resolve('success') */
     } catch (error) {
       console.log(error)
       localStorage.removeItem('token')
@@ -194,7 +161,7 @@ const existUserhandler = async (email: string) => {
         token.value = response.token
 
         getTableDatas(response.token).then((response) => {
-          console.log('response', response)
+          console.log('response of get table datas', response)
           resolve(token.value)
         })
 
@@ -218,9 +185,37 @@ const existUserhandler = async (email: string) => {
 const tempLoading = ref<boolean>(true)
 
 onMounted(async () => {
+  setTimeout(() => {
+    tempLoading.value = false
+    console.log('temp load 2', tempLoading.value)
+  }, 1000)
   chrome.storage.local.clear()
+  chrome.runtime.sendMessage({ message: 'getToken' }, function (response) {
+    console.log("token value  ee frommm rumtine lisee " , response);
+    token.value = response
+    if (token.value === null && !userExist.value) {
+    console.log('token null')
+    const storedValues = localStorage.getItem('returnedValues')
+    console.log('bura token boşsa ', storedValues)
+    returnedValues.value = storedValues ? JSON.parse(storedValues) : []
+
+
+    appReady.value = true
+    return
+  } else if (!userExist.value && token.value !== null) {
+    const existValues = localStorage.getItem('returnedValues')
+
+    localStorage.removeItem('returnedValues')
+    console.log('token verisi çalışıt')
+    getTableDatas(token.value)
+  }
+
+  });
+/*   console.log("get toke n " , localStorage.getItem('token'));
+
   console.log('token', token.value)
   console.log('temp load 1', tempLoading.value)
+
   setTimeout(() => {
     tempLoading.value = false
     console.log('temp load 2', tempLoading.value)
@@ -235,15 +230,17 @@ onMounted(async () => {
         console.log('responseeeeee', response)
 
         if (response) {
+          console.log('response çalışıye')
           token.value = response as string
           chrome.storage.local.clear()
           localStorage.removeItem('token')
         }
+        chrome.storage.local.clear()
       })
-      return
     }
   })
 
+  console.log('user exist value ', userExist.value)
   if (userExist.value) {
     console.log('burda storage silindi')
     chrome.storage.local.clear()
@@ -251,25 +248,25 @@ onMounted(async () => {
   }
 
   console.log('user existence ', userExist)
-
+  console.log('token exsitenec ', token.value)
   if (token.value === null && !userExist.value) {
     console.log('token null')
     const storedValues = localStorage.getItem('returnedValues')
+    console.log('bura token boşsa ', storedValues)
     returnedValues.value = storedValues ? JSON.parse(storedValues) : []
-    /*     const response = await axios.get('http://localhost:5000/api/getAllLanguages')
 
-    returnedValues.value = response.data
-    tempReturnedValues.value = response.data
-    console.log('languagesss', response.data) */
 
     appReady.value = true
     return
   } else if (!userExist.value && token.value !== null) {
+    const existValues = localStorage.getItem('returnedValues')
+
+    localStorage.removeItem('returnedValues')
     console.log('token verisi çalışıt')
     getTableDatas(token.value)
   }
 
-  console.log('buranın çalışmaması lazım')
+  console.log('buranın çalışmaması lazım') */
 })
 
 const sendUrlToExtension = () => {
@@ -312,8 +309,8 @@ const sendUrlToExtension = () => {
                 realLangValues: element.realValues,
                 date: element.date,
                 belongUser: {
-                  email: '', 
-                  _id: '' 
+                  email: '',
+                  _id: ''
                 }
               }
               returnedValues.value.push(transformedElement)
@@ -331,18 +328,39 @@ const sendUrlToExtension = () => {
           for (let index = 0; index < resultArray.length; index++) {
             const element = resultArray[index]
             console.log('element', element)
-            const response = await axios.post('http://localhost:5000/api/addLanguage', {
+            chrome.runtime.sendMessage(
+              {
+                message: 'addLanguage',
+                email: user.value,
+                languageData: element
+              },
+              (response) => {
+                console.log('response', response)
+                if (index === resultArray.length - 1) {
+                  chrome.runtime.sendMessage(
+                    {
+                      message: 'getUserLanguages',
+                      email: user.value
+                    },
+                    (response) => {
+                      console.log('response', response)
+                      returnedValues.value = response
+                      tempReturnedValues.value = response
+                      loadingButton.value = false
+                      console.log('sorted languages', response)
+                    }
+                  )
+                }
+              }
+            )
+
+            /*   const response = await axios.post('http://localhost:5000/api/addLanguage', {
               email: user.value,
               languageData: element
             })
 
             if (index === resultArray.length - 1) {
-              /*   const languagesResponse = await axios.get(
-                'http://localhost:5000/api/getUserLanguages',
-                {
-                  params: { email: response.data.user.email }
-                }
-              ) */
+            
               const languagesResponse = await axios.get('http://localhost:5000/api/getAllLanguages')
               console.log('language response', languagesResponse.data)
 
@@ -351,7 +369,7 @@ const sendUrlToExtension = () => {
               loadingButton.value = false
 
               console.log('sorted languages', languagesResponse.data)
-            }
+            } */
           }
         } catch (error) {
           console.log(error)
@@ -470,7 +488,24 @@ const deleteItems = async () => {
   console.log('delete items clicked  ', deleteItemsList.value)
   console.log('user ', user.value)
   try {
-    const response = await axios.delete('http://localhost:5000/api/deletesLanguages', {
+    chrome.runtime.sendMessage(
+      {
+        message: 'deletesLanguages',
+        email: user.value,
+        languageIdList: deleteItemsList.value
+      },
+      (response) => {
+        console.log('response', response)
+        returnedValues.value = response
+        tempReturnedValues.value = response
+        console.log('returned values', returnedValues.value)
+        console.log('after delete items list ', deleteItemsList.value)
+        appReady.value = true
+        allItemsSelected.value = false
+        deleteItemsList.value = []
+      }
+    )
+    /*     const response = await axios.delete('http://localhost:5000/api/deletesLanguages', {
       params: { email: user.value, languageIdList: deleteItemsList.value }
     })
 
@@ -482,7 +517,7 @@ const deleteItems = async () => {
     console.log('after delete items list ', deleteItemsList.value)
     appReady.value = true
     allItemsSelected.value = false
-    deleteItemsList.value = []
+    deleteItemsList.value = [] */
   } catch (error) {
     console.log(error)
   }

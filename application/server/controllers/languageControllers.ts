@@ -183,7 +183,7 @@ const deletesLanguages = async (req: Request, res: Response) => {
     );
 
     await user.save();
-    res.status(200).json(languages);
+    res.status(200).json(user.languageUrls);
   } catch (error: any) {
     res.status(500).json({ error: error.message });
   }

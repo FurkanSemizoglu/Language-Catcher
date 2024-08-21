@@ -1,6 +1,7 @@
 import DetectLanguage from 'detectlanguage'
 import { languages } from './types'
 import type { LanguageLocation, LanguageData, RealValues, ExtensionResponse } from './types'
+
 console.log('content is running for language-catcher-extension')
 
 let htmlTag: boolean = false
@@ -18,6 +19,43 @@ const realValues: RealValues = {
   realLangMeta: ''
 }
 
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request.action === 'saveToken') {
+    localStorage.setItem('token', request.token)
+    sendResponse({ status: 'success' })
+
+    return true
+  }
+  else if (request.action === 'deleteToken') {
+    localStorage.removeItem('token')
+    sendResponse({ status: 'success' })
+
+    return true
+  }
+  else if(request.action === 'getToken') {
+    const token = localStorage.getItem('token')
+    console.log("token , ",token);
+    sendResponse({ token:token })
+
+    return true
+  }
+})
+
+
+window.addEventListener('logOutFromApp', (e) => { 
+  console.log('logOutFromApp')
+  chrome.runtime.sendMessage({ message: 'logOut' }, (response) => {
+    console.log('response from background for logOut', response)
+    const logOutResponse = new CustomEvent('logOutResponse', {
+      detail: {
+        response: response
+      }
+    })
+
+    window.dispatchEvent(logOutResponse)
+  })
+})
+
 window.addEventListener('deleteLanguagesFromApp', (e) => {
   const event = e as CustomEvent
   console.log("listerner çalıştır" , event.detail);
@@ -26,7 +64,7 @@ window.addEventListener('deleteLanguagesFromApp', (e) => {
   console.log("object languageIdList : ", languageIdlist);
   chrome.runtime.sendMessage({ message: 'deletesLanguages', email : email , languageIdList : languageIdlist }, (response) => {
     console.log('response from background for deleteLanguage', response)
-    const deletesLanguageResponse = new CustomEvent('deletesLanguagesResponse ', {
+    const deletesLanguageResponse = new CustomEvent('deletesLanguagesResponse', {
       detail: {
         response: response
       }
@@ -76,10 +114,20 @@ window.addEventListener('registerFromApp', (e) => {
 
 window.addEventListener('existUser', (e) => {
   const event = e as CustomEvent
-  console.log('event', event.detail.user)
-  chrome.runtime.sendMessage({ message: 'existUser', user: event.detail.user }, (response) => {
+  console.log('event exist USer', event.detail.user)
+
+  const bodyFormData = {
+    email: event.detail.user,
+    password : "Furkan55?"
+  }
+/*   chrome.runtime.sendMessage({ message: 'existUser', user: event.detail.user }, (response) => {
     console.log('response from background for existUser', response)
-  })
+  }) */
+    chrome.runtime.sendMessage({ message: 'login', bodyFormData: bodyFormData }, (response) => {
+      console.log('response from background for existUser', response)
+      /* location.reload(); */
+      return true
+    })
 })
 
 window.addEventListener('getUserFromApp', (e) => {
@@ -138,7 +186,7 @@ window.addEventListener('addLanguageFromApp', (e) => {
 let isInjected = true
 
 function showTableContent() {
-  const container = document.getElementById('showTable')
+  const container = document.getElementById('placeToShowExtensionTable')
   if (container) {
     const iframe = document.createElement('iframe')
     /*  iframe.src = 'http://localhost:5173/' */

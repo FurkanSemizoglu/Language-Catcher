@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import axios from 'axios'
-import { ref, watch } from 'vue'
+import { ref, watch , defineEmits} from 'vue'
 
 const email = ref<string>('')
 const password = ref<string>('')
@@ -12,6 +12,7 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { faEye } from '@fortawesome/free-solid-svg-icons'
 import { faEyeSlash } from '@fortawesome/free-solid-svg-icons'
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons'
+
 
 const passwordFieldType = ref('password')
 const passwordFieldType2 = ref('password')
@@ -36,6 +37,10 @@ const togglePasswordVisibility2 = () => {
   passwordFieldType2.value = passwordFieldType2.value === 'password' ? 'text' : 'password'
 }
 
+const emit = defineEmits<{
+  (e: 'page', page: string): void
+}>()
+
 const toast = useToast()
 
 const register = async () => {
@@ -50,7 +55,23 @@ const register = async () => {
     }
 
     try {
-      const response = await axios.post('http://localhost:5000/auth/register', bodyFormData, {
+      chrome.runtime.sendMessage(
+        {
+          message: 'register',
+          bodyFormData: bodyFormData
+        },
+        (response) => {
+          if (response.status) {
+            toast.success('Register successful')
+            emit('page', 'login')
+            /* router.push('/'); */
+          }
+          else{
+            toast.error(response.message)
+          }
+        }
+      )
+   /*    const response = await axios.post('http://localhost:5000/auth/register', bodyFormData, {
         headers: {
           'Content-Type': 'application/json'
         }
@@ -60,8 +81,8 @@ const register = async () => {
 
       if (response.status) {
         toast.success('Register successful')
-        /* router.push('/'); */
-      }
+        
+      } */
     } catch (err) {
       if (axios.isAxiosError(err)) {
         console.error('Axios error status:', err.response?.status)
