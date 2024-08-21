@@ -39,7 +39,7 @@ const logOut = () => {
     >
       {{ shortName }}
     </div>
-    <div  class="border border-[#2F33B0]! flex flex-col items-center gap-4 p-4">
+    <div  class="absolute left-8 -top-4 border border-[#2F33B0]! flex flex-col items-center gap-4 p-4">
       <div>
         {{ props.user }}
       </div>
@@ -47,13 +47,13 @@ const logOut = () => {
       <div class="cursor-pointer text-[#2F33B0] " @click="logOut">Çıkış Yap</div>
     </div>
 
-    <div v-if="openProfileDetail" class="absolute left-4 -top-4 bg-red">
+    <!-- <div v-if="openProfileDetail" class="absolute left-4 -top-4 bg-red">
       <div>
         {{ props.user }}
       </div>
 
       <div>Çıkış Yap</div>
-    </div>
+    </div> -->
   </div>
   <!--   <div class="ml-2">
     <FontAwesomeIcon :icon="faSquare" class="cursor-pointer" />

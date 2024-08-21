@@ -39,6 +39,19 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
     return true
   }
+  else if(request.action === 'getReturnedValues') {
+    const getReturnedValues = localStorage.getItem('returnedValues')
+    sendResponse(getReturnedValues)
+
+    return true
+  }
+  else if(request.action === 'storeReturnedValues') {
+    console.log("object request.returnedValues : ", request.returnedValues);
+    localStorage.setItem('returnedValues' , request.returnedValues)
+    sendResponse({ status: 'success' })
+
+    return true
+  }
 })
 
 
@@ -303,7 +316,7 @@ const recurciveProcess = (
           languageLocation: response.languageLocation,
           languageAccuracy: response.accuracy,
           realValues: response.realValues,
-          date: date
+          date: date.toString()
         }
       })
 
@@ -377,7 +390,7 @@ const sendProgressEvent = (index: number, arrayLength: number) => {
         languageLocation: response.languageLocation,
         languageAccuracy: response.accuracy,
         realValues: response.realValues,
-        date: date
+        date: date.toString()
       }
     })
 

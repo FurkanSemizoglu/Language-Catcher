@@ -34,7 +34,7 @@ interface ExtensionResponse {
   languageLocation: LanguageLocation
   languageAccuracy: string
   realValues: RealValues
-  date: Date
+  date: string
 }
 
 interface extensionResponse {
@@ -276,7 +276,7 @@ interface extensionResult {
   languageLocation: LanguageLocation
   languageAccuracy: string
   realLangValues: realLangValues
-  date: Date
+  date: string
   belongUser : {
     email: string
     _id: string

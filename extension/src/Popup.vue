@@ -74,49 +74,100 @@ const appReadyTiming = () => {
 
 console.log('local storage', localStorage.getItem('user'))
 
-const getTableDatas = async (token: string) => {
+const getTableDatas = async (tokenn: string) => {
   return new Promise(async (resolve, reject) => {
     try {
-
+      const existValues = localStorage.getItem('returnedValues')
+      token.value = tokenn
       chrome.runtime.sendMessage(
         {
           message: 'getUser',
-          token: token
+          token: tokenn
         },
         (response) => {
           console.log('bide repsone var mı ', response)
           console.log('response getr userr', response.user)
 
+          user.value = response.user.email
+
           if (response) {
-            userExist.value = true
-            user.value = response.user.email
+            if (existValues && existValues?.length > 0) {
+              console.log('exist values', existValues)
+              console.log('object', JSON.parse(existValues))
+              const parsedValues = JSON.parse(existValues)
+              for (let index = 0; index < parsedValues.length; index++) {
+                const addDataLanguage: extensionResponse = {
+                  status: parsedValues[index].status,
+                  domain: parsedValues[index].domain,
+                  language: parsedValues[index].language,
+                  languageFetchedFrom: parsedValues[index].languageFetchedFrom,
+                  langName: parsedValues[index].langName,
 
-            console.log('get userrr', response.user.email)
-
-            chrome.runtime.sendMessage(
-              {
-                message: 'getUserLanguages',
-                email: user.value
-              },
-              (response) => {
-                console.log('get juser languages', response)
-                returnedValues.value = response
-                tempReturnedValues.value = response
-                console.log('languagesss', response)
-
-                appReady.value = true
-                console.log("appready.value " , appReady.value);
-                console.log("temp load" ,tempLoading.value);
-
-                resolve(returnedValues.value)
+                  langNativeName: parsedValues[index].langNativeName,
+                  languageLocation: parsedValues[index].languageLocation,
+                  languageAccuracy: parsedValues[index].languageAccuracy,
+                  realValues: parsedValues[index].realLangValues,
+                  date: parsedValues[index].date
+                }
+                console.log('add data languagea', addDataLanguage)
+                chrome.runtime.sendMessage(
+                  {
+                    message: 'addLanguage',
+                    email: user.value,
+                    languageData: addDataLanguage
+                  },
+                  (response) => {
+                    console.log('response for add DAtaaaS', response)
+                    if (index === parsedValues.length - 1) {
+                      chrome.runtime.sendMessage(
+                        {
+                          message: 'getUserLanguages',
+                          email: user.value
+                        },
+                        (response) => {
+                          console.log('response', response)
+                          returnedValues.value = response
+                          tempReturnedValues.value = response
+                          loadingButton.value = false
+                          url.value = ''
+                          localStorage.removeItem('returnedValues')
+                          console.log('sorted languages', response)
+                        }
+                      )
+                    }
+                  }
+                )
               }
-            )
+            } else {
+              userExist.value = true
+              user.value = response.user.email
+
+              console.log('get userrr', response.user.email)
+
+              chrome.runtime.sendMessage(
+                {
+                  message: 'getUserLanguages',
+                  email: user.value
+                },
+                (response) => {
+                  console.log('get juser languages', response)
+                  returnedValues.value = response
+                  tempReturnedValues.value = response
+                  console.log('languagesss', response)
+
+                  appReady.value = true
+                  console.log('appready.value ', appReady.value)
+                  console.log('temp load', tempLoading.value)
+
+                  resolve(returnedValues.value)
+                }
+              )
+            }
           } else {
             userExist.value = false
           }
         }
       )
-
 
       appReady.value = true
       /*  resolve('success') */
@@ -171,7 +222,7 @@ const existUserhandler = async (email: string) => {
 
     /*     console.log('exist user handler', response.data)
 
-  
+
     localStorage.removeItem('token')
     console.log('token response ', response.data.token)
 
@@ -185,33 +236,45 @@ const existUserhandler = async (email: string) => {
 const tempLoading = ref<boolean>(true)
 
 onMounted(async () => {
+  /* localStorage.removeItem('token') */
   setTimeout(() => {
     tempLoading.value = false
     console.log('temp load 2', tempLoading.value)
   }, 1000)
 
+  console.log('on MOunted workinggg')
+
   chrome.runtime.sendMessage({ message: 'getToken' }, function (response) {
-    console.log("token value  ee frommm rumtine lisee " , response);
+    console.log('token value  ee frommm rumtine lisee ', response)
     token.value = response
+
+    // burada exist use var mı diye bir kontrol mesajı gönderilebilir varsa localStoragedan token silinir.
     if (token.value === null && !userExist.value) {
-    console.log('token null')
-    const storedValues = localStorage.getItem('returnedValues')
-    console.log('bura token boşsa ', storedValues)
-    returnedValues.value = storedValues ? JSON.parse(storedValues) : []
+      console.log('token null')
+      chrome.runtime.sendMessage({ message: 'getReturnedValues' }, (response) => {
+        console.log('response of store returned values', response)
+        const storedValues = response
+        console.log('bura token boşsa ', storedValues)
+        returnedValues.value = storedValues ? JSON.parse(storedValues) : []
 
+        appReady.value = true
+        return
+      })
+    } else if (!userExist.value && token.value !== null) {
+      /*       const existValues = localStorage.getItem('returnedValues')
 
-    appReady.value = true
-    return
-  } else if (!userExist.value && token.value !== null) {
-    const existValues = localStorage.getItem('returnedValues')
+      if (existValues && existValues?.length > 0) {
+        console.log('exist values', existValues)
+        console.log('object', JSON.parse(existValues))
 
-    localStorage.removeItem('returnedValues')
-    console.log('token verisi çalışıt')
-    getTableDatas(token.value)
-  }
-
-  });
-/*   console.log("get toke n " , localStorage.getItem('token'));
+        return
+      } */
+      /*  localStorage.removeItem('returnedValues') */
+      console.log('token verisi çalışıt')
+      getTableDatas(token.value)
+    }
+  })
+  /*   console.log("get toke n " , localStorage.getItem('token'));
 
   console.log('token', token.value)
   console.log('temp load 1', tempLoading.value)
@@ -292,6 +355,7 @@ const sendUrlToExtension = () => {
 
         const resultArray: extensionResponse[] = response
         console.log('result array', resultArray)
+        console.log('token value', token.value)
         try {
           if (token.value === null) {
             for (let index = 0; index < resultArray.length; index++) {
@@ -307,69 +371,55 @@ const sendUrlToExtension = () => {
                 languageLocation: element.languageLocation,
                 languageAccuracy: element.languageAccuracy,
                 realLangValues: element.realValues,
-                date: element.date,
+                date: element.date.toString(),
                 belongUser: {
-                  email: '',
+                  email: 'Guest',
                   _id: ''
                 }
               }
               returnedValues.value.push(transformedElement)
               tempReturnedValues.value.push(transformedElement)
             }
-
-            /*  returnedValues.value.concat(resultArray) */
             loadingButton.value = false
             appReady.value = true
-            localStorage.setItem('returnedValues', JSON.stringify(returnedValues.value))
-            // veriler burada localStorage a kaydedilebilir
+            const sendedReturnedValues = JSON.stringify(returnedValues.value)
+            chrome.runtime.sendMessage({action : 'storeReturnedValues', returnedValues: returnedValues.value })
+           /*  localStorage.setItem('returnedValues', JSON.stringify(returnedValues.value)) */
+            url.value = ''
+
             return
-          }
-
-          for (let index = 0; index < resultArray.length; index++) {
-            const element = resultArray[index]
-            console.log('element', element)
-            chrome.runtime.sendMessage(
-              {
-                message: 'addLanguage',
-                email: user.value,
-                languageData: element
-              },
-              (response) => {
-                console.log('response', response)
-                if (index === resultArray.length - 1) {
-                  chrome.runtime.sendMessage(
-                    {
-                      message: 'getUserLanguages',
-                      email: user.value
-                    },
-                    (response) => {
-                      console.log('response', response)
-                      returnedValues.value = response
-                      tempReturnedValues.value = response
-                      loadingButton.value = false
-                      console.log('sorted languages', response)
-                    }
-                  )
+          } else {
+            for (let index = 0; index < resultArray.length; index++) {
+              const element = resultArray[index]
+              console.log('element', element)
+              chrome.runtime.sendMessage(
+                {
+                  message: 'addLanguage',
+                  email: user.value,
+                  languageData: element
+                },
+                (response) => {
+                  console.log('response', response)
+                  if (index === resultArray.length - 1) {
+                    chrome.runtime.sendMessage(
+                      {
+                        message: 'getUserLanguages',
+                        email: user.value
+                      },
+                      (response) => {
+                        console.log('response', response)
+                        returnedValues.value = response
+                        tempReturnedValues.value = response
+                        loadingButton.value = false
+                        url.value = ''
+                        console.log('sorted languages', response)
+                        return
+                      }
+                    )
+                  }
                 }
-              }
-            )
-
-            /*   const response = await axios.post('http://localhost:5000/api/addLanguage', {
-              email: user.value,
-              languageData: element
-            })
-
-            if (index === resultArray.length - 1) {
-            
-              const languagesResponse = await axios.get('http://localhost:5000/api/getAllLanguages')
-              console.log('language response', languagesResponse.data)
-
-              returnedValues.value = languagesResponse.data
-              tempReturnedValues.value = languagesResponse.data
-              loadingButton.value = false
-
-              console.log('sorted languages', languagesResponse.data)
-            } */
+              )
+            }
           }
         } catch (error) {
           console.log(error)
@@ -559,7 +609,7 @@ const filterAccuracy = () => {
     if (highAccuracy.value && value.languageAccuracy === 'high') return true
     if (mediumAccuracy.value && value.languageAccuracy === 'medium') return true
     if (lowAccuracy.value && value.languageAccuracy === 'low') return true
-    /* 
+    /*
     if(flag) return true; */
     return false
   })
@@ -646,21 +696,23 @@ const loginText = ref<boolean>(true)
               </div> -->
               <div
                 v-if="loginText"
-                class="animate__animated animate__fadeInDown ma rounded-md p-5 text-lg"
+                class="animate__animated animate__fadeInDown ma rounded-md px-2 text-md"
                 @click="loginText = !loginText"
               >
                 <span
                   class="text-[#2C39A6] cursor-pointer flex items-center w-100px"
                   @click="loginPage = !loginPage"
-                  >giriş yapınız.</span
+                  >Giriş Yap</span
                 >
               </div>
               <div
                 v-else
-                class="block cursor-pointer"
+                class="animate__animated animate__fadeInDown ma rounded-md px-2 text-md"
                 @click="(loginText = !loginText), (loginPage = !loginPage)"
               >
-                <--
+                <span class="text-[#2C39A6] cursor-pointer flex items-center w-100px"
+                  >Geri Dön</span
+                >
               </div>
             </div>
           </div>

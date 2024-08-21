@@ -443,7 +443,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     })
     return true
   } else if (request.message === 'getToken') {
-    console.log("get token çalıştı");
+    console.log('get token çalıştı')
 
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
       const activeTab = tabs[0]
@@ -452,8 +452,27 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
           console.log('response from content languages data  : ', response)
 
           sendResponse(response.token)
-
-          
+        })
+      }
+    })
+    return true
+  } else if (request.message === 'getReturnedValues') {
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      const activeTab = tabs[0]
+      if (activeTab && activeTab.id) {
+        chrome.tabs.sendMessage(activeTab.id, { action: 'getReturnedValues' }, (response) => {
+          sendResponse(response)
+        })
+      }
+    })
+    return true
+  } else if (request.message === 'storeReturnedValues') {
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      const activeTab = tabs[0]
+      if (activeTab && activeTab.id) {
+        chrome.tabs.sendMessage(activeTab.id, { action: 'storeReturnedValues' , returnedValues : request.returnedValues}, (response) => {
+          console.log("bg   responee" , response);
+          sendResponse(response)
         })
       }
     })
