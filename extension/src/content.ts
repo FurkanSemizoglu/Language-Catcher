@@ -2,6 +2,7 @@ import DetectLanguage from 'detectlanguage'
 import { languages } from './types'
 import type { LanguageLocation, LanguageData, RealValues, ExtensionResponse } from './types'
 
+
 console.log('content is running for language-catcher-extension')
 
 let htmlTag: boolean = false
@@ -25,37 +26,47 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     sendResponse({ status: 'success' })
 
     return true
-  }
-  else if (request.action === 'deleteToken') {
+  } else if (request.action === 'deleteToken') {
     localStorage.removeItem('token')
     sendResponse({ status: 'success' })
 
     return true
-  }
-  else if(request.action === 'getToken') {
+  } else if (request.action === 'getToken') {
     const token = localStorage.getItem('token')
-    console.log("token , ",token);
-    sendResponse({ token:token })
+    console.log('token , ', token)
+    sendResponse({ token: token })
 
     return true
-  }
-  else if(request.action === 'getReturnedValues') {
+  } else if (request.action === 'getReturnedValues') {
     const getReturnedValues = localStorage.getItem('returnedValues')
-    sendResponse(getReturnedValues)
+    console.log("getreturned values valur" , getReturnedValues);
+
+    if(getReturnedValues === null) {
+      console.log("nulll imişss");
+      sendResponse([])
+    }else{
+
+      sendResponse(getReturnedValues)
+    }
 
     return true
-  }
-  else if(request.action === 'storeReturnedValues') {
-    console.log("object request.returnedValues : ", request.returnedValues);
-    localStorage.setItem('returnedValues' , request.returnedValues)
+  } else if (request.action === 'storeReturnedValues') {
+    console.log('conetnt aldı mesajı ', request)
+    console.log('object request.returnedValues : ', request.returnedValues)
+    localStorage.setItem('returnedValues', JSON.stringify(request.returnedValues))
+    sendResponse({ status: 'success' })
+
+    return true
+  } else if (request.action === 'deleteReturnedValues') {
+    console.log('conetnt aldı mesajı delete returend ', request)
+    localStorage.removeItem('returnedValues')  
     sendResponse({ status: 'success' })
 
     return true
   }
 })
 
-
-window.addEventListener('logOutFromApp', (e) => { 
+window.addEventListener('logOutFromApp', (e) => {
   console.log('logOutFromApp')
   chrome.runtime.sendMessage({ message: 'logOut' }, (response) => {
     console.log('response from background for logOut', response)
@@ -71,20 +82,23 @@ window.addEventListener('logOutFromApp', (e) => {
 
 window.addEventListener('deleteLanguagesFromApp', (e) => {
   const event = e as CustomEvent
-  console.log("listerner çalıştır" , event.detail);
+  console.log('listerner çalıştır', event.detail)
   const email = event.detail.email
   const languageIdlist = event.detail.languageIdList
-  console.log("object languageIdList : ", languageIdlist);
-  chrome.runtime.sendMessage({ message: 'deletesLanguages', email : email , languageIdList : languageIdlist }, (response) => {
-    console.log('response from background for deleteLanguage', response)
-    const deletesLanguageResponse = new CustomEvent('deletesLanguagesResponse', {
-      detail: {
-        response: response
-      }
-    })
+  console.log('object languageIdList : ', languageIdlist)
+  chrome.runtime.sendMessage(
+    { message: 'deletesLanguages', email: email, languageIdList: languageIdlist },
+    (response) => {
+      console.log('response from background for deleteLanguage', response)
+      const deletesLanguageResponse = new CustomEvent('deletesLanguagesResponse', {
+        detail: {
+          response: response
+        }
+      })
 
-    window.dispatchEvent(deletesLanguageResponse)
-  })
+      window.dispatchEvent(deletesLanguageResponse)
+    }
+  )
 })
 
 window.addEventListener('loginFromApp', (e) => {
@@ -103,14 +117,12 @@ window.addEventListener('loginFromApp', (e) => {
 
     window.dispatchEvent(loginResponse)
   })
-
 })
 
 window.addEventListener('registerFromApp', (e) => {
-
   const event = e as CustomEvent
   const bodyFormData = event.detail.bodyFormData
-  console.log("object bodyFormData : ", bodyFormData);
+  console.log('object bodyFormData : ', bodyFormData)
   chrome.runtime.sendMessage({ message: 'register', bodyFormData: bodyFormData }, (response) => {
     console.log('response from background for register', response)
 
@@ -122,7 +134,6 @@ window.addEventListener('registerFromApp', (e) => {
 
     window.dispatchEvent(registerResponse)
   })
-
 })
 
 window.addEventListener('existUser', (e) => {
@@ -131,22 +142,22 @@ window.addEventListener('existUser', (e) => {
 
   const bodyFormData = {
     email: event.detail.user,
-    password : "Furkan55?"
+    password: 'Furkan55?'
   }
-/*   chrome.runtime.sendMessage({ message: 'existUser', user: event.detail.user }, (response) => {
+  /*   chrome.runtime.sendMessage({ message: 'existUser', user: event.detail.user }, (response) => {
     console.log('response from background for existUser', response)
   }) */
-    chrome.runtime.sendMessage({ message: 'login', bodyFormData: bodyFormData }, (response) => {
-      console.log('response from background for existUser', response)
-      /* location.reload(); */
-      return true
-    })
+  chrome.runtime.sendMessage({ message: 'login', bodyFormData: bodyFormData }, (response) => {
+    console.log('response from background for existUser', response)
+    /* location.reload(); */
+    return true
+  })
 })
 
 window.addEventListener('getUserFromApp', (e) => {
   const event = e as CustomEvent
   const token = event.detail.token
-  chrome.runtime.sendMessage({ message: 'getUser' , token : token }, (response) => {
+  chrome.runtime.sendMessage({ message: 'getUser', token: token }, (response) => {
     console.log('response from background for getUser', response)
     const getUserResponse = new CustomEvent('getUserResponse', {
       detail: {
@@ -158,12 +169,10 @@ window.addEventListener('getUserFromApp', (e) => {
   })
 })
 
-
 window.addEventListener('getUserLanguagesFromApp', (e) => {
-
   const event = e as CustomEvent
   const email = event.detail.email
-  chrome.runtime.sendMessage({ message: 'getUserLanguages', email : email }, (response) => {
+  chrome.runtime.sendMessage({ message: 'getUserLanguages', email: email }, (response) => {
     console.log('response from background for getUserLanguages', response)
     const getUserLanguagesResponse = new CustomEvent('getUserLanguagesResponse', {
       detail: {
@@ -173,28 +182,28 @@ window.addEventListener('getUserLanguagesFromApp', (e) => {
 
     window.dispatchEvent(getUserLanguagesResponse)
   })
-
 })
 
 window.addEventListener('addLanguageFromApp', (e) => {
   const event = e as CustomEvent
-/*   const bodyFormData = event.detail.bodyFormData */
+  /*   const bodyFormData = event.detail.bodyFormData */
   // buralra type eklenebilir
   const email = event.detail.email
   const languageData = event.detail.languageData
-  chrome.runtime.sendMessage({ message: 'addLanguage', email: email , languageData : languageData }, (response) => {
-    console.log('response from background for addLanguage', response)
-    const addLanguageResponse = new CustomEvent('addLanguageResponse', {
-      detail: {
-        response: response
-      }
-    })
+  chrome.runtime.sendMessage(
+    { message: 'addLanguage', email: email, languageData: languageData },
+    (response) => {
+      console.log('response from background for addLanguage', response)
+      const addLanguageResponse = new CustomEvent('addLanguageResponse', {
+        detail: {
+          response: response
+        }
+      })
 
-    window.dispatchEvent(addLanguageResponse)
-  })
+      window.dispatchEvent(addLanguageResponse)
+    }
+  )
 })
-
-
 
 let isInjected = true
 
@@ -211,6 +220,8 @@ function showTableContent() {
     container.appendChild(iframe)
   }
 }
+
+showTableContent()
 
 function removeTableContent() {
   const popupDiv = document.getElementById('popupIframe')
@@ -321,51 +332,48 @@ const recurciveProcess = (
       })
 
       languageCatcherResultArray.push(languageCatcherResult.detail)
-    /*   if(index === 0) {
+      /*   if(index === 0) {
         sendProgressEvent(0, urlList.length)
       }else{
 
         sendProgressEvent(index +1, urlList.length)
       } */
-      sendProgressEvent(index +1, urlList.length)
+      sendProgressEvent(index + 1, urlList.length)
       resolve()
     })
   })
 }
 
 const sendProgressEventForApp = (index: number, arrayLength: number) => {
-   const updateProgress = new CustomEvent('updateProgress', {
-     detail: {
-       progress: index / arrayLength
-     }
-   })
-   window.dispatchEvent(updateProgress)
- 
-/*    console.log("object progress : ", { message : "updateProgress",  progress: index / arrayLength });
+  const updateProgress = new CustomEvent('updateProgress', {
+    detail: {
+      progress: index / arrayLength
+    }
+  })
+  window.dispatchEvent(updateProgress)
+
+  /*    console.log("object progress : ", { message : "updateProgress",  progress: index / arrayLength });
    chrome.runtime.sendMessage({ message : "updateProgress",  progress: index / arrayLength }) */
- 
- }
- 
+}
 
 const sendProgressEvent = (index: number, arrayLength: number) => {
- /*  const updateProgress = new CustomEvent('updateProgress', {
+  /*  const updateProgress = new CustomEvent('updateProgress', {
     detail: {
       progress: index / arrayLength
     }
   })
   window.dispatchEvent(updateProgress) */
 
-  console.log("object progress : ", { message : "updateProgress",  progress: index / arrayLength });
-  chrome.runtime.sendMessage({ message : "updateProgress",  progress: index / arrayLength })
-
+  console.log('object progress : ', { message: 'updateProgress', progress: index / arrayLength })
+  chrome.runtime.sendMessage({ message: 'updateProgress', progress: index / arrayLength })
 }
 
- const recurciveProcessForApp = (
+const recurciveProcessForApp = (
   URL: string,
   languageCatcherResultArray: ExtensionResponse[],
   urlList: string[],
   index: number
-) : ExtensionResponse[] | null => {
+): ExtensionResponse[] | null => {
   chrome.runtime.sendMessage({ message: 'URL-sended', url: urlList[index] }, (response: any) => {
     console.log('message sent to background to run in application')
     console.log('response from background for url sended for application ', response)
@@ -407,11 +415,11 @@ const sendProgressEvent = (index: number, arrayLength: number) => {
       console.log('senda dataa array : ', languageCatcherResultArray)
       console.log('send data worksss ', index)
       window.dispatchEvent(languageCatcherResultArrayEvent)
-      return languageCatcherResultArray;
+      return languageCatcherResultArray
     }
   })
   return null
-} 
+}
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   console.log('who is sender', sender)
@@ -452,7 +460,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         console.error('Error processing language catcher:', error)
         sendResponse([])
       })
-    return true 
+    return true
     /* return true  */
   }
   return true // şurası return true olunca çalıştı

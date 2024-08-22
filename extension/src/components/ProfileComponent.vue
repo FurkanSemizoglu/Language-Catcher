@@ -31,15 +31,14 @@ const logOut = () => {
     v-if="props.user"
     class="relative"
     @mouseenter="openProfileDetail = true"
-    @mouseleave="openProfileDetail = false"
+
   >
     <div
       class="w-25px h-25px p-3 mb-1 border border-[#2F33B0]! flex items-center justify-center cursor-pointer"
-      @click="openProfileDetail = !openProfileDetail"
     >
       {{ shortName }}
     </div>
-    <div  class="absolute left-8 -top-4 border border-[#2F33B0]! flex flex-col items-center gap-4 p-4">
+    <div  v-if="openProfileDetail"  @mouseleave="openProfileDetail = false" class="detailUser absolute left-8 -top-8 border border-[#2F33B0]! flex flex-col items-center gap-4 p-4">
       <div>
         {{ props.user }}
       </div>
@@ -60,3 +59,10 @@ const logOut = () => {
    
   </div> -->
 </template>
+
+
+<style scoped>
+.detailUser{
+  top: -60px;
+}
+</style>

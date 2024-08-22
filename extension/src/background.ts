@@ -38,7 +38,11 @@ const login = (bodyFormData: { email: string; password: string }) => {
           })
         }
       })
+    }else{
+      resolve(data)
     }
+
+    
   })
 }
 
@@ -215,7 +219,7 @@ const getUserLanguages = (email: string) => {
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   console.log('background received message', request)
-  console.log('URL : ', request.url)
+  console.log('URL : ', request.message)
 
   const langData: LanguageData = {
     language: '',
@@ -238,6 +242,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       realLangMeta: ''
     }
   }
+
 
   if (request.message === 'login') {
     console.log('Login part worked', request.bodyFormData)
@@ -467,13 +472,35 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     })
     return true
   } else if (request.message === 'storeReturnedValues') {
+    console.log('store returned çalışıt ', request)
+    console.log('object for store returned', request.returnedValues)
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
       const activeTab = tabs[0]
       if (activeTab && activeTab.id) {
-        chrome.tabs.sendMessage(activeTab.id, { action: 'storeReturnedValues' , returnedValues : request.returnedValues}, (response) => {
-          console.log("bg   responee" , response);
-          sendResponse(response)
-        })
+        chrome.tabs.sendMessage(
+          activeTab.id,
+          { action: 'storeReturnedValues', returnedValues: request.returnedValues },
+          (response) => {
+            console.log('bg   responee', response)
+            sendResponse(response)
+          }
+        )
+      }
+    })
+    return true
+  } else if (request.message === 'deleteReturnedValues') {
+    console.log('delete returned çalıştı')
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      const activeTab = tabs[0]
+      if (activeTab && activeTab.id) {
+        chrome.tabs.sendMessage(
+          activeTab.id,
+          { action: 'deleteReturnedValues'},
+          (response) => {
+            console.log('bg   responee', response)
+            sendResponse(response)
+          }
+        )
       }
     })
     return true

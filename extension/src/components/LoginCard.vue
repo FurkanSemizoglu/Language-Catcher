@@ -45,19 +45,13 @@ const login = async () => {
     }
 
     try {
-      /*  const response = await axios.post('http://localhost:5000/auth/login', bodyFormData, {
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      }) */
-
       chrome.runtime.sendMessage(
         {
           message: 'login',
           bodyFormData: bodyFormData
         },
         (response) => {
-          console.log(response)
+          console.log("respponse for login " , response)
 
           if (response.status) {
             toast.success('Login successful')
@@ -105,7 +99,7 @@ const login = async () => {
         type="email"
         class="h-30px bg-white border w-full  p-3 text-black"
         /> -->
-      <input v-model="email" placeholder="Email" type="email" class="border border-[#2F33B0] p-2" />
+      <input v-model="email" placeholder="Email" type="email" class="border border-[#2F33B0] p-2 focus:outline-[#DCE2EE]" />
     </div>
 
     <div class="relative w-full">
@@ -128,7 +122,7 @@ const login = async () => {
 
     <div class="flex gap-2 items-center">
       <button
-        class="p-2 px-4 bg-[#2C39A6] font-300 text-white text-md transition duration-300 ease-in-out hover:bg-[#4B95FF]"
+        class="p-2 px-4 bg-[#2C39A6] font-300 text-white text-md transition duration-300 ease-in-out hover:bg-[#4752B2]"
         @click="login"
       >
         Giriş

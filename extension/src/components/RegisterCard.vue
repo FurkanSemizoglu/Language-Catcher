@@ -106,7 +106,7 @@ const register = async () => {
         v-model="email"
         placeholder="Email"
         type="email"
-        class="border border-[#2F33B0] p-2 w-full"
+        class="border border-[#2F33B0] p-2 w-full focus:outline-[#DCE2EE]"
       />
     </div>
 
@@ -115,12 +115,12 @@ const register = async () => {
         v-model="password"
         placeholder="Password"
         :type="passwordFieldType"
-        class="border border-[#2F33B0] p-2 w-full"
+        class="border border-[#2F33B0] p-2 w-full focus:outline-[#DCE2EE]"
       />
       <FontAwesomeIcon
         @click="togglePasswordVisibility"
         :icon="passwordFieldType === 'password' ? faEye : faEyeSlash"
-        class="iconClass top-0 mt-3 w-5 cursor-pointer"
+        class="iconClass top-0 mt-3 w-5 cursor-pointer "
         style="color: #6f6f6f"
       />
     </div>
@@ -130,7 +130,7 @@ const register = async () => {
         v-model="password2"
         placeholder="Password"
         :type="passwordFieldType2"
-        class="border border-[#2F33B0] p-2 w-full"
+        class="border border-[#2F33B0] p-2 w-full focus:outline-[#DCE2EE]"
       />
       <FontAwesomeIcon
         @click="togglePasswordVisibility2"
