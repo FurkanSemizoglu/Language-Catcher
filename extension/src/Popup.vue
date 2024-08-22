@@ -267,7 +267,12 @@ onMounted(async () => {
         console.log('response of store returned values', response)
         const storedValues = response
         console.log('bura token boşsa ', storedValues)
+        if(storedValues.length === 0){
+          appReady.value = true
+          return
+        }
         returnedValues.value = storedValues ? JSON.parse(storedValues) : []
+        console.log("clg", returnedValues.value);
 
         appReady.value = true
         return
@@ -278,62 +283,7 @@ onMounted(async () => {
       getTableDatas(token.value)
     }
   })
-  /*   console.log("get toke n " , localStorage.getItem('token'));
 
-  console.log('token', token.value)
-  console.log('temp load 1', tempLoading.value)
-
-  setTimeout(() => {
-    tempLoading.value = false
-    console.log('temp load 2', tempLoading.value)
-  }, 1000)
-
-  chrome.storage.local.get('userExistence', async (data) => {
-    if (data.userExistence && data.userExistence.message === 'existUser') {
-      console.log('user exist', data.userExistence.user)
-      userExist.value = true
-      user.value = data.userExistence.user
-      existUserhandler(user.value).then((response) => {
-        console.log('responseeeeee', response)
-
-        if (response) {
-          console.log('response çalışıye')
-          token.value = response as string
-          chrome.storage.local.clear()
-          localStorage.removeItem('token')
-        }
-        chrome.storage.local.clear()
-      })
-    }
-  })
-
-  console.log('user exist value ', userExist.value)
-  if (userExist.value) {
-    console.log('burda storage silindi')
-    chrome.storage.local.clear()
-    return
-  }
-
-  console.log('user existence ', userExist)
-  console.log('token exsitenec ', token.value)
-  if (token.value === null && !userExist.value) {
-    console.log('token null')
-    const storedValues = localStorage.getItem('returnedValues')
-    console.log('bura token boşsa ', storedValues)
-    returnedValues.value = storedValues ? JSON.parse(storedValues) : []
-
-
-    appReady.value = true
-    return
-  } else if (!userExist.value && token.value !== null) {
-    const existValues = localStorage.getItem('returnedValues')
-
-    localStorage.removeItem('returnedValues')
-    console.log('token verisi çalışıt')
-    getTableDatas(token.value)
-  }
-
-  console.log('buranın çalışmaması lazım') */
 })
 
 const sendUrlToExtension = () => {
