@@ -12,7 +12,6 @@ const toast = useToast()
 
 const passwordFieldType = ref('password')
 
-const loginPage = ref<boolean>(true)
 
 const togglePasswordVisibility = () => {
   passwordFieldType.value = passwordFieldType.value === 'password' ? 'text' : 'password'

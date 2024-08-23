@@ -11,7 +11,7 @@ import { useToast } from 'vue-toastification'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { faEye } from '@fortawesome/free-solid-svg-icons'
 import { faEyeSlash } from '@fortawesome/free-solid-svg-icons'
-import { faArrowLeft } from '@fortawesome/free-solid-svg-icons'
+
 
 
 const passwordFieldType = ref('password')
@@ -64,25 +64,14 @@ const register = async () => {
           if (response.status) {
             toast.success('Register successful')
             emit('page', 'login')
-            /* router.push('/'); */
+      
           }
           else{
             toast.error(response.message)
           }
         }
       )
-   /*    const response = await axios.post('http://localhost:5000/auth/register', bodyFormData, {
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      })
 
-      console.log(response.data)
-
-      if (response.status) {
-        toast.success('Register successful')
-        
-      } */
     } catch (err) {
       if (axios.isAxiosError(err)) {
         console.error('Axios error status:', err.response?.status)
@@ -91,7 +80,6 @@ const register = async () => {
         toast.error(err.response?.data.message)
       } else {
         console.error('Unexpected error:', err)
-        console.log('Unexpected error occurred')
       }
     }
   } else {

@@ -15,7 +15,8 @@ chrome.action.onClicked.addListener((tab) => {
 const login = (request: {bodyFormData : bodyFormData}) => {
   const bodyFormData = request.bodyFormData
   console.log("body form data", bodyFormData) ;
-  return new Promise(async (resolve, reject) => {
+  return new Promise( async(resolve) => {
+    // Burada Promise içinde await kullanılmaz hatası çıkıyor lintte ama düzgün çalışıyor 
     const response = await fetch('http://localhost:5000/auth/login', {
       method: 'POST',
       headers: {
@@ -157,7 +158,7 @@ const logOut = (request: any) => {
         chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
           const activeTab = tabs[0]
           if (activeTab && activeTab.id) {
-            chrome.tabs.sendMessage(activeTab.id, { action: 'deleteToken' }, (response) => {
+            chrome.tabs.sendMessage(activeTab.id, { action: 'deleteToken' }, () => {
               resolve(data)
             })
           }
@@ -176,7 +177,6 @@ const addLanguage = (request: { languageData: LanguageData; email: string }) => 
   return new Promise(async (resolve, reject) => {
     const { languageData, email } = request
 
-    console.log('add language func called 2')
 
     try {
       const response = await fetch('http://localhost:5000/api/addLanguage', {
@@ -188,7 +188,6 @@ const addLanguage = (request: { languageData: LanguageData; email: string }) => 
       })
 
       const data = await response.json()
-      console.log('add language response : ', data)
 
       if (response.ok) {
         resolve(data)
@@ -297,7 +296,7 @@ const getReturnedValues = (request: any, sendResponse: (response?: any) => void)
   })
 }
 const urlSendedFunction = (requestUrl: string): Promise<LanguageData> => {
-  return new Promise(async (resolve, reject) => {
+  return new Promise(async (resolve) => {
     const newURL: string = requestUrl
 
     try {

@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import { faSquareCheck } from '@fortawesome/free-regular-svg-icons'
-import { faSquare } from '@fortawesome/free-regular-svg-icons'
+
 const props = defineProps<{ user: string }>()
 const shortName = ref<string>('')
 shortName.value = props.user.substring(0, 2).toUpperCase()

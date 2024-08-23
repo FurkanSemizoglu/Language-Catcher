@@ -65,7 +65,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   }
 })
 
-window.addEventListener('logOutFromApp', (e) => {
+window.addEventListener('logOutFromApp', () => {
   chrome.runtime.sendMessage({ message: 'logOut' }, (response) => {
     const logOutResponse = new CustomEvent('logOutResponse', {
       detail: {
@@ -183,7 +183,7 @@ window.addEventListener('addLanguageFromApp', (e) => {
   )
 })
 
-let isInjected = true
+
 
 function showTableContent() {
   const container = document.getElementById('placeToShowExtensionTable')
@@ -201,11 +201,12 @@ function showTableContent() {
 
 showTableContent()
 
+
 function removeTableContent() {
   const popupDiv = document.getElementById('popupIframe')
   if (popupDiv) {
     popupDiv.remove()
-    isInjected = false
+    
   }
 }
 
@@ -216,7 +217,7 @@ window.addEventListener('language-catcher-start', (e) => {
   const url : string= event.detail.url
   const urlList: string[] = event.detail.url.split(',').map((url: string) => url.trim())
 
-  let index = 0
+  const index = 0
 
   const languageCatcherResultArray: ExtensionResponse[] = []
 
@@ -227,7 +228,7 @@ window.addEventListener('language-catcher-start', (e) => {
 const languageCatcherStart = (url: string): Promise<ExtensionResponse[]> => {
   const urlList: string[] = url.split(',').map((url: string) => url.trim())
 
-  let index = 0
+  const index = 0
   const languageCatcherResultArray: ExtensionResponse[] = []
 
   return new Promise((resolve, reject) => {
@@ -644,15 +645,9 @@ const sendResponse = (
   accuracy: string,
   realValues: RealValues
 ): LanguageData => {
-  const updateProgress = new CustomEvent('updateProgress', {
-    detail: {
-      progress: 50
-    }
-  })
-  // Burada update eventi gönderilerek progress barın güncellenmesi sağlanabilir
-  /* window.dispatchEvent(updateProgress) */
+
   if (detectedLanguages.length === 1) {
-    console.log('paragphh in sendresponse')
+
     const data = {
       language: detectedLanguages[0],
       findedPlaces: detectedPlaces,
@@ -661,7 +656,7 @@ const sendResponse = (
       accuracy: accuracy,
       realValues: realValues
     }
-    console.log('returned data from content.ts  to send background : ', data)
+
     return data
   } else {
     return {
@@ -695,9 +690,7 @@ const languageDetectPrediction = async (): Promise<LanguageData> => {
     paragraph: paragraph
   }
   accuracy = accuracyCalculator(detectedPlaces, paragraphCorrectObj.value)
-  console.log('detected places : ', detectedPlaces)
-  console.log('detected languages : ', detectedLanguages)
-  console.log('paragraph Correct : ', paragraphCorrectObj.value)
+
   return sendResponse(
     detectedLanguages,
     detectedPlaces,

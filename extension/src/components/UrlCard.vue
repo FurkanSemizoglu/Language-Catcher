@@ -2,20 +2,15 @@
 import { ref, watch, defineEmits } from 'vue'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { faAngleDown } from '@fortawesome/free-solid-svg-icons'
-import { faTrashCan } from '@fortawesome/free-solid-svg-icons'
-/* import { faSquare } from '@fortawesome/free-solid-svg-icons'; */
-/* import { faSquareCheck } from '@fortawesome/free-solid-svg-icons'; */
 import { faSquareCheck } from '@fortawesome/free-regular-svg-icons'
 import { faSquare } from '@fortawesome/free-regular-svg-icons'
 import type { urlCardResultProps } from '../types'
 import AccuracyCircle from './AccuracyCircle.vue'
-import axios from 'axios'
 
 const props = defineProps<urlCardResultProps>()
 const localeDate = new Date(props.date).toLocaleString('tr-TR')
 const detectedLanguagesText = ref<string>('')
 const cardId = ref<string[]>([])
-const model = ref<string>('')
 const checkbox = ref<boolean>(false)
 const emit = defineEmits<{
   (e: 'cardId', id: string): void
@@ -28,22 +23,9 @@ if (props.detectedLanguage === 'not detected') {
     props.detectedLanguage + ' - ' + props.langName + ' - ' + props.langNativeName
 }
 
-/* import AccuracyCircle from './AccuracyCircle.vue' */
+
 const showDetails = ref<boolean>(false)
 
-const deleteCard = async () => {
-  console.log('id', props.id)
-  try {
-    const response = await axios.delete('http://localhost:5000/api/deleteLanguage', {
-      params: { email: props.email, languageId: props.id }
-    })
-
-    console.log('abi gitti artık ', response.data)
-    location.reload()
-  } catch (error) {
-    console.log(error)
-  }
-}
 
 const paragraphText = ref<string>('')
 const paragraphTextFunc = () => {

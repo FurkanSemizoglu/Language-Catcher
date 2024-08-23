@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { defineProps, onMounted, ref, watch } from 'vue'
+import { defineProps,  ref, watch } from 'vue'
 
 const props = defineProps<{ loadingButton: boolean; updateNumber: number }>()
 const progressDegree = ref<number>(0)

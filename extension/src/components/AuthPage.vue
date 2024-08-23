@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import LoginCard from './LoginCard.vue';
-import LoginPage from './LoginPage.vue'
 import RegisterCard from './RegisterCard.vue';
-import RegisterPage from './RegisterPage.vue'
 import { ref , defineEmits} from 'vue'
 
 const loginPage = ref<boolean>(true)

@@ -34,7 +34,7 @@ interface ExtensionResponse {
   date: string
 }
 
-interface extensionResponse {
+/* interface extensionResponse {
   status: string
   domain: string
   language: string
@@ -45,7 +45,7 @@ interface extensionResponse {
   languageAccuracy: string
   realValues: RealValues
   date: Date
-}
+} */
 
 const languages: { [key: string]: Language } = {
   ab: { name: 'Abkhaz', nativeName: 'аҧсуа' },

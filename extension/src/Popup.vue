@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import axios from 'axios'
 import { onMounted, ref, watch } from 'vue'
 
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
@@ -23,7 +22,6 @@ const loadingButton = ref<boolean>(false)
 let extensionExist = ref<boolean>(true)
 const appReady = ref<boolean>(false)
 const dateClicked = ref<boolean>(true)
-const urlClicked = ref<boolean>(false)
 const toast = useToast()
 token.value = localStorage.getItem('token')
 
@@ -37,7 +35,7 @@ const loginPage = ref<boolean>(false)
 
 const updateProgressNumber = ref<number>(0)
 
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+chrome.runtime.onMessage.addListener((request) => {
   console.log('request', request)
   if (request.message === 'updateProgress') {
     console.log('proges in popup', request.progress)
@@ -60,7 +58,7 @@ watch(
 extensionExist.value = true
 
 const getTableDatas = async (tokenn: string) => {
-  return new Promise(async (resolve, reject) => {
+  return new Promise((resolve, reject) => {
     try {
       let existValues: any = []
       chrome.runtime.sendMessage({ message: 'getReturnedValues' }, (response) => {
@@ -98,15 +96,14 @@ const getTableDatas = async (tokenn: string) => {
                   realValues: parsedValues[index].realLangValues,
                   date: parsedValues[index].date
                 }
-               
+
                 chrome.runtime.sendMessage(
                   {
                     message: 'addLanguage',
                     email: user.value,
                     languageData: addDataLanguage
                   },
-                  (response) => {
-                  
+                  () => {
                     if (index === parsedValues.length - 1) {
                       chrome.runtime.sendMessage(
                         {
@@ -114,13 +111,10 @@ const getTableDatas = async (tokenn: string) => {
                           email: user.value
                         },
                         (response) => {
-                         
                           returnedValues.value = response
                           tempReturnedValues.value = response
                           loadingButton.value = false
                           url.value = ''
-                       /*    localStorage.removeItem('returnedValues')
-                          console.log('sorted languages', response) */
                         }
                       )
                     }
@@ -128,7 +122,7 @@ const getTableDatas = async (tokenn: string) => {
                 )
               }
 
-              chrome.runtime.sendMessage({ message: 'deleteReturnedValues' }, (response) => {})
+              chrome.runtime.sendMessage({ message: 'deleteReturnedValues' })
             } else {
               userExist.value = true
               user.value = response.user.email
@@ -278,7 +272,7 @@ const sendUrlToExtension = () => {
             }
             loadingButton.value = false
             appReady.value = true
-            const sendedReturnedValues = JSON.stringify(returnedValues.value)
+
             chrome.runtime.sendMessage(
               { message: 'storeReturnedValues', returnedValues: returnedValues.value },
               (response) => {
@@ -297,7 +291,7 @@ const sendUrlToExtension = () => {
                   email: user.value,
                   languageData: element
                 },
-                (response) => {
+                () => {
                   if (index === resultArray.length - 1) {
                     chrome.runtime.sendMessage(
                       {
@@ -327,12 +321,12 @@ const sendUrlToExtension = () => {
   )
 }
 
-const logout = async () => {
+/* const logout = async () => {
   const response = await axios.get('http://localhost:5000/auth/logout')
 
   localStorage.removeItem('token')
   window.location.href = '/'
-}
+} */
 
 const sortDate = () => {
   if (dateClicked.value === false) {
@@ -349,7 +343,7 @@ const sortDate = () => {
   returnedValues.value = [...returnedValues.value]
 }
 
-const sortUrls = () => {
+/* const sortUrls = () => {
   if (urlClicked.value === false) {
     returnedValues.value.sort((a: extensionResult, b: extensionResult) => {
       console.log('splittedd ', a.domain.split('/'))
@@ -384,7 +378,7 @@ const sortUrls = () => {
   }
 
   console.log('sorted names ', returnedValues.value)
-}
+} */
 
 const deleteItemsFunc = (id: string) => {
   if (deleteItemsList.value.includes(id)) {
@@ -414,10 +408,12 @@ const deleteItems = async () => {
     chrome.runtime.sendMessage(
       { message: 'deleteReturnedValues', returnedValues: returnedValues.value },
       (response) => {
-        appReady.value = true
-        allItemsSelected.value = false
-        deleteItemsList.value = []
-        return
+        if (response) {
+          appReady.value = true
+          allItemsSelected.value = false
+          deleteItemsList.value = []
+          return
+        }
       }
     )
   }
@@ -490,7 +486,6 @@ const pageChecker = (isLoggedIn: boolean) => {
     loginPage.value = true
   }
 }
-
 
 const loginText = ref<boolean>(true)
 </script>
