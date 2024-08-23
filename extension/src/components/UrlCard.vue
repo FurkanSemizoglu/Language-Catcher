@@ -112,7 +112,8 @@ function getDomainFromUrl(url: string) {
 
 const url = props.url
 const domain = getDomainFromUrl(url)
-const iconUrl = `https://icon.horse/icon/${domain}`
+/* const iconUrl = `https://icon.horse/icon/${domain}` */
+const iconUrl = `https://www.google.com/s2/favicons?domain=${domain}&sz=64`
 
 const detectedLangCode = ref<string>('')
 /* const tempLangCode = props.detectedLanguage.split('-')[0]

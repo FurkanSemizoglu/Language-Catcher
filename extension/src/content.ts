@@ -60,6 +60,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   } else if (request.action === 'deleteReturnedValues') {
     console.log('conetnt aldı mesajı delete returend ', request)
     localStorage.removeItem('returnedValues')  
+    localStorage.setItem('returnedValues', JSON.stringify(request.returnedValues))
     sendResponse({ status: 'success' })
 
     return true

@@ -12,7 +12,8 @@ chrome.action.onClicked.addListener((tab) => {
   }
 })
 
-const login = (bodyFormData: { email: string; password: string }) => {
+const login = (request:any) => {
+  const bodyFormData : { email: string; password: string } =  request.bodyFormData
   return new Promise(async (resolve, reject) => {
     const response = await fetch('http://localhost:5000/auth/login', {
       method: 'POST',
@@ -38,26 +39,27 @@ const login = (bodyFormData: { email: string; password: string }) => {
           })
         }
       })
-    }else{
+    } else {
       resolve(data)
     }
-
-    
   })
 }
 
-const getToken = () => {
+const getToken = (request: any, sendResponse: (response?: any) => void) => {
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
     const activeTab = tabs[0]
     if (activeTab && activeTab.id) {
       chrome.tabs.sendMessage(activeTab.id, { action: 'getToken' }, (response) => {
         console.log('response from content languages data  : ', response)
+
+        sendResponse(response.token)
       })
     }
   })
 }
 
-const register = (bodyFormData: { email: string; password: string }) => {
+const register = (request : any) => {
+  const bodyFormData  : { email: string; password: string } =  request.bodyFormData
   return new Promise(async (resolve, reject) => {
     const response = await fetch('http://localhost:5000/auth/register', {
       method: 'POST',
@@ -73,8 +75,9 @@ const register = (bodyFormData: { email: string; password: string }) => {
   })
 }
 
-const getUser = (token: string) => {
+const getUser = (request : any) => {
   console.log('get user func called')
+  const token = request.token
 
   return new Promise(async (resolve, reject) => {
     console.log('get user func called 2')
@@ -103,8 +106,10 @@ const getUser = (token: string) => {
   })
 }
 
-const deletesLanguages = (email: string, languageIdList: string[]) => {
+const deletesLanguages = (request: any) => {
   return new Promise(async (resolve, reject) => {
+    const email: string = request.email
+    const languageIdList: string[] = request.languageIdList
     console.log('delete language func called 2', email, languageIdList)
 
     try {
@@ -131,7 +136,7 @@ const deletesLanguages = (email: string, languageIdList: string[]) => {
   })
 }
 
-const logOut = () => {
+const logOut = (request: any) => {
   return new Promise(async (resolve, reject) => {
     console.log('log out func called 2')
 
@@ -165,8 +170,10 @@ const logOut = () => {
   })
 }
 
-const addLanguage = (languageData: LanguageData, email: string) => {
+const addLanguage = (request: any) => {
   return new Promise(async (resolve, reject) => {
+    const languageData: LanguageData = request.languageData
+    const email: string = request.email
     console.log('add language func called 2')
 
     try {
@@ -193,8 +200,9 @@ const addLanguage = (languageData: LanguageData, email: string) => {
   })
 }
 
-const getUserLanguages = (email: string) => {
+const getUserLanguages = (request: any) => {
   return new Promise(async (resolve, reject) => {
+    const email = request.email
     console.log('get user language', email)
     const response = await fetch(
       'http://localhost:5000/api/getUserLanguages?' + new URLSearchParams({ email: email }),
@@ -217,68 +225,73 @@ const getUserLanguages = (email: string) => {
   })
 }
 
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  console.log('background received message', request)
-  console.log('URL : ', request.message)
-
-  const langData: LanguageData = {
-    language: '',
-    findedPlaces: [],
-    paragraphLang: false,
-    languageLocation: {
-      localStorage: false,
-      sessionStorage: false,
-      metaTag: false,
-      htmlTag: false,
-      url: false,
-      paragraph: false
-    },
-    accuracy: 'low',
-    realValues: {
-      realLangPath: '',
-      realLangAttr: '',
-      realLangStorage: '',
-      realLangLocalStorage: '',
-      realLangMeta: ''
-    }
+const langData: LanguageData = {
+  language: '',
+  findedPlaces: [],
+  paragraphLang: false,
+  languageLocation: {
+    localStorage: false,
+    sessionStorage: false,
+    metaTag: false,
+    htmlTag: false,
+    url: false,
+    paragraph: false
+  },
+  accuracy: 'low',
+  realValues: {
+    realLangPath: '',
+    realLangAttr: '',
+    realLangStorage: '',
+    realLangLocalStorage: '',
+    realLangMeta: ''
   }
+}
+const storeReturnedValues = (request: any, sendResponse: (response?: any) => void) => {
+  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    const activeTab = tabs[0]
+    if (activeTab && activeTab.id) {
+      chrome.tabs.sendMessage(
+        activeTab.id,
+        { action: 'storeReturnedValues', returnedValues: request.returnedValues },
+        (response) => {
+          sendResponse(response)
+        }
+      )
+    }
+  })
+}
 
+const deleteReturnedValues = (request: any, sendResponse: (response?: any) => void) => {
+  console.log('delete returned çalıştı')
 
-  if (request.message === 'login') {
-    console.log('Login part worked', request.bodyFormData)
+  chrome.tabs.query({ active: true, currentWindow: true }, (tabs: chrome.tabs.Tab[]) => {
+    const activeTab = tabs[0]
+    if (activeTab && activeTab.id) {
+      chrome.tabs.sendMessage(
+        activeTab.id,
+        { action: 'deleteReturnedValues', returnedValues: request.returnedValues },
+        (response) => {
+          sendResponse(response)
+        }
+      )
+    }
+  })
+}
 
-    try {
-      login(request.bodyFormData).then((data) => {
-        sendResponse(data)
+const getReturnedValues = (request: any, sendResponse: (response?: any) => void) => {
+  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    const activeTab = tabs[0]
+    if (activeTab && activeTab.id) {
+      chrome.tabs.sendMessage(activeTab.id, { action: 'getReturnedValues' }, (response) => {
+        sendResponse(response)
       })
-
-      /* sendResponse(data); */
-    } catch (error: any) {
-      console.error('Error during login:', error)
-      sendResponse({ error: error.message })
     }
-
-    // Return true to indicate that the response will be sent asynchronously
-    return true
-  }
-
-  if (request.message === 'getUser') {
-    console.log('get user received from bg')
-    try {
-      getUser(request.token).then((data) => {
-        sendResponse(data)
-      })
-    } catch (error: any) {
-      console.error('Error during login:', error)
-      sendResponse({ error: error.message })
-    }
-
-    return true
-  }
-
-  if (request.message === 'URL-sended') {
+  })
+}
+const urlSendedFunction = (requestUrl: string): Promise<LanguageData> => {
+  return new Promise(async (resolve, reject) => {
     console.log('URL-sended')
-    const newURL: string = request.url
+    const newURL: string = requestUrl
 
     try {
       console.log('trying new tab creation')
@@ -310,7 +323,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                           langData.languageLocation = response.languageLocation
                           langData.accuracy = response.accuracy
                           langData.realValues = response.realValues
-                          sendResponse(langData)
+                          resolve(langData)
 
                           chrome.tabs.remove(tabs[0].id)
                         }
@@ -329,205 +342,98 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     } catch (error) {
       console.log('error while creating new tab', error)
     }
-    return true // Indicate that sendResponse will be called asynchronously
-  } else if (request.message === 'show-language-in-same-page') {
-    console.log('show-language-in-same-page task is working in background.ts')
+    return true
+  })
+}
 
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs: any) => {
-      chrome.tabs.sendMessage(tabs[0].id, { action: 'show-language-in-same-page' }, (response) => {
-        console.log('response from content languages data  : ', response)
-        langData.language = response.language
-        langData.findedPlaces = response.findedPlaces
+const languageCatcherStart = (request: any, sendResponse: (response?: any) => void) => {
+  chrome.tabs.query({ active: true, currentWindow: true }, (tabs: any) => {
+    chrome.tabs.sendMessage(
+      tabs[0].id,
+      { action: 'start-language-catcher', url: request.url },
+      (response) => {
+        console.log('response geldi gözüküyo')
+        console.log('responsee ', response)
+        sendResponse(response)
+      }
+    )
+  })
+}
+const updateProgress = (request: any) => {
+  chrome.runtime.sendMessage({
+    message: 'updateProgress',
+    progress: request.progress
+  })
+}
 
-        if (response.paragraphLang) {
-          langData.paragraphLang = response.paragraphLang
-        }
-        console.log('lang data checker', langData)
-        console.log('lang data checker', langData.findedPlaces)
+const tokenHandlers: {
+  [key: string]: (request: any, sendResponse: (response?: any) => void) => void
+} = {
+  getToken: getToken,
+  getReturnedValues: getReturnedValues,
+  storeReturnedValues: storeReturnedValues,
+  deleteReturnedValues: deleteReturnedValues
+}
 
-        sendResponse(langData)
-      })
+const languageHandlers: {
+  [key: string]: (request: any) => Promise<any>
+} = {
+  getUserLanguages: getUserLanguages,
+  addLanguage: addLanguage,
+  deletesLanguages: deletesLanguages,
+  logOut: logOut
+}
+
+const authHandlers: {
+  [key: string]: (request: any) => Promise<any>
+} = {
+  login: login,
+  register: register,
+  getUser: getUser,
+
+}
+
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  console.log('background received message', request)
+
+  if (tokenHandlers[request.message]) {
+    tokenHandlers[request.message](request, sendResponse)
+    return true
+  } else if (languageHandlers[request.message]) {
+    languageHandlers[request.message](request).then((data) => {
+      sendResponse(data)
     })
     return true
-  } else if (request.action === 'showTable') {
-    console.log('backgronn aldı mesajı')
-  } else if (request.message === 'existUser') {
-    console.log('bg mesajı aldı ', request.user)
-    const user = request.user
-
-    console.log('user : ', user)
-    /* localStorage.setItem('user', JSON.stringify(user)) */
-    chrome.runtime.sendMessage({
-      message: 'existUser',
-      user: request.user
-    })
-
-    chrome.storage.local.set({ userExistence: { message: 'existUser', user: user } })
-    return true
-  } else if (request.message === 'updateProgress') {
-    chrome.runtime.sendMessage({
-      message: 'updateProgress',
-      progress: request.progress
-    })
-
-    return true
-  } else if (request.message === 'loginnn') {
-    console.log('Login part worked', request.bodyFormData)
-
+  } else if (authHandlers[request.message]) {
     try {
-      /*   const response = await fetch('http://localhost:5000/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(request.bodyFormData),
-      });
-
-      const data = await response.json(); */
-      /*   console.log('response from bg', data); */
-      // Send the response back to the popup script
-      /*  sendResponse(data); */
-    } catch (error: any) {
-      console.error('Error during login:', error)
-      sendResponse({ error: error.message })
-    }
-
-    // Return true to indicate that the response will be sent asynchronously
-    return true
-  } else if (request.message === 'register') {
-    console.log('register part worked', request.bodyFormData)
-
-    try {
-      register(request.bodyFormData).then((data) => {
+      authHandlers[request.message](request).then((data) => {
         sendResponse(data)
       })
     } catch (error: any) {
       console.error('Error during login:', error)
       sendResponse({ error: error.message })
     }
-
-    // Return true to indicate that the response will be sent asynchronously
-    return true
-  } else if (request.message === 'getUserrr') {
-    /*     const response = await axios.post('http://localhost:5000/auth/user', {
-      token: request.token
-    })
-
-    sendResponse(response.data) */
-    console.log('get user started', request)
-
-    try {
-      getUser(request.token).then((data) => {
-        sendResponse(data)
-      })
-    } catch (error: any) {
-      console.error('Error during login:', error)
-      sendResponse({ error: error.message })
-    }
-
-    return true
-  } else if (request.message === 'getUserLanguages') {
-    getUserLanguages(request.email).then((data) => {
-      sendResponse(data)
-    })
-    return true
-  } else if (request.message === 'addLanguage') {
-    addLanguage(request.languageData, request.email).then((data) => {
-      sendResponse(data)
-    })
-    return true
-  } else if (request.message === 'deletesLanguages') {
-    console.log('bg aldı language id list', request.languageIdList)
-    deletesLanguages(request.email, request.languageIdList).then((data) => {
-      sendResponse(data)
-    })
-    return true
-  } else if (request.message === 'logOut') {
-    logOut().then((data) => {
-      sendResponse(data)
-    })
-    return true
-  } else if (request.message === 'getToken') {
-    console.log('get token çalıştı')
-
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      const activeTab = tabs[0]
-      if (activeTab && activeTab.id) {
-        chrome.tabs.sendMessage(activeTab.id, { action: 'getToken' }, (response) => {
-          console.log('response from content languages data  : ', response)
-
-          sendResponse(response.token)
-        })
-      }
-    })
-    return true
-  } else if (request.message === 'getReturnedValues') {
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      const activeTab = tabs[0]
-      if (activeTab && activeTab.id) {
-        chrome.tabs.sendMessage(activeTab.id, { action: 'getReturnedValues' }, (response) => {
-          sendResponse(response)
-        })
-      }
-    })
-    return true
-  } else if (request.message === 'storeReturnedValues') {
-    console.log('store returned çalışıt ', request)
-    console.log('object for store returned', request.returnedValues)
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      const activeTab = tabs[0]
-      if (activeTab && activeTab.id) {
-        chrome.tabs.sendMessage(
-          activeTab.id,
-          { action: 'storeReturnedValues', returnedValues: request.returnedValues },
-          (response) => {
-            console.log('bg   responee', response)
-            sendResponse(response)
-          }
-        )
-      }
-    })
-    return true
-  } else if (request.message === 'deleteReturnedValues') {
-    console.log('delete returned çalıştı')
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      const activeTab = tabs[0]
-      if (activeTab && activeTab.id) {
-        chrome.tabs.sendMessage(
-          activeTab.id,
-          { action: 'deleteReturnedValues'},
-          (response) => {
-            console.log('bg   responee', response)
-            sendResponse(response)
-          }
-        )
-      }
-    })
     return true
   }
 
-  if (request.action === 'language-catcher-start') {
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs: any) => {
-      chrome.tabs.sendMessage(
-        tabs[0].id,
-        { action: 'start-language-catcher', url: request.url },
-        (response) => {
-          console.log('response geldi gözüküyo')
-          console.log('responsee ', response)
-          sendResponse(response)
-        }
-      )
+
+
+  if (request.message === 'URL-sended') {
+    urlSendedFunction(request.url).then((data) => {
+      sendResponse(data)
     })
     return true
-    /* 
-    chrome.tabs.query({}, (tabs) => {
-      tabs.forEach(tab => {
-        chrome.tabs.sendMessage(tab.id, {
-          action: 'language-catcher-start',
-          url: request.url
-        });
-      });
-    }); */
+  } 
+  
+  else if (request.message === 'updateProgress') {
+    updateProgress(request)
+    return true
+  }
+
+
+  if (request.action === 'language-catcher-start') {
+    languageCatcherStart(request, sendResponse)
+    return true
   }
   return false
 })

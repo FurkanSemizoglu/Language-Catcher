@@ -77,13 +77,12 @@ console.log('local storage', localStorage.getItem('user'))
 const getTableDatas = async (tokenn: string) => {
   return new Promise(async (resolve, reject) => {
     try {
-      let existValues  :any = []
+      let existValues: any = []
       chrome.runtime.sendMessage({ message: 'getReturnedValues' }, (response) => {
         console.log('response of store returned values', response)
         const storedValues = response
-        existValues = existValues.concat(storedValues);
-        console.log('ex,ist caluesss', existValues)
-
+        existValues = existValues.concat(storedValues)
+        console.log('exist caluesss', existValues)
       })
       token.value = tokenn
       chrome.runtime.sendMessage(
@@ -94,12 +93,12 @@ const getTableDatas = async (tokenn: string) => {
         (response) => {
           console.log('bide repsone var mı ', response)
           console.log('response getr userr', response.user)
-          console.log("ecist values" , existValues);
+          console.log('ecist values', existValues)
           user.value = response.user.email
 
           if (response) {
-            if (existValues && existValues?.length > 0 && existValues !== null) {
-              console.log("buraya niye giridn.");
+            if (existValues && existValues?.length > 0 && existValues !== null && existValues[0] !== "undefined") {
+              console.log('buraya niye giridn.')
               console.log('exist values', existValues)
               console.log('object', JSON.parse(existValues))
               const parsedValues = JSON.parse(existValues)
@@ -147,7 +146,7 @@ const getTableDatas = async (tokenn: string) => {
                 )
               }
 
-              chrome.runtime.sendMessage({message : 'deleteReturnedValues' } , (response) => {
+              chrome.runtime.sendMessage({ message: 'deleteReturnedValues' }, (response) => {
                 console.log('response of store returned values', response)
               })
             } else {
@@ -267,23 +266,21 @@ onMounted(async () => {
         console.log('response of store returned values', response)
         const storedValues = response
         console.log('bura token boşsa ', storedValues)
-        if(storedValues.length === 0){
+        if (storedValues.length === 0 || storedValues === null || storedValues === "undefined") { 
           appReady.value = true
           return
         }
         returnedValues.value = storedValues ? JSON.parse(storedValues) : []
-        console.log("clg", returnedValues.value);
+        console.log('clg', returnedValues.value)
 
         appReady.value = true
         return
       })
     } else if (!userExist.value && token.value !== null) {
-
       console.log('token verisi çalışıt')
       getTableDatas(token.value)
     }
   })
-
 })
 
 const sendUrlToExtension = () => {
@@ -325,7 +322,7 @@ const sendUrlToExtension = () => {
                 languageLocation: element.languageLocation,
                 languageAccuracy: element.languageAccuracy,
                 realLangValues: element.realValues,
-                date: element.date.toString() ,
+                date: element.date.toString(),
                 belongUser: {
                   email: 'Guest',
                   _id: ''
@@ -337,10 +334,13 @@ const sendUrlToExtension = () => {
             loadingButton.value = false
             appReady.value = true
             const sendedReturnedValues = JSON.stringify(returnedValues.value)
-            chrome.runtime.sendMessage({message : 'storeReturnedValues', returnedValues: returnedValues.value } , (response) => {
-              console.log('response of store returned values', response)
-            })
-           /*  localStorage.setItem('returnedValues', JSON.stringify(returnedValues.value)) */
+            chrome.runtime.sendMessage(
+              { message: 'storeReturnedValues', returnedValues: returnedValues.value },
+              (response) => {
+                console.log('response of store returned values', response)
+              }
+            )
+            /*  localStorage.setItem('returnedValues', JSON.stringify(returnedValues.value)) */
             url.value = ''
 
             return
@@ -481,11 +481,16 @@ const deleteItems = async () => {
       return !deleteItemsList.value.includes(value._id)
     })
 
-    localStorage.setItem('returnedValues', JSON.stringify(returnedValues.value))
-    appReady.value = true
-    allItemsSelected.value = false
-    deleteItemsList.value = []
-    return
+    chrome.runtime.sendMessage(
+      { message: 'deleteReturnedValues', returnedValues: returnedValues.value },
+      (response) => {
+        console.log('response of store returned values', response)
+        appReady.value = true
+        allItemsSelected.value = false
+        deleteItemsList.value = []
+        return
+      }
+    )
   }
   appReady.value = false
   console.log('ReturnedValues.value', returnedValues.value)
