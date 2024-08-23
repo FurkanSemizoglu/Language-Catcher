@@ -2,9 +2,6 @@
 import axios from 'axios'
 import { onMounted, ref, watch } from 'vue'
 
-/* import { faAngleDown, faTrashCan, faSliders, faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
-import { faSquareCheck, faSquare } from '@fortawesome/free-regular-svg-icons'; */
-
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { faAngleDown } from '@fortawesome/free-solid-svg-icons'
 import { faSquareCheck } from '@fortawesome/free-regular-svg-icons'
@@ -19,7 +16,6 @@ import LoadingBarCard from './components/LoadingBarCard.vue'
 
 import type { extensionResult, ExtensionResponse as extensionResponse } from './types'
 
-const checkbox = ref<boolean>(false)
 let token = ref<string | null>('')
 const user = ref<string>('')
 const url = ref<string>('')
@@ -63,26 +59,13 @@ watch(
 
 extensionExist.value = true
 
-const appReadyTiming = () => {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      appReady.value = false
-      resolve('success')
-    }, 400)
-  })
-}
-
-console.log('local storage', localStorage.getItem('user'))
-
 const getTableDatas = async (tokenn: string) => {
   return new Promise(async (resolve, reject) => {
     try {
       let existValues: any = []
       chrome.runtime.sendMessage({ message: 'getReturnedValues' }, (response) => {
-        console.log('response of store returned values', response)
         const storedValues = response
         existValues = existValues.concat(storedValues)
-        console.log('exist caluesss', existValues)
       })
       token.value = tokenn
       chrome.runtime.sendMessage(
@@ -91,16 +74,15 @@ const getTableDatas = async (tokenn: string) => {
           token: tokenn
         },
         (response) => {
-          console.log('bide repsone var mı ', response)
-          console.log('response getr userr', response.user)
-          console.log('ecist values', existValues)
           user.value = response.user.email
 
           if (response) {
-            if (existValues && existValues?.length > 0 && existValues !== null && existValues[0] !== "undefined") {
-              console.log('buraya niye giridn.')
-              console.log('exist values', existValues)
-              console.log('object', JSON.parse(existValues))
+            if (
+              existValues &&
+              existValues?.length > 0 &&
+              existValues !== null &&
+              existValues[0] !== 'undefined'
+            ) {
               const parsedValues = JSON.parse(existValues)
               for (let index = 0; index < parsedValues.length; index++) {
                 const addDataLanguage: extensionResponse = {
@@ -116,7 +98,7 @@ const getTableDatas = async (tokenn: string) => {
                   realValues: parsedValues[index].realLangValues,
                   date: parsedValues[index].date
                 }
-                console.log('add data languagea', addDataLanguage)
+               
                 chrome.runtime.sendMessage(
                   {
                     message: 'addLanguage',
@@ -124,7 +106,7 @@ const getTableDatas = async (tokenn: string) => {
                     languageData: addDataLanguage
                   },
                   (response) => {
-                    console.log('response for add DAtaaaS', response)
+                  
                     if (index === parsedValues.length - 1) {
                       chrome.runtime.sendMessage(
                         {
@@ -132,13 +114,13 @@ const getTableDatas = async (tokenn: string) => {
                           email: user.value
                         },
                         (response) => {
-                          console.log('response', response)
+                         
                           returnedValues.value = response
                           tempReturnedValues.value = response
                           loadingButton.value = false
                           url.value = ''
-                          localStorage.removeItem('returnedValues')
-                          console.log('sorted languages', response)
+                       /*    localStorage.removeItem('returnedValues')
+                          console.log('sorted languages', response) */
                         }
                       )
                     }
@@ -146,14 +128,10 @@ const getTableDatas = async (tokenn: string) => {
                 )
               }
 
-              chrome.runtime.sendMessage({ message: 'deleteReturnedValues' }, (response) => {
-                console.log('response of store returned values', response)
-              })
+              chrome.runtime.sendMessage({ message: 'deleteReturnedValues' }, (response) => {})
             } else {
               userExist.value = true
               user.value = response.user.email
-
-              console.log('get userrr', response.user.email)
 
               chrome.runtime.sendMessage(
                 {
@@ -161,14 +139,10 @@ const getTableDatas = async (tokenn: string) => {
                   email: user.value
                 },
                 (response) => {
-                  console.log('get juser languages', response)
                   returnedValues.value = response
                   tempReturnedValues.value = response
-                  console.log('languagesss', response)
 
                   appReady.value = true
-                  console.log('appready.value ', appReady.value)
-                  console.log('temp load', tempLoading.value)
 
                   resolve(returnedValues.value)
                 }
@@ -181,7 +155,6 @@ const getTableDatas = async (tokenn: string) => {
       )
 
       appReady.value = true
-      /*  resolve('success') */
     } catch (error) {
       console.log(error)
       localStorage.removeItem('token')
@@ -192,18 +165,13 @@ const getTableDatas = async (tokenn: string) => {
   })
 }
 
-const existUserhandler = async (email: string) => {
+/* const existUserhandler = async (email: string) => {
   return new Promise(async (resolve, reject) => {
-    /*    const response = await axios.get('http://localhost:5000/api/getAllLanguages') */
+
     const bodyFormData = {
       email: email,
       password: 'Furkan55?'
     }
-    /*    const response = await axios.post('http://localhost:5000/auth/login', bodyFormData, {
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    }) */
 
     chrome.runtime.sendMessage(
       {
@@ -227,57 +195,38 @@ const existUserhandler = async (email: string) => {
           resolve(token.value)
         })
 
-        /*    resolve(response.token) */
+
       }
     )
-
-    /*     console.log('exist user handler', response.data)
-
-
-    localStorage.removeItem('token')
-    console.log('token response ', response.data.token)
-
-    localStorage.setItem('token', response.data.token)
-    token.value = response.data.token */
-
     reject('error')
   })
-}
+} */
 
 const tempLoading = ref<boolean>(true)
 
 onMounted(async () => {
-  /* localStorage.removeItem('token') */
   setTimeout(() => {
     tempLoading.value = false
     console.log('temp load 2', tempLoading.value)
   }, 1000)
 
-  console.log('on MOunted workinggg')
-
   chrome.runtime.sendMessage({ message: 'getToken' }, function (response) {
-    console.log('token value  ee frommm rumtine lisee ', response)
     token.value = response
 
     // burada exist use var mı diye bir kontrol mesajı gönderilebilir varsa localStoragedan token silinir.
     if (token.value === null && !userExist.value) {
-      console.log('token null')
       chrome.runtime.sendMessage({ message: 'getReturnedValues' }, (response) => {
-        console.log('response of store returned values', response)
         const storedValues = response
-        console.log('bura token boşsa ', storedValues)
-        if (storedValues.length === 0 || storedValues === null || storedValues === "undefined") { 
+        if (storedValues.length === 0 || storedValues === null || storedValues === 'undefined') {
           appReady.value = true
           return
         }
         returnedValues.value = storedValues ? JSON.parse(storedValues) : []
-        console.log('clg', returnedValues.value)
 
         appReady.value = true
         return
       })
     } else if (!userExist.value && token.value !== null) {
-      console.log('token verisi çalışıt')
       getTableDatas(token.value)
     }
   })
@@ -302,11 +251,7 @@ const sendUrlToExtension = () => {
       if (chrome.runtime.lastError) {
         console.error(chrome.runtime.lastError.message)
       } else {
-        console.log('Response received:', response)
-
         const resultArray: extensionResponse[] = response
-        console.log('result array', resultArray)
-        console.log('token value', token.value)
         try {
           if (token.value === null) {
             for (let index = 0; index < resultArray.length; index++) {
@@ -340,14 +285,12 @@ const sendUrlToExtension = () => {
                 console.log('response of store returned values', response)
               }
             )
-            /*  localStorage.setItem('returnedValues', JSON.stringify(returnedValues.value)) */
             url.value = ''
 
             return
           } else {
             for (let index = 0; index < resultArray.length; index++) {
               const element = resultArray[index]
-              console.log('element', element)
               chrome.runtime.sendMessage(
                 {
                   message: 'addLanguage',
@@ -355,7 +298,6 @@ const sendUrlToExtension = () => {
                   languageData: element
                 },
                 (response) => {
-                  console.log('response', response)
                   if (index === resultArray.length - 1) {
                     chrome.runtime.sendMessage(
                       {
@@ -363,12 +305,10 @@ const sendUrlToExtension = () => {
                         email: user.value
                       },
                       (response) => {
-                        console.log('response', response)
                         returnedValues.value = response
                         tempReturnedValues.value = response
                         loadingButton.value = false
                         url.value = ''
-                        console.log('sorted languages', response)
                         return
                       }
                     )
@@ -385,9 +325,6 @@ const sendUrlToExtension = () => {
       }
     }
   )
-  /*   console.log('event dispatched')
-  window.dispatchEvent(sendedURL)
-  console.log('event dispatched 2') */
 }
 
 const logout = async () => {
@@ -410,7 +347,6 @@ const sortDate = () => {
     dateClicked.value = false
   }
   returnedValues.value = [...returnedValues.value]
-  console.log('sorted values', returnedValues.value)
 }
 
 const sortUrls = () => {
@@ -451,18 +387,12 @@ const sortUrls = () => {
 }
 
 const deleteItemsFunc = (id: string) => {
-  /*   if(token === null){
-    toast.error('Lütfen giriş yapınız!')
-    return
-  } */
-  console.log('received id ', id)
   if (deleteItemsList.value.includes(id)) {
     deleteItemsList.value = deleteItemsList.value.filter((item) => item !== id)
     console.log(deleteItemsList.value)
     return
   }
   deleteItemsList.value.push(id)
-  console.log('delete items', deleteItemsList.value)
 }
 
 const deleteItems = async () => {
@@ -484,7 +414,6 @@ const deleteItems = async () => {
     chrome.runtime.sendMessage(
       { message: 'deleteReturnedValues', returnedValues: returnedValues.value },
       (response) => {
-        console.log('response of store returned values', response)
         appReady.value = true
         allItemsSelected.value = false
         deleteItemsList.value = []
@@ -493,11 +422,6 @@ const deleteItems = async () => {
     )
   }
   appReady.value = false
-  console.log('ReturnedValues.value', returnedValues.value)
-  console.log('tempReturnedValues.value', tempReturnedValues.value)
-
-  console.log('delete items clicked  ', deleteItemsList.value)
-  console.log('user ', user.value)
   try {
     chrome.runtime.sendMessage(
       {
@@ -506,29 +430,13 @@ const deleteItems = async () => {
         languageIdList: deleteItemsList.value
       },
       (response) => {
-        console.log('response', response)
         returnedValues.value = response
         tempReturnedValues.value = response
-        console.log('returned values', returnedValues.value)
-        console.log('after delete items list ', deleteItemsList.value)
         appReady.value = true
         allItemsSelected.value = false
         deleteItemsList.value = []
       }
     )
-    /*     const response = await axios.delete('http://localhost:5000/api/deletesLanguages', {
-      params: { email: user.value, languageIdList: deleteItemsList.value }
-    })
-
-    console.log('abi gitti artık ', response.data)
-
-    returnedValues.value = response.data
-    tempReturnedValues.value = response.data
-    console.log('returned values', returnedValues.value)
-    console.log('after delete items list ', deleteItemsList.value)
-    appReady.value = true
-    allItemsSelected.value = false
-    deleteItemsList.value = [] */
   } catch (error) {
     console.log(error)
   }
@@ -540,14 +448,10 @@ let oldReturnedValues = ref<extensionResult[]>([])
 oldReturnedValues.value = JSON.parse(JSON.stringify(returnedValues.value))
 
 const searchUrl = () => {
-  console.log('old values', oldReturnedValues.value)
-  console.log('searched url', searchedUrl.value)
   const searchedValues = tempReturnedValues.value.filter((value: any) => {
     return value.domain.includes(searchedUrl.value)
   })
-
   returnedValues.value = searchedValues
-  console.log('searched values', searchedValues)
 }
 
 if (searchedUrl.value === '') {
@@ -563,23 +467,17 @@ const filterAccuracy = () => {
     returnedValues.value = tempReturnedValues.value
     return
   }
-  console.log('hifh ', highAccuracy.value)
 
-  /*  let flag : boolean = false */
   returnedValues.value = tempReturnedValues.value.filter((value: any) => {
     if (highAccuracy.value && value.languageAccuracy === 'high') return true
     if (mediumAccuracy.value && value.languageAccuracy === 'medium') return true
     if (lowAccuracy.value && value.languageAccuracy === 'low') return true
-    /*
-    if(flag) return true; */
+
     return false
   })
-
-  console.log('returned values', returnedValues.value)
 }
 
 import AuthPage from './components/AuthPage.vue'
-import LoginCard from './components/LoginCard.vue'
 import ProfileComponent from './components/ProfileComponent.vue'
 
 watch([highAccuracy, mediumAccuracy, lowAccuracy], filterAccuracy)
@@ -593,12 +491,6 @@ const pageChecker = (isLoggedIn: boolean) => {
   }
 }
 
-const tokenTaken = (tokenn: string) => {
-  // aslında tokenı local storagedan alıyor
-  userExist.value = true
-  extensionExist.value = true
-  token.value = tokenn
-}
 
 const loginText = ref<boolean>(true)
 </script>

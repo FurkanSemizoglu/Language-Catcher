@@ -1,6 +1,6 @@
 console.log('background is running')
 
-import type { LanguageData } from './types'
+import type { bodyFormData, extensionResult, LanguageData } from './types'
 
 let showTable = true
 
@@ -12,8 +12,9 @@ chrome.action.onClicked.addListener((tab) => {
   }
 })
 
-const login = (request:any) => {
-  const bodyFormData : { email: string; password: string } =  request.bodyFormData
+const login = (request: {bodyFormData : bodyFormData}) => {
+  const bodyFormData = request.bodyFormData
+  console.log("body form data", bodyFormData) ;
   return new Promise(async (resolve, reject) => {
     const response = await fetch('http://localhost:5000/auth/login', {
       method: 'POST',
@@ -58,8 +59,8 @@ const getToken = (request: any, sendResponse: (response?: any) => void) => {
   })
 }
 
-const register = (request : any) => {
-  const bodyFormData  : { email: string; password: string } =  request.bodyFormData
+const register = (request: {bodyFormData : bodyFormData}) => {
+  const bodyFormData  = request.bodyFormData
   return new Promise(async (resolve, reject) => {
     const response = await fetch('http://localhost:5000/auth/register', {
       method: 'POST',
@@ -75,9 +76,9 @@ const register = (request : any) => {
   })
 }
 
-const getUser = (request : any) => {
+const getUser = (request: { token: string }) => {
   console.log('get user func called')
-  const token = request.token
+  const { token } = request
 
   return new Promise(async (resolve, reject) => {
     console.log('get user func called 2')
@@ -106,10 +107,11 @@ const getUser = (request : any) => {
   })
 }
 
-const deletesLanguages = (request: any) => {
+const deletesLanguages = (request: { email: string; languageIdList: string[] }) => {
   return new Promise(async (resolve, reject) => {
-    const email: string = request.email
-    const languageIdList: string[] = request.languageIdList
+    const { email, languageIdList } = request
+    /*     const email: string = request.email
+    const languageIdList: string[] = request.languageIdList */
     console.log('delete language func called 2', email, languageIdList)
 
     try {
@@ -170,10 +172,10 @@ const logOut = (request: any) => {
   })
 }
 
-const addLanguage = (request: any) => {
+const addLanguage = (request: { languageData: LanguageData; email: string }) => {
   return new Promise(async (resolve, reject) => {
-    const languageData: LanguageData = request.languageData
-    const email: string = request.email
+    const { languageData, email } = request
+
     console.log('add language func called 2')
 
     try {
@@ -200,7 +202,7 @@ const addLanguage = (request: any) => {
   })
 }
 
-const getUserLanguages = (request: any) => {
+const getUserLanguages = (request: { email: string }) => {
   return new Promise(async (resolve, reject) => {
     const email = request.email
     console.log('get user language', email)
@@ -246,13 +248,17 @@ const langData: LanguageData = {
     realLangMeta: ''
   }
 }
-const storeReturnedValues = (request: any, sendResponse: (response?: any) => void) => {
+const storeReturnedValues = (
+  request: { returnedValues: extensionResult },
+  sendResponse: (response?: any) => void
+) => {
+  const returnedValues: extensionResult = request.returnedValues
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
     const activeTab = tabs[0]
     if (activeTab && activeTab.id) {
       chrome.tabs.sendMessage(
         activeTab.id,
-        { action: 'storeReturnedValues', returnedValues: request.returnedValues },
+        { action: 'storeReturnedValues', returnedValues: returnedValues },
         (response) => {
           sendResponse(response)
         }
@@ -261,15 +267,17 @@ const storeReturnedValues = (request: any, sendResponse: (response?: any) => voi
   })
 }
 
-const deleteReturnedValues = (request: any, sendResponse: (response?: any) => void) => {
-  console.log('delete returned çalıştı')
-
+const deleteReturnedValues = (
+  request: { returnedValues: extensionResult },
+  sendResponse: (response?: any) => void
+) => {
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs: chrome.tabs.Tab[]) => {
     const activeTab = tabs[0]
+    const returnedValues: extensionResult = request.returnedValues
     if (activeTab && activeTab.id) {
       chrome.tabs.sendMessage(
         activeTab.id,
-        { action: 'deleteReturnedValues', returnedValues: request.returnedValues },
+        { action: 'deleteReturnedValues', returnedValues: returnedValues },
         (response) => {
           sendResponse(response)
         }
@@ -290,19 +298,14 @@ const getReturnedValues = (request: any, sendResponse: (response?: any) => void)
 }
 const urlSendedFunction = (requestUrl: string): Promise<LanguageData> => {
   return new Promise(async (resolve, reject) => {
-    console.log('URL-sended')
     const newURL: string = requestUrl
 
     try {
-      console.log('trying new tab creation')
       chrome.windows
         .create({ url: newURL, state: 'minimized' })
         .then((window: chrome.windows.Window) => {
-          console.log('tab created successfully')
           chrome.tabs.onUpdated.addListener(function listener(tabId, changeInfo, tab) {
-            console.log('new window has been triggered')
             if (changeInfo.status === 'complete' && tab.windowId === window.id) {
-              console.log('tab is complete')
               try {
                 chrome.tabs.query({ active: true, windowId: window.id }, (tabs: any) => {
                   if (tabs.length > 0) {
@@ -332,7 +335,7 @@ const urlSendedFunction = (requestUrl: string): Promise<LanguageData> => {
                   }
                 })
 
-                return true // Indicate that sendResponse will be called asynchronously
+                return true
               } catch (error) {
                 console.log('error in background', error)
               }
@@ -346,20 +349,18 @@ const urlSendedFunction = (requestUrl: string): Promise<LanguageData> => {
   })
 }
 
-const languageCatcherStart = (request: any, sendResponse: (response?: any) => void) => {
+const languageCatcherStart = (request: {url : string}, sendResponse: (response?: any) => void) => {
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs: any) => {
     chrome.tabs.sendMessage(
       tabs[0].id,
       { action: 'start-language-catcher', url: request.url },
       (response) => {
-        console.log('response geldi gözüküyo')
-        console.log('responsee ', response)
         sendResponse(response)
       }
     )
   })
 }
-const updateProgress = (request: any) => {
+const updateProgress = (request: {progress : number}) => {
   chrome.runtime.sendMessage({
     message: 'updateProgress',
     progress: request.progress
@@ -389,8 +390,7 @@ const authHandlers: {
 } = {
   login: login,
   register: register,
-  getUser: getUser,
-
+  getUser: getUser
 }
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
@@ -416,20 +416,15 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     return true
   }
 
-
-
   if (request.message === 'URL-sended') {
     urlSendedFunction(request.url).then((data) => {
       sendResponse(data)
     })
     return true
-  } 
-  
-  else if (request.message === 'updateProgress') {
+  } else if (request.message === 'updateProgress') {
     updateProgress(request)
     return true
   }
-
 
   if (request.action === 'language-catcher-start') {
     languageCatcherStart(request, sendResponse)

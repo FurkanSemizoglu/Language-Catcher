@@ -3,9 +3,6 @@ interface Language {
   nativeName: string
 }
 
-
-
-
 interface LanguageData {
   language: string
   findedPlaces: string[]
@@ -242,28 +239,28 @@ const languages: { [key: string]: Language } = {
 }
 
 interface realLangValues {
-  realLangPath: string;
-  realLangAttr: string;
-  realLangStorage: string;
-  realLangLocalStorage: string;
-  realLangMeta: string;
+  realLangPath: string
+  realLangAttr: string
+  realLangStorage: string
+  realLangLocalStorage: string
+  realLangMeta: string
 }
 
 interface urlCardResultProps {
-  email: string;
-  url: string;
-  detectedLanguage: string;
-  detectedPlaces: string[];
-  languageLocation: LanguageLocation;
-  langName: string;
-  langNativeName: string;
-  accuracy: string;
-  id : string;
-  realLangValues: realLangValues;
-  date : Date;
-  index : number;
-  allItemsSelected : boolean;
-  belongUser : string;
+  email: string
+  url: string
+  detectedLanguage: string
+  detectedPlaces: string[]
+  languageLocation: LanguageLocation
+  langName: string
+  langNativeName: string
+  accuracy: string
+  id: string
+  realLangValues: realLangValues
+  date: Date
+  index: number
+  allItemsSelected: boolean
+  belongUser: string
 }
 interface extensionResult {
   _id: string
@@ -277,7 +274,7 @@ interface extensionResult {
   languageAccuracy: string
   realLangValues: realLangValues
   date: string
-  belongUser : {
+  belongUser: {
     email: string
     _id: string
   }
@@ -291,6 +288,18 @@ interface RealValues {
   realLangMeta: string
 }
 
+interface bodyFormData {
+  email: string
+  password: string
+}
 
 export { languages }
-export type { RealValues , LanguageLocation  , LanguageData , ExtensionResponse , urlCardResultProps , extensionResult}
+export type {
+  RealValues,
+  LanguageLocation,
+  LanguageData,
+  ExtensionResponse,
+  urlCardResultProps,
+  extensionResult,
+  bodyFormData
+}
