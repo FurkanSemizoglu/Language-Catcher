@@ -17,7 +17,7 @@ Extension kısmında eklentinin kendisi bulunmaktadır.Nasıl kullanıldığı h
 Projeyi klonlayın
 
 ```bash
-  git clone https://github.com/efilli/language-catcher.git
+  git clone https://github.com/FurkanSemizoglu/Language-Catcher.git
 ```
 
 ### Client
