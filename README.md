@@ -3,6 +3,13 @@
 
 Language Catcher websitelerin dilini detekte etmeye çalışan bir chrome eklentisidir.Bir ya da birden fazla urlin dilini detekte ederek otomasyona yardımcı olur.
 
+## Proje İçeriği
+
+Projenin backend kısmında kullanıcı auth işlemleri vardır.Aynı zamanda aranan urlleri kullanıcılara kaydettiğimiz, sildiğimiz ve kullanıcı verilerini getirdiğimiz kısım vardır.
+
+Projenin client kısmında bir uygulama ui kısmı vardır.Giriş çıkış yaparak kullanılabilir.Url arayabilirsiniz.Bütün istekleri eklenti üzerinden karşılanır.
+
+Extension kısmında eklentinin kendisi bulunmaktadır.Nasıl kullanıldığı hakkında bilgiyi dokümantasyon kısmında ulaşabilirsiniz.
 
 
 ## Bilgisayarınızda Çalıştırın
