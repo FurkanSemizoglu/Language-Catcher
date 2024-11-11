@@ -7,7 +7,8 @@ Language Catcher websitelerin dilini detekte etmeye çalışan bir chrome eklent
 
 
 
-https://github.com/user-attachments/assets/fe7b83aa-38b5-427a-8486-2abb520751a7
+
+https://github.com/user-attachments/assets/6425b684-f638-4b2c-9bdf-7c577b9c6835
 
 
 
